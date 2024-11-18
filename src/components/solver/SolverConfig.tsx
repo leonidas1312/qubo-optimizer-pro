@@ -18,6 +18,19 @@ export const SolverConfig = () => {
 
   return (
     <div className="space-y-6">
+      <section className="text-center mb-16 animate-fade-in-slow">
+        <h1 className="text-5xl font-bold mb-4 gradient-text">
+          Quantum-Inspired Optimization
+        </h1>
+        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          Upload your QUBO matrices and solve complex optimization problems using quantum-inspired algorithms.
+        </p>
+        <div className="flex justify-center gap-4">
+          <Button size="lg">Get Started</Button>
+          <Button size="lg" variant="outline">View Examples</Button>
+        </div>
+      </section>
+
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Solver Configuration</h3>
         
