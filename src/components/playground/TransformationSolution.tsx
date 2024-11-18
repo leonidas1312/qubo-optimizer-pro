@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { HelpTooltip } from "./help/HelpTooltip";
 import { HelpModal } from "./help/HelpModal";
 import { CodeEditor } from "./editor/CodeEditor";
+import { cn } from "@/lib/utils";
 
 export const TransformationSolution = () => {
   const [penaltyParameter, setPenaltyParameter] = useState("1.0");
