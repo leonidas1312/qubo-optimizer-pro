@@ -10,22 +10,26 @@ import Playground from "./pages/Playground";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/solvers" element={<Solvers />} />
-            <Route path="/playground" element={<Playground />} />
-          </Routes>
-          <Toaster />
-          <Sonner />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </React.StrictMode>
-);
+const App = () => {
+  return (
+    <React.StrictMode>
+      <React.Fragment>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/solvers" element={<Solvers />} />
+                <Route path="/playground" element={<Playground />} />
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </React.Fragment>
+    </React.StrictMode>
+  );
+};
 
 export default App;
