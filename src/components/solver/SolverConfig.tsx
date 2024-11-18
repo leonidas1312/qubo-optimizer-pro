@@ -27,9 +27,11 @@ export const SolverConfig = () => {
               <SelectValue placeholder="Select solver type" />
             </SelectTrigger>
             <SelectContent className="bg-card border-muted">
-              <SelectItem value="quantum" className="hover:bg-muted">Quantum</SelectItem>
+              <SelectItem value="simulated-annealing" className="hover:bg-muted">Simulated Annealing</SelectItem>
               <SelectItem value="quantum-inspired" className="hover:bg-muted">Quantum Inspired</SelectItem>
-              <SelectItem value="classical" className="hover:bg-muted">Classical</SelectItem>
+              <SelectItem value="gurobi" className="hover:bg-muted">Gurobi</SelectItem>
+              <SelectItem value="qbsolv" className="hover:bg-muted">QBSolv</SelectItem>
+              <SelectItem value="dwave-sdk" className="hover:bg-muted">D-Wave SDK</SelectItem>
             </SelectContent>
           </Select>
         </div>

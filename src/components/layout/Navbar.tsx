@@ -17,6 +17,9 @@ export const Navbar = () => {
           <Link to="/solvers" className="text-muted-foreground hover:text-foreground transition-colors">
             Solvers
           </Link>
+          <Link to="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
+            Leaderboard
+          </Link>
           <Link to="/examples" className="text-muted-foreground hover:text-foreground transition-colors">
             Examples
           </Link>
