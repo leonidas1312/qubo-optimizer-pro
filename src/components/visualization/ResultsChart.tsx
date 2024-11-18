@@ -1,15 +1,16 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from "@/components/ui/card";
 
-const data = [
-  { iteration: 1, energy: -10 },
-  { iteration: 2, energy: -15 },
-  { iteration: 3, energy: -25 },
-  { iteration: 4, energy: -28 },
-  { iteration: 5, energy: -32 },
-];
+interface OptimizationDataPoint {
+  iteration: number;
+  energy: number;
+}
 
-export const ResultsChart = () => {
+interface ResultsChartProps {
+  data: OptimizationDataPoint[];
+}
+
+export const ResultsChart = ({ data }: ResultsChartProps) => {
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">Optimization Progress</h3>
@@ -25,6 +26,7 @@ export const ResultsChart = () => {
               dataKey="energy"
               stroke="#0FA0CE"
               strokeWidth={2}
+              animationDuration={500}
             />
           </LineChart>
         </ResponsiveContainer>

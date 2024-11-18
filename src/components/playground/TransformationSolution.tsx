@@ -15,6 +15,7 @@ import { HelpTooltip } from "./help/HelpTooltip";
 import { HelpModal } from "./help/HelpModal";
 import { CodeEditor } from "./editor/CodeEditor";
 import { cn } from "@/lib/utils";
+import { ResultsChart } from "../visualization/ResultsChart";
 
 export const TransformationSolution = () => {
   const [penaltyParameter, setPenaltyParameter] = useState("1.0");
@@ -25,6 +26,13 @@ export const TransformationSolution = () => {
   const [solution, setSolution] = useState("");
   const [hasError, setHasError] = useState(false);
   const { toast } = useToast();
+  const [optimizationData, setOptimizationData] = useState([
+    { iteration: 1, energy: -10 },
+    { iteration: 2, energy: -15 },
+    { iteration: 3, energy: -25 },
+    { iteration: 4, energy: -28 },
+    { iteration: 5, energy: -32 },
+  ]);
 
   const handleTransformToQUBO = () => {
     try {
@@ -48,6 +56,17 @@ export const TransformationSolution = () => {
     try {
       // TODO: Implement solver
       setHasError(false);
+      // Simulate optimization progress
+      const newData = [
+        { iteration: 1, energy: Math.random() * -40 },
+        { iteration: 2, energy: Math.random() * -40 },
+        { iteration: 3, energy: Math.random() * -40 },
+        { iteration: 4, energy: Math.random() * -40 },
+        { iteration: 5, energy: Math.random() * -40 },
+      ].sort((a, b) => b.energy - a.energy);
+      
+      setOptimizationData(newData);
+      
       toast({
         title: "Solving QUBO",
         description: "This feature is not yet implemented.",
@@ -183,6 +202,9 @@ export const TransformationSolution = () => {
               className="mt-1"
             />
           </div>
+
+          {/* Visualization */}
+          <ResultsChart data={optimizationData} />
         </div>
       </Card>
     </div>
