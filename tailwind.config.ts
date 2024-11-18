@@ -25,11 +25,11 @@ export default {
         background: "#1A1F2C",
         foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "#9b87f5",
+          DEFAULT: "#0EA5E9",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#7E69AB",
+          DEFAULT: "#1EAEDB",
           foreground: "#FFFFFF",
         },
         destructive: {
@@ -38,10 +38,10 @@ export default {
         },
         muted: {
           DEFAULT: "#2A2F3C",
-          foreground: "#E5DEFF",
+          foreground: "#E1EFFE",
         },
         accent: {
-          DEFAULT: "#6E59A5",
+          DEFAULT: "#0284C7",
           foreground: "#FFFFFF",
         },
         card: {
