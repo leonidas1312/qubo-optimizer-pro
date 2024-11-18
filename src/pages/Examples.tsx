@@ -16,12 +16,12 @@ const Examples = () => {
             <CardDescription>Optimizing delivery routes with time constraints</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>The VRPTW extends the classic VRP by adding time windows during which each customer must be served. Each customer <InlineMath>i</InlineMath> has a time window <InlineMath>[a_i, b_i]</InlineMath> and service time <InlineMath>s_i</InlineMath>.</p>
+            <p>The VRPTW extends the classic VRP by adding time windows during which each customer <InlineMath>{"i"}</InlineMath> has a time window <InlineMath>{"[a_i, b_i]"}</InlineMath> and service time <InlineMath>{"s_i"}</InlineMath>.</p>
             
             <div className="my-4">
               <h4 className="font-semibold mb-2">Mathematical Formulation:</h4>
-              <BlockMath>{`\\min \\sum_{k \\in K} \\sum_{(i,j) \\in A} c_{ij} x_{ijk}`}</BlockMath>
-              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>x_{ijk}</InlineMath> is 1 if vehicle k travels from i to j, and 0 otherwise.</p>
+              <BlockMath>{"\\min \\sum_{k \\in K} \\sum_{(i,j) \\in A} c_{ij} x_{ij}^k"}</BlockMath>
+              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>{"x_{ij}^k"}</InlineMath> is 1 if vehicle k travels from i to j, and 0 otherwise.</p>
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
@@ -47,8 +47,8 @@ const Examples = () => {
             
             <div className="my-4">
               <h4 className="font-semibold mb-2">Mathematical Formulation:</h4>
-              <BlockMath>{`\\min \\sum_{t \\in T} \\sum_{p \\in P} c_{tp} x_{tp}`}</BlockMath>
-              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>x_{tp}</InlineMath> is 1 if tail t is assigned to path p, and 0 otherwise.</p>
+              <BlockMath>{"\\min \\sum_{t \\in T} \\sum_{p \\in P} c_{tp} x_{tp}"}</BlockMath>
+              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>{"x_{tp}"}</InlineMath> is 1 if tail t is assigned to path p, and 0 otherwise.</p>
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
@@ -74,8 +74,8 @@ const Examples = () => {
             
             <div className="my-4">
               <h4 className="font-semibold mb-2">Mathematical Formulation:</h4>
-              <BlockMath>{`\\min \\sum_{f \\in F} \\sum_{g \\in G} w_{fg} x_{fg}`}</BlockMath>
-              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>x_{fg}</InlineMath> is 1 if flight f is assigned to gate g, and 0 otherwise.</p>
+              <BlockMath>{"\\min \\sum_{f \\in F} \\sum_{g \\in G} w_{fg} x_{fg}"}</BlockMath>
+              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>{"x_{fg}"}</InlineMath> is 1 if flight f is assigned to gate g, and 0 otherwise.</p>
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
@@ -101,8 +101,8 @@ const Examples = () => {
             
             <div className="my-4">
               <h4 className="font-semibold mb-2">Mathematical Formulation:</h4>
-              <BlockMath>{`\\min C_{max} = \\max_{j \\in J} C_j`}</BlockMath>
-              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>C_j</InlineMath> is the completion time of job j.</p>
+              <BlockMath>{"\\min C_{max} = \\max_{j \\in J} C_j"}</BlockMath>
+              <p className="text-sm text-muted-foreground mt-2">Where <InlineMath>{"C_j"}</InlineMath> is the completion time of job j.</p>
             </div>
 
             <div className="bg-muted p-4 rounded-lg">
