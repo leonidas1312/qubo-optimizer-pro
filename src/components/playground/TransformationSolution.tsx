@@ -10,8 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { HelpTooltip } from "./help/HelpTooltip";
+import { HelpModal } from "./help/HelpModal";
+import { CodeEditor } from "./editor/CodeEditor";
 
 export const TransformationSolution = () => {
   const [penaltyParameter, setPenaltyParameter] = useState("1.0");
@@ -20,32 +22,64 @@ export const TransformationSolution = () => {
   const [iterations, setIterations] = useState("1000");
   const [temperature, setTemperature] = useState("0.1");
   const [solution, setSolution] = useState("");
+  const [hasError, setHasError] = useState(false);
   const { toast } = useToast();
 
   const handleTransformToQUBO = () => {
-    // TODO: Implement QUBO transformation
-    toast({
-      title: "Transforming to QUBO",
-      description: "This feature is not yet implemented.",
-    });
+    try {
+      // TODO: Implement QUBO transformation
+      setHasError(false);
+      toast({
+        title: "Transforming to QUBO",
+        description: "This feature is not yet implemented.",
+      });
+    } catch (error) {
+      setHasError(true);
+      toast({
+        title: "Error",
+        description: "Failed to transform to QUBO format",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSolve = () => {
-    // TODO: Implement solver
-    toast({
-      title: "Solving QUBO",
-      description: "This feature is not yet implemented.",
-    });
+    try {
+      // TODO: Implement solver
+      setHasError(false);
+      toast({
+        title: "Solving QUBO",
+        description: "This feature is not yet implemented.",
+      });
+    } catch (error) {
+      setHasError(true);
+      toast({
+        title: "Error",
+        description: "Failed to solve QUBO",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Transform & Solve</h2>
+        <HelpModal />
+      </div>
+
       {/* Transformation Controls */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Transform to QUBO</h3>
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          Transform to QUBO
+          <HelpTooltip content="Convert your optimization problem into QUBO format" />
+        </h3>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="penalty">Penalty Parameter</Label>
+            <Label htmlFor="penalty" className="flex items-center">
+              Penalty Parameter
+              <HelpTooltip content="Higher values enforce constraints more strictly" />
+            </Label>
             <Input
               id="penalty"
               type="number"
@@ -53,7 +87,7 @@ export const TransformationSolution = () => {
               onChange={(e) => setPenaltyParameter(e.target.value)}
               step="0.1"
               min="0"
-              className="mt-1"
+              className={cn("mt-1", hasError && "border-destructive")}
             />
           </div>
           <Button onClick={handleTransformToQUBO} className="w-full">
@@ -61,13 +95,11 @@ export const TransformationSolution = () => {
           </Button>
           <div>
             <Label htmlFor="qubo-matrix">QUBO Matrix</Label>
-            <Textarea
-              id="qubo-matrix"
+            <CodeEditor
               value={quboMatrix}
-              readOnly
-              className="mt-1 font-mono"
-              rows={6}
-              placeholder="QUBO matrix will appear here..."
+              onChange={setQuboMatrix}
+              error={hasError}
+              className="mt-1"
             />
           </div>
         </div>
@@ -75,10 +107,16 @@ export const TransformationSolution = () => {
 
       {/* Solution Controls */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Solve QUBO</h3>
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          Solve QUBO
+          <HelpTooltip content="Configure and run the QUBO solver" />
+        </h3>
         <div className="space-y-4">
           <div>
-            <Label>Solver Algorithm</Label>
+            <Label className="flex items-center">
+              Solver Algorithm
+              <HelpTooltip content="Choose the algorithm to solve your QUBO problem" />
+            </Label>
             <Select
               value={selectedAlgorithm}
               onValueChange={setSelectedAlgorithm}
@@ -100,7 +138,10 @@ export const TransformationSolution = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="iterations">Iterations</Label>
+              <Label htmlFor="iterations" className="flex items-center">
+                Iterations
+                <HelpTooltip content="Number of iterations to run the solver" />
+              </Label>
               <Input
                 id="iterations"
                 type="number"
@@ -112,7 +153,10 @@ export const TransformationSolution = () => {
               />
             </div>
             <div>
-              <Label htmlFor="temperature">Temperature</Label>
+              <Label htmlFor="temperature" className="flex items-center">
+                Temperature
+                <HelpTooltip content="Controls the exploration vs exploitation trade-off" />
+              </Label>
               <Input
                 id="temperature"
                 type="number"
@@ -131,13 +175,11 @@ export const TransformationSolution = () => {
 
           <div>
             <Label htmlFor="solution">Solution</Label>
-            <Textarea
-              id="solution"
+            <CodeEditor
               value={solution}
-              readOnly
-              className="mt-1 font-mono"
-              rows={6}
-              placeholder="Solution will appear here..."
+              onChange={setSolution}
+              error={hasError}
+              className="mt-1"
             />
           </div>
         </div>
