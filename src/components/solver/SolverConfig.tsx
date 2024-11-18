@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { SolverInfo } from "./SolverInfo";
 
 export const SolverConfig = () => {
   const [solver, setSolver] = useState("simulated-annealing");
@@ -56,8 +55,6 @@ export const SolverConfig = () => {
           <Button className="w-full">Run Solver</Button>
         </div>
       </Card>
-
-      <SolverInfo selectedSolver={solver} />
     </div>
   );
 };
