@@ -23,13 +23,13 @@ export const SolverConfig = () => {
         <div className="space-y-2">
           <Label>Solver Type</Label>
           <Select value={solver} onValueChange={setSolver}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full bg-background border-muted">
               <SelectValue placeholder="Select solver type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="quantum">Quantum</SelectItem>
-              <SelectItem value="quantum-inspired">Quantum Inspired</SelectItem>
-              <SelectItem value="classical">Classical</SelectItem>
+            <SelectContent className="bg-card border-muted">
+              <SelectItem value="quantum" className="hover:bg-muted">Quantum</SelectItem>
+              <SelectItem value="quantum-inspired" className="hover:bg-muted">Quantum Inspired</SelectItem>
+              <SelectItem value="classical" className="hover:bg-muted">Classical</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -42,6 +42,7 @@ export const SolverConfig = () => {
             min={10}
             max={1000}
             step={10}
+            className="my-4"
           />
           <span className="text-sm text-muted-foreground">
             {iterations[0]} iterations
