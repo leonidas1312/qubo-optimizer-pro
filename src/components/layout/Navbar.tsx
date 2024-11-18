@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Code2, BarChart2, Settings } from "lucide-react";
+import { Code2, Settings } from "lucide-react";
 
 export const Navbar = () => {
   return (
@@ -20,8 +20,8 @@ export const Navbar = () => {
           <Link to="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
             Leaderboard
           </Link>
-          <Link to="/examples" className="text-muted-foreground hover:text-foreground transition-colors">
-            Examples
+          <Link to="/playground" className="text-muted-foreground hover:text-foreground transition-colors">
+            Playground
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">
