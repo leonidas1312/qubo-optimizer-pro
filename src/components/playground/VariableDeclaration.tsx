@@ -15,16 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { VariableForm } from "./variable/VariableForm";
 
 interface Variable {
   id: string;
@@ -58,6 +51,20 @@ export const VariableDeclaration = ({ variables, setVariables }: VariableDeclara
     });
   };
 
+  const handleEditVariable = (variable: Omit<Variable, "id">) => {
+    if (editingVariable) {
+      const updatedVariables = variables.map((v) =>
+        v.id === editingVariable.id ? { ...variable, id: editingVariable.id } : v
+      );
+      setVariables(updatedVariables);
+      setEditingVariable(null);
+      toast({
+        title: "Variable updated",
+        description: `Variable ${variable.name} has been updated successfully.`,
+      });
+    }
+  };
+
   const handleDeleteVariable = (id: string) => {
     setVariables(variables.filter((v) => v.id !== id));
     toast({
@@ -82,12 +89,27 @@ export const VariableDeclaration = ({ variables, setVariables }: VariableDeclara
               <DialogTitle>Add New Variable</DialogTitle>
             </DialogHeader>
             <VariableForm
-              onSubmit={(variable) => handleAddVariable(variable)}
-              initialData={editingVariable}
+              onSubmit={handleAddVariable}
+              onClose={() => setIsDialogOpen(false)}
             />
           </DialogContent>
         </Dialog>
       </div>
+
+      <Dialog open={!!editingVariable} onOpenChange={(open) => !open && setEditingVariable(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Variable</DialogTitle>
+          </DialogHeader>
+          {editingVariable && (
+            <VariableForm
+              initialData={editingVariable}
+              onSubmit={handleEditVariable}
+              onClose={() => setEditingVariable(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="border rounded-lg">
         <Table>
@@ -129,93 +151,5 @@ export const VariableDeclaration = ({ variables, setVariables }: VariableDeclara
         </Table>
       </div>
     </div>
-  );
-};
-
-interface VariableFormProps {
-  onSubmit: (variable: Omit<Variable, "id">) => void;
-  initialData?: Variable | null;
-}
-
-const VariableForm = ({ onSubmit, initialData }: VariableFormProps) => {
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [type, setType] = useState<Variable["type"]>(initialData?.type ?? "binary");
-  const [lowerBound, setLowerBound] = useState<string>(
-    initialData?.lowerBound?.toString() ?? ""
-  );
-  const [upperBound, setUpperBound] = useState<string>(
-    initialData?.upperBound?.toString() ?? ""
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit({
-      name,
-      type,
-      lowerBound: lowerBound ? Number(lowerBound) : undefined,
-      upperBound: upperBound ? Number(upperBound) : undefined,
-    });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium">
-          Variable Name
-        </label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="type" className="text-sm font-medium">
-          Variable Type
-        </label>
-        <Select value={type} onValueChange={(value: Variable["type"]) => setType(value)}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="binary">Binary</SelectItem>
-            <SelectItem value="integer">Integer</SelectItem>
-            <SelectItem value="continuous">Continuous</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label htmlFor="lowerBound" className="text-sm font-medium">
-            Lower Bound
-          </label>
-          <Input
-            id="lowerBound"
-            type="number"
-            value={lowerBound}
-            onChange={(e) => setLowerBound(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="upperBound" className="text-sm font-medium">
-            Upper Bound
-          </label>
-          <Input
-            id="upperBound"
-            type="number"
-            value={upperBound}
-            onChange={(e) => setUpperBound(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <Button type="submit" className="w-full">
-        {initialData ? "Update" : "Add"} Variable
-      </Button>
-    </form>
   );
 };
