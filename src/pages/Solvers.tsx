@@ -46,6 +46,44 @@ const quantumInspiredInfo = [
   }
 ];
 
+const tabuSearchInfo = [
+  {
+    title: "Overview",
+    description: "A metaheuristic search method that uses memory structures to enhance the performance of a local search method by avoiding previously visited solutions.",
+  },
+  {
+    title: "Key Features",
+    description: "• Tabu list maintenance\n• Aspiration criteria\n• Short and long-term memory\n• Intelligent exploration",
+  },
+  {
+    title: "Mathematical Foundation",
+    description: "Uses neighborhood search with memory structures to guide the search process and avoid cycling: S* = arg min{f(s) | s ∈ N(x) - T}",
+  },
+  {
+    title: "Applications",
+    description: "• Production Scheduling\n• Vehicle Routing\n• Network Design\n• Resource Allocation",
+  }
+];
+
+const geneticAlgorithmInfo = [
+  {
+    title: "Overview",
+    description: "A nature-inspired optimization algorithm that mimics the process of natural selection and genetic evolution to find optimal solutions.",
+  },
+  {
+    title: "Key Features",
+    description: "• Population-based search\n• Natural selection\n• Crossover operations\n• Mutation mechanisms",
+  },
+  {
+    title: "Mathematical Foundation",
+    description: "Uses evolutionary operators and fitness functions to evolve solutions: P(t+1) = Selection(Crossover(Mutation(P(t))))",
+  },
+  {
+    title: "Applications",
+    description: "• Feature Selection\n• Neural Network Training\n• Circuit Design\n• Timetabling Problems",
+  }
+];
+
 const Solvers = () => {
   return (
     <DashboardLayout>
@@ -55,8 +93,7 @@ const Solvers = () => {
             <h2 className="text-3xl font-bold mb-8 gradient-text">Simulated Annealing</h2>
             <Carousel className="w-full" opts={{ 
               align: "start",
-              containScroll: false,
-              dragFree: false
+              containScroll: "trimSnaps"
             }}>
               <CarouselContent>
                 {simulatedAnnealingInfo.map((info, index) => (
@@ -77,11 +114,52 @@ const Solvers = () => {
             <h2 className="text-3xl font-bold mb-8 gradient-text">Quantum-Inspired Optimization</h2>
             <Carousel className="w-full" opts={{ 
               align: "start",
-              containScroll: false,
-              dragFree: false
+              containScroll: "trimSnaps"
             }}>
               <CarouselContent>
                 {quantumInspiredInfo.map((info, index) => (
+                  <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
+                    <AlgorithmCard
+                      title={info.title}
+                      description={info.description}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </section>
+
+          <section>
+            <h2 className="text-3xl font-bold mb-8 gradient-text">Tabu Search</h2>
+            <Carousel className="w-full" opts={{ 
+              align: "start",
+              containScroll: "trimSnaps"
+            }}>
+              <CarouselContent>
+                {tabuSearchInfo.map((info, index) => (
+                  <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
+                    <AlgorithmCard
+                      title={info.title}
+                      description={info.description}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </section>
+
+          <section>
+            <h2 className="text-3xl font-bold mb-8 gradient-text">Genetic Algorithms</h2>
+            <Carousel className="w-full" opts={{ 
+              align: "start",
+              containScroll: "trimSnaps"
+            }}>
+              <CarouselContent>
+                {geneticAlgorithmInfo.map((info, index) => (
                   <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
                     <AlgorithmCard
                       title={info.title}
