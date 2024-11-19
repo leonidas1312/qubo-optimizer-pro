@@ -2,7 +2,13 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { HelpTooltip } from "@/components/playground/help/HelpTooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface AlgorithmParametersProps {
   solver: string;
@@ -120,10 +126,19 @@ export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmPara
       <div className="space-y-6">
         {currentParams.map((param) => (
           <div key={param.name} className="space-y-2">
-            <Label className="flex items-center">
-              {param.label}
-              <HelpTooltip content={param.tooltip} />
-            </Label>
+            <div className="flex items-center gap-2">
+              <Label>{param.label}</Label>
+              <TooltipProvider delayDuration={500}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">{param.tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <div className="flex gap-4 items-center">
               <Slider
                 defaultValue={[param.defaultValue]}

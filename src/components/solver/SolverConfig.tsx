@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { AlgorithmParameters } from "./AlgorithmParameters";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const SolverConfig = () => {
   const [solver, setSolver] = useState("simulated-annealing");
@@ -41,12 +41,12 @@ export const SolverConfig = () => {
               <SelectTrigger className="w-full bg-background border-muted">
                 <SelectValue placeholder="Select solver type" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-muted">
-                <SelectItem value="simulated-annealing" className="hover:bg-muted">Simulated Annealing</SelectItem>
-                <SelectItem value="quantum-inspired" className="hover:bg-muted">Quantum Inspired</SelectItem>
-                <SelectItem value="gurobi" className="hover:bg-muted">Gurobi</SelectItem>
-                <SelectItem value="qbsolv" className="hover:bg-muted">QBSolv</SelectItem>
-                <SelectItem value="dwave-sdk" className="hover:bg-muted">D-Wave SDK</SelectItem>
+              <SelectContent>
+                <SelectItem value="simulated-annealing">Simulated Annealing</SelectItem>
+                <SelectItem value="quantum-inspired">Quantum Inspired</SelectItem>
+                <SelectItem value="gurobi">Gurobi</SelectItem>
+                <SelectItem value="qbsolv">QBSolv</SelectItem>
+                <SelectItem value="dwave-sdk">D-Wave SDK</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -57,7 +57,7 @@ export const SolverConfig = () => {
           />
 
           <Button 
-            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800" 
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white" 
             onClick={handleRunSolver}
           >
             Run Solver
