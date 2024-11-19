@@ -18,27 +18,27 @@ const Playground = () => {
 
   return (
     <DashboardLayout>
-      <section className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8 gradient-text">Optimization Playground</h1>
         
         <TemplateSelector onTemplateSelect={handleTemplateSelect} />
         
-        <div className="grid lg:grid-cols-2 gap-8">
-          <section className="flex flex-col gap-8">
+        <section className="grid lg:grid-cols-2 gap-8">
+          <aside className="space-y-8">
             <ConstraintsInput 
               constraints={constraints}
               setConstraints={setConstraints}
             />
             <MatrixUpload />
-          </section>
+          </aside>
           
-          <section className="flex flex-col gap-8">
+          <article className="space-y-8">
             <TransformationSolution />
             <SolverConfig />
             <ResultsChart />
-          </section>
-        </div>
-      </section>
+          </article>
+        </section>
+      </main>
     </DashboardLayout>
   );
 };
