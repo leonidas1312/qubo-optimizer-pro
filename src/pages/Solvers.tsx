@@ -1,7 +1,8 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { AlgorithmCard } from "@/components/solver/AlgorithmCard";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 const algorithms = {
   "quantum-inspired": {
@@ -61,33 +62,77 @@ const algorithms = {
   }
 };
 
+const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
+  return (
+    <Card className="group relative p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer overflow-hidden">
+      <div className="space-y-4">
+        <h3 className="text-2xl font-bold">{data.title}</h3>
+        <p className="text-muted-foreground">{data.description}</p>
+        
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="space-y-6">
+            <div className="flex flex-wrap gap-2">
+              {data.features.map((feature: string, index: number) => (
+                <Badge key={index} variant="secondary">
+                  {feature}
+                </Badge>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Implementation Details</h4>
+                <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                  {data.technicalDetails.implementation.map((detail: string, index: number) => (
+                    <li key={index}>{detail}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Parameters</h4>
+                <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+                  {data.technicalDetails.parameters.map((param: string, index: number) => (
+                    <li key={index}>{param}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Mathematical Formulation</h4>
+                <div className="p-4 bg-muted rounded-md">
+                  <InlineMath>{data.formula}</InlineMath>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Example</h4>
+                <pre className="p-4 bg-muted rounded-md whitespace-pre-wrap text-sm">
+                  {data.example}
+                </pre>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Computational Complexity</h4>
+                <p className="text-muted-foreground">{data.technicalDetails.complexity}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 const Solvers = () => {
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("quantum-inspired");
-
-  const algorithmData = algorithms[selectedAlgorithm as keyof typeof algorithms];
-
   return (
     <DashboardLayout>
       <div className="container py-8 max-w-7xl mx-auto">
-        <div className="flex flex-col gap-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold">Optimization Algorithms</h1>
-            <div className="w-[250px]">
-              <Select value={selectedAlgorithm} onValueChange={setSelectedAlgorithm}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select algorithm" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="quantum-inspired">Quantum-Inspired Optimization</SelectItem>
-                  <SelectItem value="simulated-annealing">Simulated Annealing</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="w-full">
-            <AlgorithmCard {...algorithmData} />
-          </div>
+        <h1 className="text-4xl font-bold mb-8">Optimization Algorithms</h1>
+        <div className="grid gap-8">
+          {Object.entries(algorithms).map(([key, data]) => (
+            <AlgorithmCard key={key} algorithm={key} data={data} />
+          ))}
         </div>
       </div>
     </DashboardLayout>
