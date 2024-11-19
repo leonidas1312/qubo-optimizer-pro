@@ -1,117 +1,64 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { MatrixUpload } from "@/components/upload/MatrixUpload";
-import { SolverConfig } from "@/components/solver/SolverConfig";
-import { ResultsChart } from "@/components/visualization/ResultsChart";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Cpu, Zap, Target } from "lucide-react";
 
 const Index = () => {
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/playground");
+  };
 
   return (
     <DashboardLayout>
       <div className="max-w-[1400px] mx-auto">
-        <section className="text-center mb-16 animate-fade-in-slow">
-          <h1 className="text-5xl font-bold mb-4 gradient-text">
-            Quantum-Inspired Optimization
+        <section className="min-h-[80vh] flex flex-col items-center justify-center text-center animate-fade-in-slow">
+          <h1 className="text-6xl font-bold mb-6 gradient-text leading-tight max-w-4xl">
+            Quantum-Inspired Optimization for Complex Problems
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Upload your QUBO matrices and solve complex optimization problems using quantum-inspired algorithms.
+          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+            Transform your complex optimization challenges into solutions using our advanced QUBO solver platform. Harness the power of quantum-inspired algorithms for real-world applications.
           </p>
-          <div className="flex justify-center gap-4">
-            <Button size="lg">Get Started</Button>
-            <Button size="lg" variant="outline">View Examples</Button>
-          </div>
+          <Button onClick={handleGetStarted} size="lg" className="group">
+            Start Optimizing
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </section>
 
-        <div className="grid gap-8 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-8">
-              <MatrixUpload />
-              <SolverConfig />
+        <section className="py-24 animate-fade-in">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
+              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
+                <Cpu className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Quantum-Inspired Algorithms</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Leverage advanced optimization techniques inspired by quantum computing principles to solve complex problems efficiently.
+              </p>
             </div>
-            <ResultsChart />
-          </div>
 
-          {selectedAlgorithm && (
-            <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-4">Algorithm Parameters</h2>
-              {selectedAlgorithm === "simulated-annealing" && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Simulated Annealing Parameters</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Initial Temperature</Label>
-                      <Input type="number" placeholder="1.0" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Cooling Rate</Label>
-                      <Input type="number" placeholder="0.95" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Iterations</Label>
-                      <Input type="number" placeholder="1000" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Min Temperature</Label>
-                      <Input type="number" placeholder="0.01" />
-                    </div>
-                  </div>
-                </div>
-              )}
-              {selectedAlgorithm === "quantum-inspired" && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Quantum-Inspired Parameters</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Population Size</Label>
-                      <Input type="number" placeholder="100" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Mutation Rate</Label>
-                      <Slider defaultValue={[0.1]} max={1} step={0.01} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Crossover Rate</Label>
-                      <Slider defaultValue={[0.8]} max={1} step={0.01} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Generations</Label>
-                      <Input type="number" placeholder="50" />
-                    </div>
-                  </div>
-                </div>
-              )}
-              {selectedAlgorithm === "tabu-search" && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Tabu Search Parameters</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Tabu List Size</Label>
-                      <Input type="number" placeholder="10" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Max Iterations</Label>
-                      <Input type="number" placeholder="1000" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Aspiration Value</Label>
-                      <Input type="number" placeholder="100" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Neighborhood Size</Label>
-                      <Input type="number" placeholder="20" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </Card>
-          )}
-        </div>
+            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
+              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
+                <Zap className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Lightning-Fast Solutions</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Get rapid results with our optimized solvers, designed to handle large-scale optimization problems with ease.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
+              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
+                <Target className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Precise Results</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Achieve optimal solutions with our high-precision QUBO solvers, perfect for complex optimization challenges.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </DashboardLayout>
   );
