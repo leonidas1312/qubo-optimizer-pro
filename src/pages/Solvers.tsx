@@ -1,7 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlgorithmCard } from "@/components/solver/AlgorithmCard";
-import { Card } from "@/components/ui/card";
 
 const Solvers = () => {
   return (
@@ -9,7 +7,7 @@ const Solvers = () => {
       <div className="container py-8 max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Optimization Algorithms</h1>
         
-        <div className="grid gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <AlgorithmCard
             title="Quantum-Inspired Optimization"
             description="A hybrid quantum-classical approach that combines variational quantum circuits with reinforcement learning for solving QUBO problems efficiently."
