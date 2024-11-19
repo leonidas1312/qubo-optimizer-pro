@@ -55,7 +55,8 @@ const Solvers = () => {
             <h2 className="text-3xl font-bold mb-8 gradient-text">Simulated Annealing</h2>
             <Carousel opts={{ 
               align: "start",
-              slidesToScroll: 1
+              slidesToScroll: 1,
+              containScroll: "trimSnaps"
             }}>
               <CarouselContent>
                 {simulatedAnnealingInfo.map((info, index) => (
@@ -76,7 +77,8 @@ const Solvers = () => {
             <h2 className="text-3xl font-bold mb-8 gradient-text">Quantum-Inspired Optimization</h2>
             <Carousel opts={{ 
               align: "start",
-              slidesToScroll: 1
+              slidesToScroll: 1,
+              containScroll: "trimSnaps"
             }}>
               <CarouselContent>
                 {quantumInspiredInfo.map((info, index) => (
