@@ -29,8 +29,8 @@ export const TemplateSelector = ({ onTemplateSelect }: TemplateSelectorProps) =>
   };
 
   return (
-    <Card className="p-4 mb-6">
-      <div className="flex items-center gap-4">
+    <Card className="mb-8">
+      <div className="flex items-center gap-4 p-6">
         <Select onValueChange={handleTemplateSelect}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Select template" />
