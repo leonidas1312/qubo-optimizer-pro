@@ -65,7 +65,7 @@ const algorithms = {
 const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
   return (
     <div className="group">
-      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:shadow-2xl cursor-pointer overflow-hidden bg-card group-hover:fixed group-hover:inset-x-[15%] group-hover:inset-y-[10%] group-hover:z-50">
+      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:shadow-2xl cursor-pointer overflow-y-auto bg-card group-hover:fixed group-hover:inset-x-[15%] group-hover:inset-y-[10%] group-hover:z-50 max-h-[80vh]">
         <div className="space-y-4">
           <h3 className="text-2xl font-bold">{data.title}</h3>
           
@@ -84,7 +84,7 @@ const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) =>
           </p>
           
           {/* Expanded Content - Visible on Hover */}
-          <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-[2000px] transition-all duration-500 ease-in-out">
+          <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-full transition-all duration-500 ease-in-out">
             <div className="grid grid-cols-2 gap-8 pt-4">
               <div className="space-y-6">
                 <div>
