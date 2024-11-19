@@ -64,13 +64,28 @@ const algorithms = {
 
 const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
   return (
-    <Card className="group relative p-6 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl cursor-pointer overflow-hidden">
+    <Card className="group relative p-6 transition-all duration-500 ease-in-out hover:scale-110 hover:shadow-xl cursor-pointer overflow-hidden bg-card">
       <div className="space-y-4">
         <h3 className="text-2xl font-bold">{data.title}</h3>
-        <p className="text-muted-foreground">{data.description}</p>
         
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="space-y-6">
+        {/* Key Points - Always Visible */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {data.features.slice(0, 2).map((feature: string, index: number) => (
+            <Badge key={index} variant="secondary" className="text-sm">
+              {feature}
+            </Badge>
+          ))}
+        </div>
+        
+        {/* Condensed Description - Always Visible */}
+        <p className="text-muted-foreground text-sm line-clamp-2">
+          {data.description}
+        </p>
+        
+        {/* Expanded Content - Visible on Hover */}
+        <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-[2000px] transition-all duration-500 ease-in-out">
+          <div className="space-y-6 pt-4">
+            {/* All Features */}
             <div className="flex flex-wrap gap-2">
               {data.features.map((feature: string, index: number) => (
                 <Badge key={index} variant="secondary">
@@ -129,7 +144,7 @@ const Solvers = () => {
     <DashboardLayout>
       <div className="container py-8 max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">Optimization Algorithms</h1>
-        <div className="grid gap-8">
+        <div className="grid gap-8 md:grid-cols-2">
           {Object.entries(algorithms).map(([key, data]) => (
             <AlgorithmCard key={key} algorithm={key} data={data} />
           ))}
