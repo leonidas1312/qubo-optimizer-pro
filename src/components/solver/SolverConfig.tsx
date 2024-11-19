@@ -8,12 +8,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { AlgorithmParameters } from "./AlgorithmParameters";
+import { useToast } from "@/components/ui/use-toast";
 
 export const SolverConfig = () => {
   const [solver, setSolver] = useState("simulated-annealing");
-  const [iterations, setIterations] = useState([100]);
+  const [parameters, setParameters] = useState<Record<string, number>>({});
+  const { toast } = useToast();
+
+  const handleParameterChange = (param: string, value: number) => {
+    setParameters((prev) => ({ ...prev, [param]: value }));
+  };
+
+  const handleRunSolver = () => {
+    toast({
+      title: "Solver Started",
+      description: `Running ${solver} with custom parameters`,
+    });
+    console.log("Running solver with parameters:", parameters);
+  };
 
   return (
     <div className="space-y-6">
@@ -37,22 +51,17 @@ export const SolverConfig = () => {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Number of Iterations</Label>
-            <Slider
-              value={iterations}
-              onValueChange={setIterations}
-              min={10}
-              max={1000}
-              step={10}
-              className="my-4"
-            />
-            <span className="text-sm text-muted-foreground">
-              {iterations[0]} iterations
-            </span>
-          </div>
+          <AlgorithmParameters 
+            solver={solver} 
+            onParameterChange={handleParameterChange}
+          />
 
-          <Button className="w-full">Run Solver</Button>
+          <Button 
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800" 
+            onClick={handleRunSolver}
+          >
+            Run Solver
+          </Button>
         </div>
       </Card>
     </div>
