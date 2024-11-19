@@ -1,9 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { InlineMath } from 'react-katex';
-import { Check } from 'lucide-react';
-import 'katex/dist/katex.min.css';
+import { AlgorithmCard } from "@/components/solver/AlgorithmCard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 const algorithms = {
   "quantum-inspired": {
@@ -63,112 +61,33 @@ const algorithms = {
   }
 };
 
-const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
-  return (
-    <div className="group">
-      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:shadow-2xl cursor-pointer bg-gradient-to-br from-[#0a0f1c] to-[#1a1f2c] group-hover:fixed group-hover:inset-x-[15%] group-hover:inset-y-[10%] group-hover:z-50 group-hover:overflow-y-auto max-h-[80vh] border-0">
-        <div className="space-y-4">
-          <div className="flex items-start space-x-4">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#D946EF] flex items-center justify-center">
-              <Check className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-2">{data.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{data.description}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {data.features.slice(0, 2).map((feature: string, index: number) => (
-              <Badge 
-                key={index} 
-                variant="secondary"
-                className="bg-[#1E293B] text-gray-300 border-0"
-              >
-                {feature}
-              </Badge>
-            ))}
-          </div>
-          
-          {/* Expanded Content - Visible on Hover */}
-          <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-full transition-all duration-500 ease-in-out">
-            <div className="grid grid-cols-2 gap-8 pt-4">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Features</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {data.features.map((feature: string, index: number) => (
-                      <Badge 
-                        key={index} 
-                        variant="secondary"
-                        className="bg-[#1E293B] text-gray-300 border-0"
-                      >
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Implementation Details</h4>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-400">
-                    {data.technicalDetails.implementation.map((detail: string, index: number) => (
-                      <li key={index}>{detail}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Parameters</h4>
-                  <ul className="list-disc pl-6 space-y-2 text-gray-400">
-                    {data.technicalDetails.parameters.map((param: string, index: number) => (
-                      <li key={index}>{param}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Mathematical Formulation</h4>
-                  <div className="p-4 bg-[#1E293B] rounded-md text-white">
-                    <InlineMath>{data.formula}</InlineMath>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Example</h4>
-                  <pre className="p-4 bg-[#1E293B] rounded-md whitespace-pre-wrap text-sm text-gray-300">
-                    {data.example}
-                  </pre>
-                </div>
-
-                <div>
-                  <h4 className="text-xl font-semibold mb-4 text-white">Computational Complexity</h4>
-                  <p className="text-gray-400">{data.technicalDetails.complexity}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
-      
-      {/* Backdrop blur effect */}
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500 group-hover:opacity-100 -z-10 group-hover:z-40" />
-    </div>
-  );
-};
-
 const Solvers = () => {
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("quantum-inspired");
+
+  const algorithmData = algorithms[selectedAlgorithm as keyof typeof algorithms];
+
   return (
     <DashboardLayout>
       <div className="container py-8 max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2 text-white">Optimization Algorithms</h1>
-        <p className="text-gray-400 mb-8">Addressing Critical Challenges with Singularity</p>
-        <div className="grid gap-8 md:grid-cols-2">
-          {Object.entries(algorithms).map(([key, data]) => (
-            <AlgorithmCard key={key} algorithm={key} data={data} />
-          ))}
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-4xl font-bold">Optimization Algorithms</h1>
+            <div className="w-[250px]">
+              <Select value={selectedAlgorithm} onValueChange={setSelectedAlgorithm}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select algorithm" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="quantum-inspired">Quantum-Inspired Optimization</SelectItem>
+                  <SelectItem value="simulated-annealing">Simulated Annealing</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="w-full">
+            <AlgorithmCard {...algorithmData} />
+          </div>
         </div>
       </div>
     </DashboardLayout>
