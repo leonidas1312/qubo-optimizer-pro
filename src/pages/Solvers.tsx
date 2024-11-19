@@ -88,20 +88,21 @@ const geneticAlgorithmInfo = [
 const Solvers = () => {
   return (
     <DashboardLayout>
-      <div className="container py-8 max-w-7xl mx-auto space-y-16">
+      <div className="container py-8 max-w-[95%] mx-auto space-y-16">
         <div className="space-y-12">
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
               <Star className="h-8 w-8" />
               Simulated Annealing
             </h2>
-            <Carousel className="w-[65%] mx-auto" opts={{ 
+            <Carousel className="w-[95%] mx-auto" opts={{ 
               align: "start",
-              containScroll: "trimSnaps"
+              containScroll: "trimSnaps",
+              slidesToScroll: 2
             }}>
-              <CarouselContent>
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {simulatedAnnealingInfo.map((info, index) => (
-                  <CarouselItem key={index} className="basis-full">
+                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
@@ -119,13 +120,14 @@ const Solvers = () => {
               <Info className="h-8 w-8" />
               Quantum-Inspired Optimization
             </h2>
-            <Carousel className="w-[65%] mx-auto" opts={{ 
+            <Carousel className="w-[95%] mx-auto" opts={{ 
               align: "start",
-              containScroll: "trimSnaps"
+              containScroll: "trimSnaps",
+              slidesToScroll: 2
             }}>
-              <CarouselContent>
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {quantumInspiredInfo.map((info, index) => (
-                  <CarouselItem key={index} className="basis-full">
+                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
@@ -143,13 +145,14 @@ const Solvers = () => {
               <ChartBar className="h-8 w-8" />
               Tabu Search
             </h2>
-            <Carousel className="w-[65%] mx-auto" opts={{ 
+            <Carousel className="w-[95%] mx-auto" opts={{ 
               align: "start",
-              containScroll: "trimSnaps"
+              containScroll: "trimSnaps",
+              slidesToScroll: 2
             }}>
-              <CarouselContent>
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {tabuSearchInfo.map((info, index) => (
-                  <CarouselItem key={index} className="basis-full">
+                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
@@ -167,13 +170,14 @@ const Solvers = () => {
               <Check className="h-8 w-8" />
               Genetic Algorithms
             </h2>
-            <Carousel className="w-[65%] mx-auto" opts={{ 
+            <Carousel className="w-[95%] mx-auto" opts={{ 
               align: "start",
-              containScroll: "trimSnaps"
+              containScroll: "trimSnaps",
+              slidesToScroll: 2
             }}>
-              <CarouselContent>
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {geneticAlgorithmInfo.map((info, index) => (
-                  <CarouselItem key={index} className="basis-full">
+                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
