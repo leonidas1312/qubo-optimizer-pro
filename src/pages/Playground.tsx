@@ -2,15 +2,25 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { VariableDeclaration } from "@/components/playground/VariableDeclaration";
 import { ConstraintsInput } from "@/components/playground/ConstraintsInput";
 import { TransformationSolution } from "@/components/playground/TransformationSolution";
+import { TemplateSelector } from "@/components/playground/TemplateSelector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProblemTemplate } from "@/utils/problemTemplates";
+import { useState } from "react";
 
 const Playground = () => {
+  const handleTemplateSelect = (template: ProblemTemplate) => {
+    // TODO: Implement state management to handle template data
+    console.log("Selected template:", template);
+  };
+
   return (
     <DashboardLayout>
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-8 gradient-text animate-fade-in">
           Playground
         </h1>
+
+        <TemplateSelector onTemplateSelect={handleTemplateSelect} />
 
         <Tabs defaultValue="variables" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
