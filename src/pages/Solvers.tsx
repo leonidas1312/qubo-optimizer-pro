@@ -53,10 +53,13 @@ const Solvers = () => {
         <div className="space-y-12">
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text">Simulated Annealing</h2>
-            <Carousel className="w-full">
+            <Carousel opts={{ 
+              align: "start",
+              slidesToScroll: 1
+            }}>
               <CarouselContent>
                 {simulatedAnnealingInfo.map((info, index) => (
-                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
@@ -71,10 +74,13 @@ const Solvers = () => {
 
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text">Quantum-Inspired Optimization</h2>
-            <Carousel className="w-full">
+            <Carousel opts={{ 
+              align: "start",
+              slidesToScroll: 1
+            }}>
               <CarouselContent>
                 {quantumInspiredInfo.map((info, index) => (
-                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3">
                     <AlgorithmCard
                       title={info.title}
                       description={info.description}
