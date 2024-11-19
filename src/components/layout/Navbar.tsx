@@ -26,17 +26,14 @@ export const Navbar = () => {
           <span className="font-bold text-xl">QUBOt</span>
         </Link>
         <div className="flex items-center space-x-6 ml-8">
-          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-            Dashboard
+          <Link to="/playground" className="text-muted-foreground hover:text-foreground transition-colors">
+            Playground
           </Link>
           <Link to="/solvers" className="text-muted-foreground hover:text-foreground transition-colors">
             Optimization Algorithms
           </Link>
           <Link to="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
             Leaderboard
-          </Link>
-          <Link to="/playground" className="text-muted-foreground hover:text-foreground transition-colors">
-            Playground
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">
