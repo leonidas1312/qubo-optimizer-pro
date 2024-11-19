@@ -7,10 +7,41 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProblemTemplate } from "@/utils/problemTemplates";
 import { useState } from "react";
 
+interface Variable {
+  id: string;
+  name: string;
+  type: "binary" | "integer" | "continuous";
+  lowerBound?: number;
+  upperBound?: number;
+}
+
+interface Constraint {
+  id: string;
+  expression: string;
+  type: "<=" | "=" | ">=";
+  rhs: number;
+}
+
 const Playground = () => {
+  const [variables, setVariables] = useState<Variable[]>([]);
+  const [constraints, setConstraints] = useState<Constraint[]>([]);
+
   const handleTemplateSelect = (template: ProblemTemplate) => {
-    // TODO: Implement state management to handle template data
-    console.log("Selected template:", template);
+    // Convert template variables to our Variable interface format
+    const newVariables = template.variables.map((v) => ({
+      id: crypto.randomUUID(),
+      ...v
+    }));
+    setVariables(newVariables);
+
+    // Convert template constraints to our Constraint interface format
+    const newConstraints = template.constraints.map((expression) => ({
+      id: crypto.randomUUID(),
+      expression,
+      type: "<=" as const,
+      rhs: 0
+    }));
+    setConstraints(newConstraints);
   };
 
   return (
@@ -30,11 +61,17 @@ const Playground = () => {
           </TabsList>
 
           <TabsContent value="variables" className="space-y-4">
-            <VariableDeclaration />
+            <VariableDeclaration 
+              variables={variables}
+              setVariables={setVariables}
+            />
           </TabsContent>
 
           <TabsContent value="constraints" className="space-y-4">
-            <ConstraintsInput />
+            <ConstraintsInput 
+              constraints={constraints}
+              setConstraints={setConstraints}
+            />
           </TabsContent>
 
           <TabsContent value="solution" className="space-y-4">

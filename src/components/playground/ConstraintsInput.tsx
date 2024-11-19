@@ -33,8 +33,12 @@ interface Constraint {
   rhs: number;
 }
 
-export const ConstraintsInput = () => {
-  const [constraints, setConstraints] = useState<Constraint[]>([]);
+interface ConstraintsInputProps {
+  constraints: Constraint[];
+  setConstraints: (constraints: Constraint[]) => void;
+}
+
+export const ConstraintsInput = ({ constraints, setConstraints }: ConstraintsInputProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingConstraint, setEditingConstraint] = useState<Constraint | null>(null);
   const { toast } = useToast();

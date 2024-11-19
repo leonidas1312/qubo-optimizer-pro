@@ -34,8 +34,12 @@ interface Variable {
   upperBound?: number;
 }
 
-export const VariableDeclaration = () => {
-  const [variables, setVariables] = useState<Variable[]>([]);
+interface VariableDeclarationProps {
+  variables: Variable[];
+  setVariables: (variables: Variable[]) => void;
+}
+
+export const VariableDeclaration = ({ variables, setVariables }: VariableDeclarationProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVariable, setEditingVariable] = useState<Variable | null>(null);
   const { toast } = useToast();
