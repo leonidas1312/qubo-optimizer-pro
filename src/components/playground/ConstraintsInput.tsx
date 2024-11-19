@@ -73,8 +73,8 @@ export const ConstraintsInput = ({ constraints, setConstraints }: ConstraintsInp
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <section className="space-y-4">
+      <header className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Constraints</h2>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -93,7 +93,7 @@ export const ConstraintsInput = ({ constraints, setConstraints }: ConstraintsInp
             />
           </DialogContent>
         </Dialog>
-      </div>
+      </header>
 
       <Dialog open={!!editingConstraint} onOpenChange={(open) => !open && setEditingConstraint(null)}>
         <DialogContent>
@@ -147,6 +147,6 @@ export const ConstraintsInput = ({ constraints, setConstraints }: ConstraintsInp
           </TableBody>
         </Table>
       </div>
-    </div>
+    </section>
   );
 };

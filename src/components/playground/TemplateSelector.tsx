@@ -30,7 +30,7 @@ export const TemplateSelector = ({ onTemplateSelect }: TemplateSelectorProps) =>
 
   return (
     <Card className="mb-8">
-      <div className="flex items-center gap-4 p-6">
+      <section className="flex items-center gap-4 p-6">
         <Select onValueChange={handleTemplateSelect}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Select template" />
@@ -46,7 +46,7 @@ export const TemplateSelector = ({ onTemplateSelect }: TemplateSelectorProps) =>
         <p className="text-sm text-muted-foreground">
           Load a predefined optimization problem template
         </p>
-      </div>
+      </section>
     </Card>
   );
 };

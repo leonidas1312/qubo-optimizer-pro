@@ -28,7 +28,6 @@ export const TransformationSolution = () => {
 
   const handleTransformToQUBO = () => {
     try {
-      // TODO: Implement QUBO transformation
       setHasError(false);
       toast({
         title: "Transforming to QUBO",
@@ -46,7 +45,6 @@ export const TransformationSolution = () => {
 
   const handleSolve = () => {
     try {
-      // TODO: Implement solver
       setHasError(false);
       toast({
         title: "Solving QUBO",
@@ -63,19 +61,18 @@ export const TransformationSolution = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
+    <section className="space-y-6">
+      <header className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Transform & Solve</h2>
         <HelpModal />
-      </div>
+      </header>
 
-      {/* Transformation Controls */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center">
           Transform to QUBO
           <HelpTooltip content="Convert your optimization problem into QUBO format" />
         </h3>
-        <div className="space-y-4">
+        <section className="space-y-4">
           <div>
             <Label htmlFor="penalty" className="flex items-center">
               Penalty Parameter
@@ -103,16 +100,15 @@ export const TransformationSolution = () => {
               className="mt-1"
             />
           </div>
-        </div>
+        </section>
       </Card>
 
-      {/* Solution Controls */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center">
           Solve QUBO
           <HelpTooltip content="Configure and run the QUBO solver" />
         </h3>
-        <div className="space-y-4">
+        <section className="space-y-4">
           <div>
             <Label className="flex items-center">
               Solver Algorithm
@@ -183,8 +179,8 @@ export const TransformationSolution = () => {
               className="mt-1"
             />
           </div>
-        </div>
+        </section>
       </Card>
-    </div>
+    </section>
   );
 };
