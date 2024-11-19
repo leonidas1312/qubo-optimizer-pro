@@ -64,78 +64,92 @@ const algorithms = {
 
 const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
   return (
-    <Card className="group relative p-6 transition-all duration-500 ease-in-out hover:scale-110 hover:shadow-xl cursor-pointer overflow-hidden bg-card">
-      <div className="space-y-4">
-        <h3 className="text-2xl font-bold">{data.title}</h3>
-        
-        {/* Key Points - Always Visible */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {data.features.slice(0, 2).map((feature: string, index: number) => (
-            <Badge key={index} variant="secondary" className="text-sm">
-              {feature}
-            </Badge>
-          ))}
-        </div>
-        
-        {/* Condensed Description - Always Visible */}
-        <p className="text-muted-foreground text-sm line-clamp-2">
-          {data.description}
-        </p>
-        
-        {/* Expanded Content - Visible on Hover */}
-        <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-[2000px] transition-all duration-500 ease-in-out">
-          <div className="space-y-6 pt-4">
-            {/* All Features */}
-            <div className="flex flex-wrap gap-2">
-              {data.features.map((feature: string, index: number) => (
-                <Badge key={index} variant="secondary">
-                  {feature}
-                </Badge>
-              ))}
-            </div>
+    <div className="group">
+      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-110 group-hover:shadow-2xl cursor-pointer overflow-hidden bg-card group-hover:fixed group-hover:inset-4 group-hover:z-50">
+        <div className="space-y-4">
+          <h3 className="text-2xl font-bold">{data.title}</h3>
+          
+          {/* Key Points - Always Visible */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {data.features.slice(0, 2).map((feature: string, index: number) => (
+              <Badge key={index} variant="secondary" className="text-sm">
+                {feature}
+              </Badge>
+            ))}
+          </div>
+          
+          {/* Condensed Description - Always Visible */}
+          <p className="text-muted-foreground text-sm line-clamp-2 group-hover:hidden">
+            {data.description}
+          </p>
+          
+          {/* Expanded Content - Visible on Hover */}
+          <div className="opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-[2000px] transition-all duration-500 ease-in-out">
+            <div className="grid grid-cols-2 gap-8 pt-4">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Description</h4>
+                  <p className="text-muted-foreground">{data.description}</p>
+                </div>
 
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">Implementation Details</h4>
-                <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                  {data.technicalDetails.implementation.map((detail: string, index: number) => (
-                    <li key={index}>{detail}</li>
-                  ))}
-                </ul>
-              </div>
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Features</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {data.features.map((feature: string, index: number) => (
+                      <Badge key={index} variant="secondary">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Parameters</h4>
-                <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                  {data.technicalDetails.parameters.map((param: string, index: number) => (
-                    <li key={index}>{param}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-2">Mathematical Formulation</h4>
-                <div className="p-4 bg-muted rounded-md">
-                  <InlineMath>{data.formula}</InlineMath>
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Implementation Details</h4>
+                  <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                    {data.technicalDetails.implementation.map((detail: string, index: number) => (
+                      <li key={index}>{detail}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Example</h4>
-                <pre className="p-4 bg-muted rounded-md whitespace-pre-wrap text-sm">
-                  {data.example}
-                </pre>
-              </div>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Parameters</h4>
+                  <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                    {data.technicalDetails.parameters.map((param: string, index: number) => (
+                      <li key={index}>{param}</li>
+                    ))}
+                  </ul>
+                </div>
 
-              <div>
-                <h4 className="font-semibold mb-2">Computational Complexity</h4>
-                <p className="text-muted-foreground">{data.technicalDetails.complexity}</p>
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Mathematical Formulation</h4>
+                  <div className="p-4 bg-muted rounded-md">
+                    <InlineMath>{data.formula}</InlineMath>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Example</h4>
+                  <pre className="p-4 bg-muted rounded-md whitespace-pre-wrap text-sm">
+                    {data.example}
+                  </pre>
+                </div>
+
+                <div>
+                  <h4 className="text-xl font-semibold mb-4">Computational Complexity</h4>
+                  <p className="text-muted-foreground">{data.technicalDetails.complexity}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+      
+      {/* Backdrop blur effect */}
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500 group-hover:opacity-100 -z-10 group-hover:z-40" />
+    </div>
   );
 };
 
