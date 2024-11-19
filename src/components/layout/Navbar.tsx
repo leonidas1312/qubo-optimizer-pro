@@ -1,8 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Code2, Settings } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Navbar = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSettings = () => {
+    toast({
+      title: "Settings",
+      description: "Settings panel coming soon!",
+    });
+  };
+
+  const handleGetStarted = () => {
+    navigate("/playground");
+  };
+
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
@@ -15,7 +30,7 @@ export const Navbar = () => {
             Dashboard
           </Link>
           <Link to="/solvers" className="text-muted-foreground hover:text-foreground transition-colors">
-            Solvers
+            Optimization Algorithms
           </Link>
           <Link to="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
             Leaderboard
@@ -25,10 +40,10 @@ export const Navbar = () => {
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleSettings}>
             <Settings className="h-5 w-5" />
           </Button>
-          <Button>Get Started</Button>
+          <Button onClick={handleGetStarted}>Get Started</Button>
         </div>
       </div>
     </nav>
