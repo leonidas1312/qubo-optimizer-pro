@@ -65,7 +65,7 @@ const algorithms = {
 const AlgorithmCard = ({ algorithm, data }: { algorithm: string; data: any }) => {
   return (
     <div className="group">
-      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-110 group-hover:shadow-2xl cursor-pointer overflow-hidden bg-card group-hover:fixed group-hover:inset-4 group-hover:z-50">
+      <Card className="relative p-6 transition-all duration-500 ease-in-out group-hover:scale-105 group-hover:shadow-2xl cursor-pointer overflow-hidden bg-card group-hover:fixed group-hover:inset-x-[15%] group-hover:inset-y-[10%] group-hover:z-50">
         <div className="space-y-4">
           <h3 className="text-2xl font-bold">{data.title}</h3>
           
