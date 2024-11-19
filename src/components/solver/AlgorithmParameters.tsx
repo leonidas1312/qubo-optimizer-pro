@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface AlgorithmParametersProps {
   solver: string;
@@ -120,6 +121,38 @@ export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmPara
   };
 
   const currentParams = parameters[solver as keyof typeof parameters] || [];
+  const [paramValues, setParamValues] = useState<Record<string, number>>({});
+
+  // Initialize parameter values when solver changes
+  useEffect(() => {
+    const initialValues = currentParams.reduce((acc, param) => ({
+      ...acc,
+      [param.name]: param.defaultValue
+    }), {});
+    setParamValues(initialValues);
+    // Notify parent of initial values
+    Object.entries(initialValues).forEach(([name, value]) => {
+      onParameterChange(name, value);
+    });
+  }, [solver]);
+
+  const handleSliderChange = (name: string, value: number[]) => {
+    const newValue = value[0];
+    setParamValues(prev => ({ ...prev, [name]: newValue }));
+    onParameterChange(name, newValue);
+  };
+
+  const handleInputChange = (name: string, value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      const param = currentParams.find(p => p.name === name);
+      if (param) {
+        const clampedValue = Math.min(Math.max(numValue, param.min), param.max);
+        setParamValues(prev => ({ ...prev, [name]: clampedValue }));
+        onParameterChange(name, clampedValue);
+      }
+    }
+  };
 
   return (
     <Card className="p-6 mt-4 bg-gradient-to-br from-background/80 to-background/40 backdrop-blur-sm border-white/10">
@@ -142,16 +175,17 @@ export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmPara
             <div className="flex gap-4 items-center">
               <Slider
                 defaultValue={[param.defaultValue]}
+                value={[paramValues[param.name] || param.defaultValue]}
                 min={param.min}
                 max={param.max}
                 step={param.step}
-                onValueChange={([value]) => onParameterChange(param.name, value)}
+                onValueChange={(value) => handleSliderChange(param.name, value)}
                 className="flex-1"
               />
               <Input
                 type="number"
-                value={param.defaultValue}
-                onChange={(e) => onParameterChange(param.name, Number(e.target.value))}
+                value={paramValues[param.name] || param.defaultValue}
+                onChange={(e) => handleInputChange(param.name, e.target.value)}
                 className="w-20"
                 min={param.min}
                 max={param.max}
