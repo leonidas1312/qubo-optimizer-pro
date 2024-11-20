@@ -8,6 +8,16 @@ interface MatrixUploadProps {
   onMatrixLoaded: (matrix: number[][]) => void;
 }
 
+import { useState, useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import { Upload, File } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+interface MatrixUploadProps {
+  onMatrixLoaded: (matrix: number[][]) => void;
+}
+
 export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
 
@@ -15,24 +25,21 @@ export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
     const uploadedFile = acceptedFiles[0];
     if (uploadedFile) {
       try {
-        const arrayBuffer = await uploadedFile.arrayBuffer();
-        // Convert ArrayBuffer to Buffer for Python processing
-        const buffer = Buffer.from(arrayBuffer);
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
         
-        // Send the buffer to the Python backend
-        const response = await fetch('/api/load-matrix', {
+        const response = await fetch('http://localhost:8000/api/load-matrix', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/octet-stream',
-          },
-          body: buffer,
+          body: formData,
         });
 
         if (!response.ok) throw new Error('Failed to load matrix');
         
-        const matrix = await response.json();
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
         setFile(uploadedFile);
-        onMatrixLoaded(matrix);
+        onMatrixLoaded(data.matrix);
         toast.success("QUBO matrix loaded successfully");
       } catch (error) {
         toast.error("Failed to load QUBO matrix");
@@ -80,3 +87,4 @@ export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
     </div>
   );
 };
+
