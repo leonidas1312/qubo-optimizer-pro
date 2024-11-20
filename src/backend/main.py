@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from typing import Dict, Any
 import json
-from backend.solver import solve_qubo
+from backend.solver import solve_qubo_stream
 import tempfile
 import os
 
@@ -58,20 +58,13 @@ async def solve(data: Dict[Any, Any]):
         solver_type = data.get("solver", "tabu-search")
         parameters = data.get("parameters", {})
         
-        # Call the solver function
-        best_solution, best_cost, iterations_cost, time_taken = solve_qubo(
+        # Call the solver function with streaming
+        return await solve_qubo_stream(
             qubo_matrix=matrix,
             solver_type=solver_type,
             parameters=parameters,
             constant=constant
         )
-        
-        return {
-            "solution": best_solution.tolist(),
-            "cost": float(best_cost),
-            "iterations_cost": [float(c) for c in iterations_cost],
-            "time": time_taken
-        }
     except Exception as e:
         return {"error": str(e)}
 
