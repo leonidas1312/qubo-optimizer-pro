@@ -55,22 +55,31 @@ export const parameters: AlgorithmParameters = {
   ],
   "tabu-search": [
     {
-      name: "tabu-list-size",
-      label: "Tabu List Size",
+      name: "max-iterations",
+      label: "Maximum Iterations",
+      defaultValue: 1000,
+      min: 100,
+      max: 10000,
+      step: 100,
+      tooltip: "Maximum number of iterations for the search process"
+    },
+    {
+      name: "tabu-tenure",
+      label: "Tabu Tenure",
       defaultValue: 10,
       min: 1,
       max: 50,
       step: 1,
-      tooltip: "Number of recent moves to keep in tabu list"
+      tooltip: "Number of iterations a solution remains in the tabu list"
     },
     {
-      name: "max-iterations",
-      label: "Maximum Iterations",
-      defaultValue: 100,
-      min: 10,
-      max: 1000,
-      step: 10,
-      tooltip: "Maximum number of iterations without improvement"
+      name: "neighborhood-size",
+      label: "Neighborhood Size",
+      defaultValue: 10,
+      min: 5,
+      max: 50,
+      step: 5,
+      tooltip: "Number of neighbor solutions to evaluate in each iteration"
     }
   ],
   "genetic-algorithm": [
