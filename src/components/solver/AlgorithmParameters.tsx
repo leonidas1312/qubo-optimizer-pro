@@ -1,37 +1,29 @@
 import { Card } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { parameters } from "./parameters/algorithmParameterDefinitions";
 import { ParameterControl } from "./parameters/ParameterControl";
 
 interface AlgorithmParametersProps {
   solver: string;
   onParameterChange: (param: string, value: number) => void;
+  currentParameters: Record<string, number>;
 }
 
-export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmParametersProps) => {
-  const [paramValues, setParamValues] = useState<Record<string, number>>({});
+export const AlgorithmParameters = ({ 
+  solver, 
+  onParameterChange,
+  currentParameters 
+}: AlgorithmParametersProps) => {
   const currentParams = parameters[solver as keyof typeof parameters] || [];
 
   useEffect(() => {
-    // Reset parameters when solver changes
-    const initialValues = currentParams.reduce((acc, param) => ({
-      ...acc,
-      [param.name]: param.defaultValue
-    }), {} as Record<string, number>);
-    
-    setParamValues(initialValues);
-    
-    // Notify parent of initial values
-    Object.entries(initialValues).forEach(([name, value]) => {
-      onParameterChange(name, value);
+    // Initialize parameters when solver changes
+    currentParams.forEach(param => {
+      if (currentParameters[param.name] === undefined) {
+        onParameterChange(param.name, param.defaultValue);
+      }
     });
   }, [solver, onParameterChange]);
-
-  const handleParameterChange = (name: string, value: number) => {
-    const newValues = { ...paramValues, [name]: value };
-    setParamValues(newValues);
-    onParameterChange(name, value);
-  };
 
   return (
     <Card className="p-6 mt-4 bg-gradient-to-br from-background/80 to-background/40 backdrop-blur-sm border-white/10">
@@ -41,11 +33,11 @@ export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmPara
             key={param.name}
             label={param.label}
             tooltip={param.tooltip}
-            value={paramValues[param.name] ?? param.defaultValue}
+            value={currentParameters[param.name] ?? param.defaultValue}
             min={param.min}
             max={param.max}
             step={param.step}
-            onChange={(value) => handleParameterChange(param.name, value)}
+            onChange={(value) => onParameterChange(param.name, value)}
           />
         ))}
       </div>
