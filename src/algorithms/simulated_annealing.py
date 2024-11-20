@@ -1,6 +1,6 @@
+# Simulated Annealing Algorithm Implementation
 import numpy as np
 import time
-from typing import Generator, Tuple
 
 def compute_cost(qubo_matrix, solution, constant):
     """
@@ -8,9 +8,9 @@ def compute_cost(qubo_matrix, solution, constant):
     """
     return solution @ qubo_matrix @ solution.T + constant
 
-def simulated_annealing(qubo_matrix, constant, initial_temperature=1000, cooling_rate=0.99, max_iterations=1000) -> Generator[Tuple[np.ndarray, float, list, float], None, None]:
+def simulated_annealing(qubo_matrix, constant, initial_temperature=1000, cooling_rate=0.99, max_iterations=1000):
     """
-    Implements Simulated Annealing for QUBO optimization with progress updates.
+    Implements Simulated Annealing for QUBO optimization.
     """
     num_vars = qubo_matrix.shape[0]
 
@@ -52,14 +52,11 @@ def simulated_annealing(qubo_matrix, constant, initial_temperature=1000, cooling
         # Cool down the temperature
         temperature *= cooling_rate
 
-        # Yield current progress
-        elapsed_time = time.time() - start_time
-        yield best_solution, best_cost, costs_per_iteration, elapsed_time
-
         # Stop if the temperature is too low
         if temperature < 1e-6:
             break
 
-    # Final yield
-    elapsed_time = time.time() - start_time
-    yield best_solution, best_cost, costs_per_iteration, elapsed_time
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    return best_solution, best_cost, costs_per_iteration, elapsed_time

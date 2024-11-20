@@ -1,6 +1,6 @@
+# Genetic Algorithm Implementation
 import numpy as np
 import time
-from typing import Generator, Tuple
 
 def compute_cost(qubo_matrix, solution, constant):
     """
@@ -45,9 +45,9 @@ def mutate(offspring, mutation_rate):
                 individual[i] = 1 - individual[i]  # Flip the bit
     return offspring
 
-def genetic_algorithm(qubo_matrix, constant, pop_size=50, num_generations=100, mutation_rate=0.01) -> Generator[Tuple[np.ndarray, float, list, float], None, None]:
+def genetic_algorithm(qubo_matrix, constant, pop_size=50, num_generations=100, mutation_rate=0.01):
     """
-    Implements the Genetic Algorithm for QUBO optimization with progress updates.
+    Implements the Genetic Algorithm for QUBO optimization.
     """
     num_vars = qubo_matrix.shape[0]
     population = initialize_population(pop_size, num_vars)
@@ -85,10 +85,7 @@ def genetic_algorithm(qubo_matrix, constant, pop_size=50, num_generations=100, m
         # Create new population
         population = np.vstack((parents, offspring))
 
-        # Yield current progress
-        elapsed_time = time.time() - start_time
-        yield best_solution, best_cost, costs_per_generation, elapsed_time
+    end_time = time.time()
+    elapsed_time = end_time - start_time
 
-    # Final yield
-    elapsed_time = time.time() - start_time
-    yield best_solution, best_cost, costs_per_generation, elapsed_time
+    return best_solution, best_cost, costs_per_generation, elapsed_time
