@@ -1,17 +1,23 @@
-# Tabu Search Algorithm Implementation
 import numpy as np
 import time
 
-def compute_cost(qubo_matrix, solution, constant):
+def compute_cost(qubo_matrix: np.ndarray, solution: np.ndarray, constant: float) -> float:
     """
     Computes the cost for a given solution based on the QUBO matrix and constant.
     """
-    return solution @ qubo_matrix @ solution.T + constant
+    return float(solution @ qubo_matrix @ solution.T + constant)
 
-def tabu_search(qubo_matrix, constant, max_iterations=1000, tabu_tenure=10, neighborhood_size=10):
+def tabu_search(
+    qubo_matrix: np.ndarray, 
+    constant: float = 0.0,
+    max_iterations: int = 1000, 
+    tabu_tenure: int = 10, 
+    neighborhood_size: int = 10
+) -> tuple:
     """
     Implements the Tabu Search algorithm for QUBO optimization.
     """
+    start_time = time.time()
     num_vars = qubo_matrix.shape[0]
     
     # Initialize random solution
@@ -22,9 +28,7 @@ def tabu_search(qubo_matrix, constant, max_iterations=1000, tabu_tenure=10, neig
     best_cost = current_cost
     
     tabu_list = []
-    cost_per_iteration = []
-    
-    start_time = time.time()
+    cost_per_iteration = [current_cost]
     
     for iteration in range(max_iterations):
         # Generate neighbors by flipping one bit at a time
@@ -36,7 +40,7 @@ def tabu_search(qubo_matrix, constant, max_iterations=1000, tabu_tenure=10, neig
             flip_index = np.random.randint(num_vars)
             neighbor[flip_index] = 1 - neighbor[flip_index]  # Flip the bit
             
-            if not any((neighbor == x).all() for x in tabu_list):
+            if not any(np.array_equal(neighbor, x) for x in tabu_list):
                 neighbors.append(neighbor)
                 neighbor_costs.append(compute_cost(qubo_matrix, neighbor, constant))
         
@@ -47,7 +51,7 @@ def tabu_search(qubo_matrix, constant, max_iterations=1000, tabu_tenure=10, neig
             current_cost = neighbor_costs[best_neighbor_index]
             
             # Update tabu list
-            tabu_list.append(current_solution)
+            tabu_list.append(current_solution.copy())
             if len(tabu_list) > tabu_tenure:
                 tabu_list.pop(0)
             

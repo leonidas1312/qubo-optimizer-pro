@@ -8,7 +8,8 @@ from algorithms.genetic_algorithm import genetic_algorithm
 def solve_qubo(
     qubo_matrix: np.ndarray,
     solver_type: str = "tabu-search",
-    **parameters
+    parameters: dict = None,
+    constant: float = 0.0
 ) -> Tuple[np.ndarray, float, List[float], float]:
     """
     Solve QUBO problem using the specified solver.
@@ -16,7 +17,8 @@ def solve_qubo(
     Args:
         qubo_matrix: The QUBO matrix
         solver_type: Type of solver to use
-        **parameters: Additional parameters for the solver
+        parameters: Additional parameters for the solver
+        constant: Constant term in the QUBO formulation
     
     Returns:
         Tuple containing:
@@ -25,11 +27,17 @@ def solve_qubo(
         - List of costs per iteration
         - Time taken
     """
-    # Add a small constant to ensure the matrix is symmetric
-    constant = 0.0
+    if parameters is None:
+        parameters = {}
     
     solvers = {
-        "tabu-search": tabu_search,
+        "tabu-search": lambda m, c, p: tabu_search(
+            qubo_matrix=m,
+            constant=c,
+            max_iterations=p.get('max-iterations', 1000),
+            tabu_tenure=p.get('tabu-tenure', 10),
+            neighborhood_size=p.get('neighborhood-size', 10)
+        ),
         "simulated-annealing": simulated_annealing,
         "quantum-inspired": quantum_inspired,
         "genetic-algorithm": genetic_algorithm
@@ -39,4 +47,8 @@ def solve_qubo(
         raise ValueError(f"Unknown solver type: {solver_type}")
     
     solver_func = solvers[solver_type]
-    return solver_func(qubo_matrix, constant, **parameters)
+    
+    try:
+        return solver_func(qubo_matrix, constant, parameters)
+    except Exception as e:
+        raise RuntimeError(f"Solver failed: {str(e)}")

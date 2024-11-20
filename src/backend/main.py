@@ -12,7 +12,7 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,23 +54,23 @@ async def load_matrix(file: UploadFile = File(...)):
 async def solve(data: Dict[Any, Any]):
     try:
         matrix = np.array(data["matrix"])
-        constant = data.get("constant", 0.0)
+        constant = float(data.get("constant", 0.0))
         solver_type = data.get("solver", "tabu-search")
         parameters = data.get("parameters", {})
         
         # Call the solver function
-        best_solution, best_cost, iterations_cost, time = solve_qubo(
+        best_solution, best_cost, iterations_cost, time_taken = solve_qubo(
             qubo_matrix=matrix,
-            constant=constant,
             solver_type=solver_type,
-            **parameters
+            parameters=parameters,
+            constant=constant
         )
         
         return {
             "solution": best_solution.tolist(),
             "cost": float(best_cost),
             "iterations_cost": [float(c) for c in iterations_cost],
-            "time": time
+            "time": time_taken
         }
     except Exception as e:
         return {"error": str(e)}
