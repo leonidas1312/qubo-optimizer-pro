@@ -38,7 +38,7 @@ export const SolverConfig = () => {
           <div className="space-y-2">
             <Label>Solver Type</Label>
             <Select value={solver} onValueChange={setSolver}>
-              <SelectTrigger className="w-full bg-background border-muted">
+              <SelectTrigger className="w-full bg-card border-muted">
                 <SelectValue placeholder="Select solver type" />
               </SelectTrigger>
               <SelectContent>

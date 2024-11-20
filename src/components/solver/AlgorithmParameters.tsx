@@ -127,14 +127,14 @@ export const AlgorithmParameters = ({ solver, onParameterChange }: AlgorithmPara
   useEffect(() => {
     const initialValues = currentParams.reduce((acc, param) => ({
       ...acc,
-      [param.name]: param.defaultValue
-    }), {});
+      [param.name]: param.defaultValue as number
+    }), {} as Record<string, number>);
     setParamValues(initialValues);
     // Notify parent of initial values
     Object.entries(initialValues).forEach(([name, value]) => {
       onParameterChange(name, value);
     });
-  }, [solver]);
+  }, [solver, onParameterChange]);
 
   const handleSliderChange = (name: string, value: number[]) => {
     const newValue = value[0];
