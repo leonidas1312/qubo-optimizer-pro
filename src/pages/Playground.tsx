@@ -6,6 +6,12 @@ import { useState } from "react";
 
 const Playground = () => {
   const [quboMatrix, setQuboMatrix] = useState<number[][] | null>(null);
+  const [constant, setConstant] = useState<number>(0);
+
+  const handleMatrixLoaded = (matrix: number[][], constant: number) => {
+    setQuboMatrix(matrix);
+    setConstant(constant);
+  };
 
   return (
     <DashboardLayout>
@@ -13,8 +19,8 @@ const Playground = () => {
         <h1 className="text-3xl font-bold mb-8 gradient-text">Optimization Playground</h1>
         
         <section className="space-y-8">
-          <MatrixUpload onMatrixLoaded={setQuboMatrix} />
-          <SolverConfig quboMatrix={quboMatrix} />
+          <MatrixUpload onMatrixLoaded={handleMatrixLoaded} />
+          <SolverConfig quboMatrix={quboMatrix} constant={constant} />
           <ResultsChart />
         </section>
       </main>

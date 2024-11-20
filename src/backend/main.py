@@ -28,15 +28,25 @@ async def load_matrix(file: UploadFile = File(...)):
             temp_file.flush()
             
             # Load the numpy array from the temporary file
-            matrix = np.load(temp_file.name)
+            data = np.load(temp_file.name, allow_pickle=True)
             
         # Clean up the temporary file
         os.unlink(temp_file.name)
         
+        # Extract matrix and constant from the loaded data
+        if isinstance(data, np.ndarray) and data.shape == (2,):
+            matrix = data[0]
+            constant = float(data[1])
+        else:
+            raise ValueError("Invalid file format: Expected array with shape (2,)")
+        
         # Convert numpy array to Python list for JSON serialization
         matrix_list = matrix.tolist()
         
-        return {"matrix": matrix_list}
+        return {
+            "matrix": matrix_list,
+            "constant": constant
+        }
     except Exception as e:
         return {"error": str(e)}
 
@@ -44,12 +54,14 @@ async def load_matrix(file: UploadFile = File(...)):
 async def solve(data: Dict[Any, Any]):
     try:
         matrix = np.array(data["matrix"])
+        constant = data.get("constant", 0.0)
         solver_type = data.get("solver", "tabu-search")
         parameters = data.get("parameters", {})
         
         # Call the solver function
         best_solution, best_cost, iterations_cost, time = solve_qubo(
             qubo_matrix=matrix,
+            constant=constant,
             solver_type=solver_type,
             **parameters
         )

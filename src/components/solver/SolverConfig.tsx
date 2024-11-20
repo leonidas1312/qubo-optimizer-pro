@@ -15,9 +15,10 @@ import { toast } from "sonner";
 
 interface SolverConfigProps {
   quboMatrix: number[][] | null;
+  constant: number;
 }
 
-export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
+export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
   const [solver, setSolver] = useState("tabu-search");
   const [parameters, setParameters] = useState<Record<string, number>>({});
   const [isRunning, setIsRunning] = useState(false);
@@ -49,6 +50,7 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
         },
         body: JSON.stringify({
           matrix: quboMatrix,
+          constant: constant,
           solver: solver,
           parameters: parameters,
         }),
