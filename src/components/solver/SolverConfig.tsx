@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { AlgorithmParameters } from "./AlgorithmParameters";
 import { toast } from "sonner";
+import { ResultsChart } from "../visualization/ResultsChart";
 
 interface SolverConfigProps {
   quboMatrix: number[][] | null;
@@ -23,7 +24,11 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
   const [parameters, setParameters] = useState<Record<string, number>>({});
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<{ cost: number; time: number } | null>(null);
+  const [result, setResult] = useState<{ 
+    cost: number; 
+    time: number;
+    iterations_cost?: number[];
+  } | null>(null);
 
   const handleParameterChange = (param: string, value: number) => {
     setParameters((prevParams) => {
@@ -64,6 +69,7 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
       setResult({
         cost: data.cost,
         time: data.time,
+        iterations_cost: data.iterations_cost,
       });
       
       toast.success(`Optimization completed! Best cost: ${data.cost}`);
@@ -126,6 +132,10 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
           </Button>
         </div>
       </Card>
+
+      {result?.iterations_cost && (
+        <ResultsChart data={result.iterations_cost} />
+      )}
     </div>
   );
 };
