@@ -7,81 +7,81 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Star, Info, ChartBar, Check } from "lucide-react";
+import { Star, Cpu, Target, Dna } from "lucide-react";
 
 const simulatedAnnealingInfo = [
   {
     title: "Overview",
-    description: "A probabilistic technique inspired by the metallurgical annealing process. Just as metals are heated and cooled to increase their strength, this algorithm explores solution spaces by allowing temporary 'uphill' moves to escape local optima. Perfect for complex optimization problems where finding the absolute best solution isn't critical.",
+    description: "A probabilistic optimization technique that mimics the physical process of annealing in metallurgy. Starting with a high temperature, the algorithm gradually 'cools' while exploring the solution space, allowing it to escape local optima and find better solutions.",
   },
   {
-    title: "Key Features",
-    description: "• Robust against local optima\n• Adaptable cooling schedules\n• Probabilistic acceptance criteria\n• Excellent for NP-hard problems\n• Parallel implementation support\n• Memory-efficient operation",
+    title: "Implementation Details",
+    description: "• Random initial solution generation\n• Temperature-based acceptance probability\n• Controlled cooling schedule\n• Neighbor generation through bit flipping\n• Best solution tracking\n• Cost computation using QUBO matrix",
   },
   {
-    title: "Mathematical Foundation",
-    description: "Based on the Metropolis-Hastings algorithm and Boltzmann distribution:\nP(ΔE) = exp(-ΔE/kT)\nwhere:\n• ΔE is the energy difference\n• k is Boltzmann's constant\n• T is the temperature parameter\n\nConvergence is guaranteed under certain conditions following the Geman-Geman theorem.",
+    title: "Parameters",
+    description: "• Initial Temperature: Controls initial exploration (default: 1000)\n• Cooling Rate: How quickly temperature decreases (default: 0.99)\n• Maximum Iterations: Number of search steps (default: 1000)\n\nHigher temperatures allow more exploration, while lower temperatures focus on exploitation.",
   },
   {
-    title: "Real-world Applications",
-    description: "• Semiconductor chip placement and routing\n• Neural network training\n• Financial portfolio optimization\n• Vehicle routing problems\n• Production scheduling\n• Network design optimization\n• Molecular structure prediction",
+    title: "Applications",
+    description: "• Portfolio optimization\n• Resource allocation\n• Network design\n• Circuit layout optimization\n• Production scheduling\n• Logistics optimization\n• Pattern recognition",
   }
 ];
 
 const quantumInspiredInfo = [
   {
     title: "Overview",
-    description: "A groundbreaking approach that harnesses quantum computing principles without requiring quantum hardware. These algorithms simulate quantum phenomena like superposition and entanglement on classical computers, offering a bridge between classical and quantum optimization.",
+    description: "A hybrid quantum-classical algorithm that combines quantum circuit simulation with reinforcement learning. It uses minimal encoding to represent classical variables with quantum bits, allowing for efficient problem solving with logarithmic qubit requirements.",
+  },
+  {
+    title: "Implementation Details",
+    description: "• Quantum circuit simulation using PennyLane\n• Hardware efficient ansatz implementation\n• Minimal encoding scheme\n• ADAM optimization for quantum parameters\n• Reinforcement learning local search\n• UCB-based exploitation phase\n• Softmax-based exploration phase",
+  },
+  {
+    title: "Parameters",
+    description: "• Number of Layers: Quantum circuit depth\n• Maximum Iterations: Optimizer+RL cycles\n• Number of Bitstrings: Samples from quantum circuit\n• Optimizer Time: ADAM optimization duration\n• RL Search Time: Local search duration\n• Initial Temperature: Controls RL exploration",
   },
   {
     title: "Key Features",
-    description: "• Quantum superposition simulation\n• Quantum entanglement modeling\n• Amplitude amplification\n• Quantum-inspired crossover\n• Quantum-inspired mutation\n• Hybrid classical-quantum approaches\n• Scalable to large problems",
-  },
-  {
-    title: "Mathematical Foundation",
-    description: "Based on quantum mechanics principles:\nmin x^T Q x, where x ∈ {0,1}^n\n\nUtilizes concepts like:\n• Quantum bits (qubits)\n• Quantum gates\n• Quantum measurement\n• Quantum interference\n\nImplements quantum-inspired operators while maintaining classical computability.",
-  },
-  {
-    title: "Industry Applications",
-    description: "• Financial risk analysis\n• Supply chain optimization\n• Traffic flow management\n• Power grid optimization\n• Machine learning acceleration\n• Cryptography\n• Drug discovery optimization\n• Quantum chemistry simulations",
+    description: "• Logarithmic qubit scaling\n• Hybrid classical-quantum approach\n• Adaptive learning mechanisms\n• Multi-phase optimization\n• Quantum state preparation\n• Efficient classical post-processing\n• Scalable to large problems",
   }
 ];
 
 const tabuSearchInfo = [
   {
     title: "Overview",
-    description: "An advanced metaheuristic search method that enhances local search by maintaining a memory structure (tabu list) of previously visited solutions. This prevents cycling and allows the algorithm to escape local optima by forbidding certain moves.",
+    description: "A metaheuristic search method that uses memory structures (tabu lists) to avoid revisiting recent solutions. This allows the algorithm to escape local optima and explore new regions of the solution space effectively.",
   },
   {
-    title: "Key Features",
-    description: "• Adaptive memory programming\n• Short-term memory (recency)\n• Long-term memory (frequency)\n• Aspiration criteria\n• Strategic oscillation\n• Path relinking\n• Reactive mechanisms",
+    title: "Implementation Details",
+    description: "• Dynamic tabu list management\n• Neighborhood exploration\n• Best solution tracking\n• Cost computation using QUBO matrix\n• Memory-based search guidance\n• Efficient solution space traversal",
   },
   {
-    title: "Mathematical Foundation",
-    description: "Utilizes sophisticated memory structures:\nS* = arg min{f(s) | s ∈ N(x) - T}\nwhere:\n• S* is the best non-tabu solution\n• N(x) is the neighborhood of x\n• T is the tabu list\n\nIncorporates frequency-based memory and pattern recognition.",
+    title: "Parameters",
+    description: "• Maximum Iterations: Length of search process\n• Tabu Tenure: Duration solutions remain tabu\n• Neighborhood Size: Solutions evaluated per iteration\n\nLarger tenure prevents cycling, while larger neighborhood size increases exploration.",
   },
   {
-    title: "Enterprise Applications",
-    description: "• Workforce scheduling\n• Vehicle routing optimization\n• Network design\n• Production planning\n• Resource allocation\n• Facility location\n• Telecommunications network optimization\n• Supply chain design",
+    title: "Applications",
+    description: "• Job scheduling\n• Vehicle routing\n• Network optimization\n• Facility location\n• Resource allocation\n• Pattern sequencing\n• Graph coloring",
   }
 ];
 
 const geneticAlgorithmInfo = [
   {
     title: "Overview",
-    description: "A powerful evolutionary algorithm that mimics natural selection processes. Through iterative evolution of a population of solutions, it combines survival of the fittest with structured yet randomized information exchange to form a robust search mechanism.",
+    description: "An evolutionary algorithm that mimics natural selection to optimize solutions. It maintains a population of candidate solutions and evolves them through selection, crossover, and mutation operations.",
   },
   {
-    title: "Key Features",
-    description: "• Population-based evolution\n• Natural selection simulation\n• Crossover operations\n• Mutation mechanisms\n• Elitism strategies\n• Multi-objective optimization\n• Parallel processing capability\n• Adaptive parameter control",
+    title: "Implementation Details",
+    description: "• Population initialization\n• Fitness-proportional selection\n• Single-point crossover\n• Bit-flip mutation\n• Population evolution tracking\n• Cost-based fitness evaluation\n• Best solution preservation",
   },
   {
-    title: "Mathematical Foundation",
-    description: "Based on evolutionary biology principles:\nP(t+1) = Selection(Crossover(Mutation(P(t))))\n\nKey components:\n• Fitness function evaluation\n• Selection probability\n• Crossover probability\n• Mutation rate\n\nConvergence follows Holland's schema theorem.",
+    title: "Parameters",
+    description: "• Population Size: Number of solutions maintained\n• Number of Generations: Evolution cycles\n• Mutation Rate: Probability of bit flips\n\nLarger populations increase diversity, while higher mutation rates promote exploration.",
   },
   {
-    title: "Industry Impact",
-    description: "• Deep learning architecture optimization\n• Financial market prediction\n• Aerospace design optimization\n• Robot path planning\n• Game AI development\n• Circuit design optimization\n• Chemical process optimization\n• Structural engineering",
+    title: "Applications",
+    description: "• Circuit design\n• Parameter optimization\n• Feature selection\n• Path planning\n• Schedule optimization\n• Portfolio optimization\n• Network design",
   }
 ];
 
@@ -117,7 +117,7 @@ const Solvers = () => {
 
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Info className="h-8 w-8" />
+              <Cpu className="h-8 w-8" />
               Quantum-Inspired Optimization
             </h2>
             <Carousel className="w-[95%] mx-auto" opts={{ 
@@ -142,7 +142,7 @@ const Solvers = () => {
 
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <ChartBar className="h-8 w-8" />
+              <Target className="h-8 w-8" />
               Tabu Search
             </h2>
             <Carousel className="w-[95%] mx-auto" opts={{ 
@@ -167,8 +167,8 @@ const Solvers = () => {
 
           <section>
             <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Check className="h-8 w-8" />
-              Genetic Algorithms
+              <Dna className="h-8 w-8" />
+              Genetic Algorithm
             </h2>
             <Carousel className="w-[95%] mx-auto" opts={{ 
               align: "start",
