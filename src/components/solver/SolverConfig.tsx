@@ -44,9 +44,8 @@ export const SolverConfig = () => {
               <SelectContent className="bg-background border-input">
                 <SelectItem value="simulated-annealing">Simulated Annealing</SelectItem>
                 <SelectItem value="quantum-inspired">Quantum Inspired</SelectItem>
-                <SelectItem value="gurobi">Gurobi</SelectItem>
-                <SelectItem value="qbsolv">QBSolv</SelectItem>
-                <SelectItem value="dwave-sdk">D-Wave SDK</SelectItem>
+                <SelectItem value="tabu-search">Tabu Search</SelectItem>
+                <SelectItem value="genetic-algorithm">Genetic Algorithm</SelectItem>
               </SelectContent>
             </Select>
           </div>
