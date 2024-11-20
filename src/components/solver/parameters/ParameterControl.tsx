@@ -49,7 +49,7 @@ export const ParameterControl = ({
           min={min}
           max={max}
           step={step}
-          onValueChange={(value) => onChange(value[0])}
+          onValueChange={(values) => onChange(values[0])}
           className="flex-1"
         />
         <Input
