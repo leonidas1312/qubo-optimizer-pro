@@ -45,10 +45,32 @@ def mutate(offspring, mutation_rate):
                 individual[i] = 1 - individual[i]  # Flip the bit
     return offspring
 
-def genetic_algorithm(qubo_matrix, constant, pop_size=50, num_generations=100, mutation_rate=0.01):
+def genetic_algorithm(qubo_matrix, constant, parameters=None):
     """
     Implements the Genetic Algorithm for QUBO optimization.
+    
+    Args:
+        qubo_matrix: The QUBO matrix
+        constant: Constant term in the QUBO formulation
+        parameters: Dictionary containing algorithm parameters
+            - pop_size: Population size (default: 50)
+            - num_generations: Number of generations (default: 100)
+            - mutation_rate: Mutation rate (default: 0.01)
+    
+    Returns:
+        Tuple containing:
+        - Best solution found (numpy array)
+        - Best cost found (float)
+        - List of costs per generation (list of floats)
+        - Time taken (float)
     """
+    if parameters is None:
+        parameters = {}
+    
+    pop_size = parameters.get('pop_size', 50)
+    num_generations = parameters.get('num_generations', 100)
+    mutation_rate = parameters.get('mutation_rate', 0.01)
+    
     num_vars = qubo_matrix.shape[0]
     population = initialize_population(pop_size, num_vars)
     best_solution = None
