@@ -2,10 +2,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card } from "@/components/ui/card";
 
 interface ResultsChartProps {
-  data: number[];
+  data?: number[];
 }
 
 export const ResultsChart = ({ data }: ResultsChartProps) => {
+  if (!data || data.length === 0) {
+    return null;
+  }
+
   const chartData = data.map((cost, index) => ({
     iteration: index + 1,
     energy: cost

@@ -1,7 +1,6 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MatrixUpload } from "@/components/upload/MatrixUpload";
 import { SolverConfig } from "@/components/solver/SolverConfig";
-import { ResultsChart } from "@/components/visualization/ResultsChart";
 import { useState } from "react";
 
 const Playground = () => {
@@ -21,7 +20,6 @@ const Playground = () => {
         <section className="space-y-8">
           <MatrixUpload onMatrixLoaded={handleMatrixLoaded} />
           <SolverConfig quboMatrix={quboMatrix} constant={constant} />
-          <ResultsChart />
         </section>
       </main>
     </DashboardLayout>
