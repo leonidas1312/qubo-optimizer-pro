@@ -8,10 +8,32 @@ def compute_cost(qubo_matrix, solution, constant):
     """
     return solution @ qubo_matrix @ solution.T + constant
 
-def simulated_annealing(qubo_matrix, constant, initial_temperature=1000, cooling_rate=0.99, max_iterations=1000):
+def simulated_annealing(qubo_matrix, constant, parameters=None):
     """
     Implements Simulated Annealing for QUBO optimization.
+    
+    Args:
+        qubo_matrix: The QUBO matrix
+        constant: Constant term in the QUBO formulation
+        parameters: Dictionary containing algorithm parameters
+            - initial_temperature: Starting temperature (default: 1000)
+            - cooling_rate: Rate at which temperature decreases (default: 0.99)
+            - max_iterations: Maximum number of iterations (default: 1000)
+    
+    Returns:
+        Tuple containing:
+        - Best solution found (numpy array)
+        - Best cost found (float)
+        - List of costs per iteration (list of floats)
+        - Time taken (float)
     """
+    if parameters is None:
+        parameters = {}
+    
+    initial_temperature = parameters.get('initial_temperature', 1000)
+    cooling_rate = parameters.get('cooling_rate', 0.99)
+    max_iterations = parameters.get('max_iterations', 1000)
+    
     num_vars = qubo_matrix.shape[0]
 
     # Initialize random solution
