@@ -38,10 +38,10 @@ export const SolverConfig = () => {
           <div className="space-y-2">
             <Label>Solver Type</Label>
             <Select value={solver} onValueChange={setSolver}>
-              <SelectTrigger className="w-full bg-card border-muted">
+              <SelectTrigger className="w-full bg-background hover:bg-accent focus:bg-accent border-input">
                 <SelectValue placeholder="Select solver type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-input">
                 <SelectItem value="simulated-annealing">Simulated Annealing</SelectItem>
                 <SelectItem value="quantum-inspired">Quantum Inspired</SelectItem>
                 <SelectItem value="gurobi">Gurobi</SelectItem>
