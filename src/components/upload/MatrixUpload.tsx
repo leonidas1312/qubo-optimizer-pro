@@ -4,22 +4,47 @@ import { Upload, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-export const MatrixUpload = () => {
+interface MatrixUploadProps {
+  onMatrixLoaded: (matrix: number[][]) => void;
+}
+
+export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const uploadedFile = acceptedFiles[0];
     if (uploadedFile) {
-      setFile(uploadedFile);
-      toast.success("File uploaded successfully");
+      try {
+        const arrayBuffer = await uploadedFile.arrayBuffer();
+        // Convert ArrayBuffer to Buffer for Python processing
+        const buffer = Buffer.from(arrayBuffer);
+        
+        // Send the buffer to the Python backend
+        const response = await fetch('/api/load-matrix', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
+          body: buffer,
+        });
+
+        if (!response.ok) throw new Error('Failed to load matrix');
+        
+        const matrix = await response.json();
+        setFile(uploadedFile);
+        onMatrixLoaded(matrix);
+        toast.success("QUBO matrix loaded successfully");
+      } catch (error) {
+        toast.error("Failed to load QUBO matrix");
+        console.error(error);
+      }
     }
-  }, []);
+  }, [onMatrixLoaded]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'text/csv': ['.csv'],
-      'application/json': ['.json'],
+      'application/x-npy': ['.npy'],
     },
     maxFiles: 1,
   });
@@ -28,7 +53,9 @@ export const MatrixUpload = () => {
     <div className="w-full max-w-2xl mx-auto">
       <div
         {...getRootProps()}
-        className={`drop-zone ${isDragActive ? 'active' : ''} cursor-pointer`}
+        className={`border-2 border-dashed rounded-lg p-8 ${
+          isDragActive ? 'border-primary bg-accent/50' : 'border-muted'
+        } cursor-pointer transition-colors`}
       >
         <input {...getInputProps()} />
         <div className="text-center">
@@ -37,7 +64,7 @@ export const MatrixUpload = () => {
             {isDragActive ? "Drop your file here" : "Upload your QUBO matrix"}
           </h3>
           <p className="text-muted-foreground mb-4">
-            Drag and drop your CSV or JSON file, or click to browse
+            Drag and drop your .npy file, or click to browse
           </p>
           <Button variant="outline">Select File</Button>
         </div>

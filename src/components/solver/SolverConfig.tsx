@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -11,22 +12,75 @@ import {
 import { Label } from "@/components/ui/label";
 import { AlgorithmParameters } from "./AlgorithmParameters";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export const SolverConfig = () => {
-  const [solver, setSolver] = useState("simulated-annealing");
+interface SolverConfigProps {
+  quboMatrix: number[][] | null;
+}
+
+export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
+  const [solver, setSolver] = useState("tabu-search");
   const [parameters, setParameters] = useState<Record<string, number>>({});
-  const { toast } = useToast();
+  const [isRunning, setIsRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<{ cost: number; time: number } | null>(null);
 
   const handleParameterChange = (param: string, value: number) => {
     setParameters((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleRunSolver = () => {
-    toast({
-      title: "Solver Started",
-      description: `Running ${solver} with custom parameters`,
-    });
-    console.log("Running solver with parameters:", parameters);
+  const handleRunSolver = async () => {
+    if (!quboMatrix) {
+      toast.error("Please upload a QUBO matrix first");
+      return;
+    }
+
+    setIsRunning(true);
+    setProgress(0);
+    setResult(null);
+
+    try {
+      const response = await fetch('/api/solve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          matrix: quboMatrix,
+          solver,
+          parameters,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Solver failed');
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response stream');
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = new TextDecoder().decode(value);
+        const data = JSON.parse(text);
+
+        if (data.type === 'progress') {
+          setProgress(data.progress);
+        } else if (data.type === 'result') {
+          setResult({
+            cost: data.cost,
+            time: data.time,
+          });
+        }
+      }
+
+      toast.success(`Optimization completed! Best cost: ${result?.cost}`);
+    } catch (error) {
+      toast.error("Failed to run solver");
+      console.error(error);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   return (
@@ -55,11 +109,27 @@ export const SolverConfig = () => {
             onParameterChange={handleParameterChange}
           />
 
+          {isRunning && (
+            <div className="space-y-2">
+              <Label>Optimization Progress</Label>
+              <Progress value={progress} className="w-full" />
+            </div>
+          )}
+
+          {result && (
+            <div className="space-y-2 p-4 bg-muted rounded-lg">
+              <p className="font-medium">Results:</p>
+              <p>Best Cost: {result.cost}</p>
+              <p>Time: {result.time.toFixed(2)}s</p>
+            </div>
+          )}
+
           <Button 
-            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white" 
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white"
             onClick={handleRunSolver}
+            disabled={isRunning || !quboMatrix}
           >
-            Run Solver
+            {isRunning ? "Running..." : "Run Solver"}
           </Button>
         </div>
       </Card>
