@@ -29,7 +29,7 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
     setParameters((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleRunSolver = async () => {
+  const handleSolve = async () => {
     if (!quboMatrix) {
       toast.error("Please upload a QUBO matrix first");
       return;
@@ -40,41 +40,29 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
     setResult(null);
 
     try {
-      const response = await fetch('/api/solve', {
+      const response = await fetch('http://localhost:8000/api/solve', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           matrix: quboMatrix,
-          solver,
-          parameters,
+          solver: solver,
+          parameters: parameters,
         }),
       });
 
       if (!response.ok) throw new Error('Solver failed');
+      
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No response stream');
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const text = new TextDecoder().decode(value);
-        const data = JSON.parse(text);
-
-        if (data.type === 'progress') {
-          setProgress(data.progress);
-        } else if (data.type === 'result') {
-          setResult({
-            cost: data.cost,
-            time: data.time,
-          });
-        }
-      }
-
-      toast.success(`Optimization completed! Best cost: ${result?.cost}`);
+      setResult({
+        cost: data.cost,
+        time: data.time,
+      });
+      
+      toast.success(`Optimization completed! Best cost: ${data.cost}`);
     } catch (error) {
       toast.error("Failed to run solver");
       console.error(error);
