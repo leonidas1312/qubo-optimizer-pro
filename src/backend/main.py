@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from typing import Dict, Any
 import json
-from src.backend.solver import solve_qubo
+from backend.solver import solve_qubo
 import tempfile
 import os
 
