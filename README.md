@@ -1,69 +1,49 @@
-# Welcome to your Lovable project
+# QUBO Optimizer Pro
 
-## Project info
+**QUBO Optimizer Pro** is a project aimed at solving Quadratic Unconstrained Binary Optimization (QUBO) problems using efficient algorithms and a modern web interface. QUBO problems are widely used in combinatorial optimization, machine learning, and quantum computing.
 
-**URL**: https://lovable.dev/projects/eb11a58a-7431-4666-a889-d93b15710ada
+## Features
 
-## How can I edit this code?
+- **Interactive User Interface:** Built with React and styled with Tailwind CSS for modern and responsive UI design.
+- **Optimized Backend Logic:** Supports solving QUBO problems with a robust Python backend.
+- **Fast Development Workflow:** Powered by Vite for efficient builds and hot module replacement.
+- **Type Safety:** Written in TypeScript for a robust and maintainable codebase.
 
-There are several ways of editing your application.
+## Technology Stack
 
-**Use Lovable**
+### Frontend
+- **React:** Component-based UI library.
+- **Tailwind CSS:** Utility-first CSS framework.
+- **TypeScript:** Ensures strong typing and scalable development.
+- **Vite:** High-performance build tool for web projects.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/eb11a58a-7431-4666-a889-d93b15710ada) and start prompting.
+### Backend
+- **Python:** Used for solving QUBO problems and interacting with optimization libraries.
+- **Dependencies:** Managed with `requirements.txt` for Python-based modules.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Installation
 
-**Use your preferred IDE**
+To run the project locally, ensure you have the following installed:
+- **Node.js:** Recommended version 16+.
+- **npm or yarn:** For managing JavaScript dependencies.
+- **Python:** Version 3.8 or higher.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Steps
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository:
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd qubo-optimizer-pro
+   git clone https://github.com/leonidas1312/qubo-optimizer-pro
+2. Run the backend server using fastAPI:
+   ```bash
+   pip install -r requirements.txt
+   python setup.py
+   pip install -e .
+   python src/backend/main.py
+3. Run the frontend of the app:
+   ```bash
+   npm i
+   npm run dev
 
-Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/eb11a58a-7431-4666-a889-d93b15710ada) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
