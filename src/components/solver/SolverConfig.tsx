@@ -26,7 +26,10 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
   const [result, setResult] = useState<{ cost: number; time: number } | null>(null);
 
   const handleParameterChange = (param: string, value: number) => {
-    setParameters((prev) => ({ ...prev, [param]: value }));
+    setParameters((prev) => {
+      const newParams = { ...prev, [param]: value };
+      return newParams;
+    });
   };
 
   const handleSolve = async () => {
