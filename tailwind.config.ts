@@ -41,8 +41,12 @@ export default {
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#000000",
+          DEFAULT: "#333333",
+          foreground: "#FFFFFF",
+        },
+        popover: {
+          DEFAULT: "#111111",
+          foreground: "#FFFFFF",
         },
         card: {
           DEFAULT: "#111111",
