@@ -15,42 +15,31 @@ interface AlgorithmParameters {
 export const parameters: AlgorithmParameters = {
   "simulated-annealing": [
     {
-      name: "temperature",
+      name: "initial_temperature",
       label: "Initial Temperature",
-      defaultValue: 100,
-      min: 1,
-      max: 1000,
-      step: 1,
+      defaultValue: 1000,
+      min: 100,
+      max: 5000,
+      step: 100,
       tooltip: "Higher temperature allows for more exploration initially"
     },
     {
-      name: "cooling-rate",
+      name: "cooling_rate",
       label: "Cooling Rate",
-      defaultValue: 0.95,
-      min: 0.1,
-      max: 0.99,
-      step: 0.01,
-      tooltip: "Rate at which temperature decreases"
-    }
-  ],
-  "quantum-inspired": [
-    {
-      name: "population-size",
-      label: "Population Size",
-      defaultValue: 50,
-      min: 10,
-      max: 200,
-      step: 10,
-      tooltip: "Number of solutions in the population"
+      defaultValue: 0.99,
+      min: 0.8,
+      max: 0.999,
+      step: 0.001,
+      tooltip: "Rate at which temperature decreases (closer to 1 means slower cooling)"
     },
     {
-      name: "mutation-rate",
-      label: "Mutation Rate",
-      defaultValue: 0.1,
-      min: 0.01,
-      max: 0.5,
-      step: 0.01,
-      tooltip: "Probability of mutation occurring"
+      name: "max_iterations",
+      label: "Maximum Iterations",
+      defaultValue: 1000,
+      min: 100,
+      max: 10000,
+      step: 100,
+      tooltip: "Maximum number of iterations for the algorithm"
     }
   ],
   "tabu-search": [
@@ -84,31 +73,31 @@ export const parameters: AlgorithmParameters = {
   ],
   "genetic-algorithm": [
     {
-      name: "population-size",
+      name: "pop_size",
       label: "Population Size",
-      defaultValue: 100,
+      defaultValue: 50,
       min: 10,
-      max: 500,
+      max: 200,
       step: 10,
-      tooltip: "Number of individuals in the population"
+      tooltip: "Number of solutions in the population"
     },
     {
-      name: "mutation-rate",
+      name: "num_generations",
+      label: "Number of Generations",
+      defaultValue: 100,
+      min: 10,
+      max: 1000,
+      step: 10,
+      tooltip: "Number of generations to evolve the population"
+    },
+    {
+      name: "mutation_rate",
       label: "Mutation Rate",
       defaultValue: 0.01,
       min: 0.001,
       max: 0.1,
       step: 0.001,
-      tooltip: "Probability of gene mutation"
-    },
-    {
-      name: "crossover-rate",
-      label: "Crossover Rate",
-      defaultValue: 0.8,
-      min: 0.1,
-      max: 1.0,
-      step: 0.1,
-      tooltip: "Probability of crossover between parents"
+      tooltip: "Probability of mutation occurring for each bit"
     }
   ]
 };
