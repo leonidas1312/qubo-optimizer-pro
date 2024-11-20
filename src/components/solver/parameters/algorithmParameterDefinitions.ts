@@ -42,6 +42,62 @@ export const parameters: AlgorithmParameters = {
       tooltip: "Maximum number of iterations for the algorithm"
     }
   ],
+  "quantum-inspired": [
+    {
+      name: "num_layers",
+      label: "Number of Layers",
+      defaultValue: 2,
+      min: 1,
+      max: 10,
+      step: 1,
+      tooltip: "Number of layers for the quantum circuit"
+    },
+    {
+      name: "max_iters",
+      label: "Maximum Iterations",
+      defaultValue: 100,
+      min: 10,
+      max: 1000,
+      step: 10,
+      tooltip: "Maximum number of optimizer+RL search iterations"
+    },
+    {
+      name: "nbitstrings",
+      label: "Number of Bitstrings",
+      defaultValue: 5,
+      min: 1,
+      max: 20,
+      step: 1,
+      tooltip: "Number of samples to draw from the quantum circuit"
+    },
+    {
+      name: "opt_time",
+      label: "Optimizer Time (s)",
+      defaultValue: 10,
+      min: 1,
+      max: 100,
+      step: 1,
+      tooltip: "Optimizer time to run in seconds"
+    },
+    {
+      name: "rl_time",
+      label: "RL Search Time (s)", 
+      defaultValue: 10,
+      min: 1,
+      max: 100,
+      step: 1,
+      tooltip: "RL algorithm time to run in seconds"
+    },
+    {
+      name: "initial_temperature",
+      label: "Initial Temperature",
+      defaultValue: 10,
+      min: 0.1,
+      max: 100,
+      step: 0.1,
+      tooltip: "Starting temperature for the RL search"
+    }
+  ],
   "tabu-search": [
     {
       name: "max-iterations",
