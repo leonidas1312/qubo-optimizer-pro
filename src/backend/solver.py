@@ -1,9 +1,9 @@
 import numpy as np
 from typing import Tuple, List
-from ..algorithms.tabu_search import tabu_search
-from ..algorithms.simulated_annealing import simulated_annealing
-from ..algorithms.quantum_inspired import quantum_inspired
-from ..algorithms.genetic_algorithm import genetic_algorithm
+from src.algorithms.tabu_search import tabu_search
+from src.algorithms.simulated_annealing import simulated_annealing
+from src.algorithms.quantum_inspired import quantum_inspired
+from src.algorithms.genetic_algorithm import genetic_algorithm
 
 def solve_qubo(
     qubo_matrix: np.ndarray,
