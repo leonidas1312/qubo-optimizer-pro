@@ -8,16 +8,6 @@ interface MatrixUploadProps {
   onMatrixLoaded: (matrix: number[][]) => void;
 }
 
-import { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import { Upload, File } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-
-interface MatrixUploadProps {
-  onMatrixLoaded: (matrix: number[][]) => void;
-}
-
 export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
   const [file, setFile] = useState<File | null>(null);
 
@@ -87,4 +77,3 @@ export const MatrixUpload = ({ onMatrixLoaded }: MatrixUploadProps) => {
     </div>
   );
 };
-

@@ -114,7 +114,7 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
 
           <Button 
             className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white"
-            onClick={handleRunSolver}
+            onClick={handleSolve}
             disabled={isRunning || !quboMatrix}
           >
             {isRunning ? "Running..." : "Run Solver"}
