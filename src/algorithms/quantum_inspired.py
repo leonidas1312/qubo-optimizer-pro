@@ -293,7 +293,7 @@ def OPT_step(opt, theta):
     return theta, adam_cost
 
 
-def quantum_opt(QUBO_m, c, num_layers, max_iters, nbitstrings, opt_time, rl_time,
+def quantum_inspired(QUBO_m, c, num_layers, max_iters, nbitstrings, opt_time, rl_time,
                 initial_temperature, verbose=False):
     """Heuristic Quantum Enhanced Optimization Algorithm for QUBO problems.
     The quantum part is used to find good initial solutions for the RL search algorithm.
