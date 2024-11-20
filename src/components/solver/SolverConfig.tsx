@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { AlgorithmParameters } from "./AlgorithmParameters";
+import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 
 interface SolverConfigProps {
@@ -25,7 +26,7 @@ export const SolverConfig = ({ quboMatrix }: SolverConfigProps) => {
   const [result, setResult] = useState<{ cost: number; time: number } | null>(null);
 
   const handleParameterChange = (param: string, value: number) => {
-    setParameters(prev => ({ ...prev, [param]: value }));
+    setParameters((prev) => ({ ...prev, [param]: value }));
   };
 
   const handleSolve = async () => {
