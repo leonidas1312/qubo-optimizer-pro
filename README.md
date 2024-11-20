@@ -1,6 +1,6 @@
-# QUBO Optimizer Pro
+# QUBOt
 
-**QUBO Optimizer Pro** is a project aimed at solving Quadratic Unconstrained Binary Optimization (QUBO) problems using efficient algorithms and a modern web interface. QUBO problems are widely used in combinatorial optimization, machine learning, and quantum computing.
+**QUBOt** is a project aimed at solving Quadratic Unconstrained Binary Optimization (QUBO) problems using efficient algorithms and a modern web interface. QUBO problems are widely used in combinatorial optimization, machine learning, and quantum computing.
 
 ## Features
 
