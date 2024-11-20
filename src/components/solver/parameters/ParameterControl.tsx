@@ -28,6 +28,18 @@ export const ParameterControl = ({
   step,
   onChange,
 }: ParameterControlProps) => {
+  const handleSliderChange = (values: number[]) => {
+    onChange(values[0]);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(e.target.value);
+    if (!isNaN(newValue)) {
+      const clampedValue = Math.min(Math.max(newValue, min), max);
+      onChange(clampedValue);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -49,19 +61,13 @@ export const ParameterControl = ({
           min={min}
           max={max}
           step={step}
-          onValueChange={(values) => onChange(values[0])}
+          onValueChange={handleSliderChange}
           className="flex-1"
         />
         <Input
           type="number"
           value={value}
-          onChange={(e) => {
-            const numValue = parseFloat(e.target.value);
-            if (!isNaN(numValue)) {
-              const clampedValue = Math.min(Math.max(numValue, min), max);
-              onChange(clampedValue);
-            }
-          }}
+          onChange={handleInputChange}
           className="w-20"
           min={min}
           max={max}
