@@ -1,11 +1,7 @@
-// pages/UploadAlgos.tsx
-
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Code, File } from 'lucide-react';
-// Import CodeMirror components
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { EditorView } from '@codemirror/view';
