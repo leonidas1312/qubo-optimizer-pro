@@ -23,17 +23,16 @@ app.add_middleware(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key="your-secret-key",  # Change this to a secure secret key
+    secret_key="your-secret-key",
     same_site="lax",
-    https_only=False  # Set to True in production
+    https_only=False
 )
 
 # GitHub OAuth configuration
-GITHUB_CLIENT_ID = "your-github-client-id"  # Replace with your GitHub OAuth App client ID
-GITHUB_CLIENT_SECRET = "your-github-client-secret"  # Replace with your GitHub OAuth App client secret
+GITHUB_CLIENT_ID = "your-github-client-id"
+GITHUB_CLIENT_SECRET = "your-github-client-secret"
 GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
-
-# ... keep existing code (QUBO-related endpoints)
+FRONTEND_URL = "http://localhost:5173"
 
 @app.get("/api/auth/github")
 async def github_login():
@@ -69,7 +68,8 @@ async def github_callback(request: Request, code: str):
     request.session["github_token"] = access_token
     request.session["user"] = user_data
     
-    return RedirectResponse(url="http://localhost:5173/uploadalgos")
+    # Redirect back to the frontend upload page
+    return RedirectResponse(url=f"{FRONTEND_URL}/uploadalgos")
 
 @app.get("/api/auth/status")
 async def auth_status(request: Request):
