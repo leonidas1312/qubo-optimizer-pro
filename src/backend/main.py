@@ -29,6 +29,7 @@ app.add_middleware(
 )
 
 # GitHub OAuth configuration
+<<<<<<< HEAD
 GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
 GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
 GITHUB_REDIRECT_URI = "http://localhost:8080/auth/github/callback"
@@ -92,6 +93,12 @@ async def solve(data: Dict[Any, Any]):
     except Exception as e:
         return {"error": str(e)}
 
+=======
+GITHUB_CLIENT_ID = "your-github-client-id"
+GITHUB_CLIENT_SECRET = "your-github-client-secret"
+GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
+FRONTEND_URL = "http://localhost:5173"
+>>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
 
 @app.get("/api/auth/github")
 async def github_login():
@@ -127,7 +134,11 @@ async def github_callback(request: Request, code: str):
     user_data = user_response.json()
     request.session["github_token"] = access_token
     request.session["user"] = user_data
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
     # Redirect back to the frontend upload page
     return RedirectResponse(url=f"{FRONTEND_URL}/uploadalgos")
 
