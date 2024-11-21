@@ -4,20 +4,19 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
 import Index from "./pages/Index";
 import Solvers from "./pages/Solvers";
 import Playground from "./pages/Playground";
 import UploadAlgos from "./pages/UploadAlgos";
-
-
 
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
     <React.StrictMode>
-      <React.Fragment>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <TooltipProvider>
             <BrowserRouter>
               <Routes>
@@ -30,8 +29,8 @@ const App = () => {
               <Sonner />
             </BrowserRouter>
           </TooltipProvider>
-        </QueryClientProvider>
-      </React.Fragment>
+        </AuthProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 };

@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { EditorView } from '@codemirror/view';
+import { useAuth } from '@/context/AuthContext';
+import { Card } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 const UploadAlgos = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const [repositories, setRepositories] = useState([]);
 
   // State variables
   const [code, setCode] = useState('');
   const [quboFile, setQuboFile] = useState<File | null>(null);
   const [executionStatus, setExecutionStatus] = useState('');
   const [executionResult, setExecutionResult] = useState<any>(null);
-
-
-
-
 
   // Handlers
   const handleCodeChange = (value: string) => {
@@ -66,31 +67,38 @@ const UploadAlgos = () => {
     }
   };
 
-  // Editor theme and styling
-  const editorTheme = EditorView.theme({
-    '&': {
-      color: '#000000', // Black text
-      backgroundColor: '#ffffff', // White background
-    },
-    '.cm-content': {
-      fontFamily: 'monospace',
-      fontSize: '14px',
-    },
-    '.cm-scroller': {
-      overflow: 'hidden', // Hide internal scrollbars
-    },
-  });
+  // Fetch repositories when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRepositories();
+    }
+  }, [isAuthenticated]);
 
-  // Calculate the height for approximately 10 lines
-  const lineHeight = 24; // Approximate line height in pixels (adjust if necessary)
-  const minHeight = lineHeight * 10; // Minimum height for 10 lines
-
-  // Custom style for the editor to set minHeight and allow expansion
-  const editorStyle = {
-    minHeight: `${minHeight}px`,
-    height: 'auto',
-    maxHeight: 'none',
+  const fetchRepositories = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/github/repos', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      setRepositories(data);
+    } catch (error) {
+      console.error('Failed to fetch repositories:', error);
+      toast.error('Failed to load repositories');
+    }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-8 px-4">
+          <h1 className="text-3xl font-bold mb-6">Please Login</h1>
+          <p className="text-muted-foreground">
+            You need to login with GitHub to upload algorithms and view your repositories.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -99,30 +107,68 @@ const UploadAlgos = () => {
           Upload and Test Your Algorithm
         </h1>
 
-        {/* Code Editor */}
-        <div className="mb-8">
-          <label className="block text-lg font-medium mb-2">
-            Algorithm Code (Python)
-          </label>
-          <div className="border rounded-lg overflow-hidden">
-            <CodeMirror
-              value={code}
-              extensions={[python(), editorTheme]}
-              onChange={handleCodeChange}
-              basicSetup={{
-                lineNumbers: true,
-                foldGutter: true,
-                highlightActiveLine: true,
-                syntaxHighlighting: true,
-                bracketMatching: true,
-                autocompletion: true,
-              }}
-              style={editorStyle}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Your Repositories</h2>
+            <div className="space-y-4">
+              {repositories.map((repo: any) => (
+                <Card key={repo.id} className="p-4">
+                  <h3 className="font-medium">{repo.name}</h3>
+                  <p className="text-sm text-muted-foreground">{repo.description}</p>
+                  <div className="mt-2">
+                    <a
+                      href={repo.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      View on GitHub
+                    </a>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-lg font-medium mb-2">
+              Algorithm Code (Python)
+            </label>
+            <div className="border rounded-lg overflow-hidden">
+              <CodeMirror
+                value={code}
+                extensions={[python(), EditorView.theme({
+                  '&': {
+                    color: '#000000', // Black text
+                    backgroundColor: '#ffffff', // White background
+                  },
+                  '.cm-content': {
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                  },
+                  '.cm-scroller': {
+                    overflow: 'hidden', // Hide internal scrollbars
+                  },
+                })]}
+                onChange={handleCodeChange}
+                basicSetup={{
+                  lineNumbers: true,
+                  foldGutter: true,
+                  highlightActiveLine: true,
+                  syntaxHighlighting: true,
+                  bracketMatching: true,
+                  autocompletion: true,
+                }}
+                style={{
+                  minHeight: '240px',
+                  height: 'auto',
+                  maxHeight: 'none',
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* QUBO File Upload */}
         <div className="mb-8">
           <label className="block text-lg font-medium mb-2">
             Upload QUBO Matrix (.npy file)
@@ -141,12 +187,10 @@ const UploadAlgos = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <Button size="lg" onClick={handleSubmit}>
           Run Algorithm
         </Button>
 
-        {/* Execution Status */}
         {executionStatus && (
           <div className="mt-6">
             <p className="text-lg font-medium">
@@ -155,24 +199,17 @@ const UploadAlgos = () => {
           </div>
         )}
 
-        {/* Execution Result */}
         {executionResult && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4">Execution Result</h2>
-            {/* Display execution time */}
             <p className="mb-2">
               <strong>Execution Time:</strong> {executionResult.executionTime}{' '}
               seconds
             </p>
-            {/* Display best cost function value */}
             <p className="mb-4">
               <strong>Best Cost Function Value:</strong>{' '}
               {executionResult.bestCost}
             </p>
-            {/* Placeholder for optimization chart */}
-            {/* You can integrate a chart library like Chart.js or Recharts to display the optimization chart */}
-            {/* Example: */}
-            {/* <OptimizationChart data={executionResult.optimizationData} /> */}
           </div>
         )}
       </div>

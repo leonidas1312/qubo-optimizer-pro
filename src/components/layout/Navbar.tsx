@@ -1,13 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Code2, Settings } from "lucide-react";
+import { Code2, Settings, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { AuthContext } from './backend/AuthContext';
+import { useAuth } from "@/context/AuthContext";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
+  const { isAuthenticated, user, login, logout } = useAuth();
 
   const handleSettings = () => {
     toast({
@@ -16,8 +16,12 @@ export const Navbar = () => {
     });
   };
 
-  const handleGetStarted = () => {
-    navigate("/playground");
+  const handleAuth = () => {
+    if (isAuthenticated) {
+      logout();
+    } else {
+      login();
+    }
   };
 
   return (
@@ -42,10 +46,23 @@ export const Navbar = () => {
           <Button variant="ghost" size="icon" onClick={handleSettings}>
             <Settings className="h-5 w-5" />
           </Button>
-          <Button onClick={handleGetStarted}>Login with Github</Button>
+          <Button onClick={handleAuth} className="flex items-center space-x-2">
+            {isAuthenticated ? (
+              <>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </>
+            ) : (
+              'Login with Github'
+            )}
+          </Button>
+          {isAuthenticated && (
+            <span className="text-sm text-muted-foreground">
+              {user?.login}
+            </span>
+          )}
         </div>
       </div>
-
     </nav>
   );
 };
