@@ -94,11 +94,7 @@ const UploadAlgos = () => {
 
         <CodeUploadSection code={code} onCodeChange={setCode} />
         <FileUploadSection quboFile={quboFile} onFileChange={handleQuboFileChange} />
-<<<<<<< HEAD
-
-=======
         
->>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
         <Button size="lg" onClick={handleSubmit}>
           Run Algorithm
         </Button>

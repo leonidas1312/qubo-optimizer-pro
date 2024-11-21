@@ -40,11 +40,7 @@ export const RepositoryGrid = ({ repositories }: RepositoryGridProps) => {
                 </span>
               )}
             </div>
-<<<<<<< HEAD
-
-=======
             
->>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
             {repo.description && (
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {repo.description}
