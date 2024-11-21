@@ -19,7 +19,7 @@ def calculate_cost(angles, qnode, QUBO_matrix, const):
             blist.append(data[2 * p + 1] / clist[p])
 
     end_time1 = time.time()
-    print("Time running the qc and getting back results : " + str(end_time1 - start_time1))
+    print(f"Time running the qc and getting back results : " + str(end_time1 - start_time1))
     
     start_time_opt = time.time()
     blist = copy.deepcopy(np.array(blist))
@@ -32,6 +32,6 @@ def calculate_cost(angles, qnode, QUBO_matrix, const):
     quantum_cost = totcost - subtract_cost + add_cost + const
     
     end_time_opt = time.time()
-    print("Time to estimate cost : " + str(end_time_opt - start_time_opt))
+    print(f"Time to estimate cost : " + str(end_time_opt - start_time_opt))
     
     return quantum_cost

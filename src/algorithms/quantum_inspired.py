@@ -42,27 +42,28 @@ def quantum_inspired(qubo_matrix, constant, parameters=None):
     num_shots = 10000
     dev = qml.device("lightning.qubit", wires=nqq, shots=num_shots)
     qnode = qml.QNode(lambda angles: pennylane_HEcirc(angles, nqq), dev, diff_method="parameter-shift")
-
+    p1;
     print(f"Number of classical variables = {len(qubo_matrix)}")
     print(f"Number of qubits for the quantum circuit = {nqq}")
     print(f"Number of layers for the quantum circuit = {num_layers}")
     print(f"Number of shots = {num_shots}")
-
+    print(f"PRINNNNNN1")
     opt = qml.AdamOptimizer(stepsize=0.01)
+    print(f"PRINNNNNN2")
     theta = np.array([2 * np.pi * np.random.rand() for _ in range(nqq * num_layers)], requires_grad=True)
-
+    print(f"PRINNNNNN3")
     best_theta = []
     best_cost = float('inf')
     best_cost_opt = float('inf')
     best_bitstring = None
     cost_values = []
     progress_opt_costs = []
-    
+    print(f"PRINNNNNN4")
     start_time = time.time()
-
     for iteration in range(max_iters):
         # Run ADAM optimization
         end_time = time.time() + opt_time
+        print(f"MPIKAAA")
         while time.time() < end_time:
             theta, opt_cost = opt.step_and_cost(
                 lambda angles: calculate_cost(angles, qnode, qubo_matrix, constant), 
@@ -83,7 +84,8 @@ def quantum_inspired(qubo_matrix, constant, parameters=None):
                 qubo_matrix,
                 constant,
                 rl_time / len(drawn_bitstrings),
-                temperature=initial_temperature
+                temperature=initial_temperature,
+                verbose=True,
             )
 
             if current_cost < best_cost:

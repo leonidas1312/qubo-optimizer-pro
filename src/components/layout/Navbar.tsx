@@ -2,10 +2,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Code2, Settings } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { AuthContext } from './backend/AuthContext';
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+
 
   const handleSettings = () => {
     toast({
@@ -30,19 +32,20 @@ export const Navbar = () => {
             Playground
           </Link>
           <Link to="/solvers" className="text-muted-foreground hover:text-foreground transition-colors">
-            Optimization Algorithms
+            Documentation
           </Link>
-          <Link to="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
-            Leaderboard
+          <Link to="/uploadalgos" className="text-muted-foreground hover:text-foreground transition-colors">
+            Upload algorithm
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={handleSettings}>
             <Settings className="h-5 w-5" />
           </Button>
-          <Button onClick={handleGetStarted}>Get Started</Button>
+          <Button onClick={handleGetStarted}>Login with Github</Button>
         </div>
       </div>
+
     </nav>
   );
 };

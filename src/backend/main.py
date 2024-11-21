@@ -18,6 +18,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+CLIENT_ID = "Ov23lik0nLhm747FIJLk"
+CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"
+
 @app.post("/api/load-matrix")
 async def load_matrix(file: UploadFile = File(...)):
     try:
@@ -74,6 +77,8 @@ async def solve(data: Dict[Any, Any]):
         }
     except Exception as e:
         return {"error": str(e)}
+
+
 
 if __name__ == "__main__":
     import uvicorn
