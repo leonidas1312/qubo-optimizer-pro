@@ -38,7 +38,6 @@ To run the project locally, ensure you have the following installed:
 2. Run the backend server using fastAPI:
    ```bash
    pip install -r requirements.txt
-   python setup.py
    pip install -e .
    python src/backend/main.py
 3. Run the frontend of the app:
