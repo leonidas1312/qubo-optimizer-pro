@@ -106,11 +106,14 @@ async def github_callback(request: Request, code: str):
             "client_id": GITHUB_CLIENT_ID,
             "client_secret": GITHUB_CLIENT_SECRET,
             "code": code,
+            "redirect_uri": GITHUB_REDIRECT_URI
         },
         headers={"Accept": "application/json"},
     )
 
     access_token = token_response.json().get("access_token")
+    if not access_token:
+        return RedirectResponse(url=f"{FRONTEND_URL}?error=auth_failed")
 
     # Get user data
     user_response = requests.get(
