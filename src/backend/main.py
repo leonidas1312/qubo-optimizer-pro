@@ -15,7 +15,7 @@ app = FastAPI()
 # Configure CORS and Session
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,8 +31,8 @@ app.add_middleware(
 # GitHub OAuth configuration
 GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"
 GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"
-GITHUB_REDIRECT_URI = "http://localhost:5173/auth/github/callback"
-FRONTEND_URL = "http://localhost:5173"
+GITHUB_REDIRECT_URI = "http://localhost:8080/auth/github/callback"
+FRONTEND_URL = "http://localhost:8080"
 
 @app.post("/api/load-matrix")
 async def load_matrix(file: UploadFile = File(...)):
