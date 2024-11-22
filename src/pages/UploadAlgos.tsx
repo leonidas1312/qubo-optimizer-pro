@@ -25,7 +25,7 @@ const fetchRepositories = async () => {
 
 const fetchFileStructure = async (owner: string, repo: string) => {
   const response = await fetch(
-    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents`,
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/tree`,
     { credentials: 'include' }
   );
   if (!response.ok) throw new Error('Failed to fetch file structure');
@@ -53,6 +53,9 @@ const UploadAlgos = () => {
       setSelectedRepo({ owner, name: repoName });
       
       const structure = await fetchFileStructure(owner, repoName);
+      if (structure.error) {
+        throw new Error(structure.error);
+      }
       setFileStructure(structure);
       
       toast.success('Repository files loaded successfully');

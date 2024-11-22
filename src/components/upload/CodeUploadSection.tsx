@@ -13,19 +13,26 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
 
   return (
     <div className="flex w-full h-screen">
-
+      {/* Left Side Content */}
+      <div className="w-1/2 p-6">
+        <h1 className="text-2xl font-bold mb-4">Algorithm Information</h1>
+        <p className="text-lg">
+          Here you can provide some information or explanation about the algorithm.
+          This section will occupy the left half of the page.
+        </p>
+      </div>
 
       {/* Right Side Code Editor */}
-      <div className="w-full p-6">
+      <div className="w-1/2 p-6">
         <label className="block text-lg font-medium mb-2">
-          Code
+          Algorithm Code (Python)
         </label>
         <div className="border rounded-lg overflow-hidden h-full">
           <MonacoEditor
             height="100%"
             defaultLanguage="python"
             value={code}
-            theme="vs-dark" // Monaco's built-in dark theme
+            theme="vs-dark"
             onChange={(value) => {
               if (value !== undefined) {
                 onCodeChange(value);
@@ -38,7 +45,7 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
               fontSize: 14,
               fontFamily: 'monospace',
               automaticLayout: true,
-              bracketPairColorization: true,
+              bracketPairColorization: { enabled: true },
               wordWrap: "on",
             }}
           />
