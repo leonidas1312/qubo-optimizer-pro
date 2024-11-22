@@ -20,7 +20,6 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
           Here you can provide some information or explanation about the algorithm.
           This section will occupy the left half of the page.
         </p>
-        {/* Add any additional content you want on the left side here */}
       </div>
 
       {/* Right Side Code Editor */}
@@ -33,7 +32,7 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
             height="100%"
             defaultLanguage="python"
             value={code}
-            theme="vs-dark" // Monaco's built-in dark theme
+            theme="vs-dark"
             onChange={(value) => {
               if (value !== undefined) {
                 onCodeChange(value);
@@ -46,7 +45,7 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
               fontSize: 14,
               fontFamily: 'monospace',
               automaticLayout: true,
-              bracketPairColorization: true,
+              bracketPairColorization: { enabled: true },
               wordWrap: "on",
             }}
           />
