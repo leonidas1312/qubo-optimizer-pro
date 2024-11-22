@@ -19,9 +19,9 @@ async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
 
 async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict:
     try:
-        # Get the file blob using the Git Data API
+        # Get the file content using the contents API
         response = requests.get(
-            f"https://api.github.com/repos/{owner}/{repo}/git/blobs/{path}",
+            f"https://api.github.com/repos/{owner}/{repo}/contents/{path}",
             headers={
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/vnd.github.v3+json",
@@ -29,30 +29,20 @@ async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict
         )
         
         if response.status_code != 200:
-            # If blob not found, try the regular API as fallback
-            response = requests.get(
-                f"https://api.github.com/repos/{owner}/{repo}/contents/{path}",
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Accept": "application/vnd.github.v3+json",
-                },
-            )
-            
-            if response.status_code != 200:
-                return {"error": "Failed to fetch file contents"}
+            return {"error": "Failed to fetch file contents"}
         
         data = response.json()
         
         # Handle both blob and contents API responses
-        content = data.get("content", "")
-        encoding = data.get("encoding", "base64")
-        
-        return {
-            "content": content,
-            "encoding": encoding,
-            "type": "file",
-            "name": path.split("/")[-1],
-        }
+        if isinstance(data, dict):
+            return {
+                "content": data.get("content", ""),
+                "encoding": data.get("encoding", "base64"),
+                "type": "file",
+                "name": path.split("/")[-1],
+            }
+        else:
+            return {"error": "Invalid response format"}
         
     except Exception as e:
         return {"error": str(e)}
@@ -71,7 +61,7 @@ def build_tree(items: dict) -> list:
             if full_path not in paths:
                 new_node = {
                     'name': part,
-                    'path': item['sha'] if i == len(parts) - 1 else full_path,
+                    'path': full_path,
                     'type': 'tree' if i < len(parts) - 1 or item['type'] == 'tree' else 'file',
                     'children': [] if i < len(parts) - 1 or item['type'] == 'tree' else None
                 }

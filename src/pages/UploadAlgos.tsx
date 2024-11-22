@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
 import { CodeUploadSection } from '@/components/upload/CodeUploadSection';
 import { RepositoryGrid } from '@/components/github/RepositoryGrid';
 import { FileTree } from '@/components/github/FileTree';
@@ -32,9 +30,9 @@ const fetchFileStructure = async (owner: string, repo: string) => {
   return response.json();
 };
 
-const fetchFileContent = async (owner: string, repo: string, sha: string) => {
+const fetchFileContent = async (owner: string, repo: string, path: string) => {
   const response = await fetch(
-    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${sha}`,
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${path}`,
     { credentials: 'include' }
   );
   if (!response.ok) throw new Error('Failed to fetch file content');
@@ -74,11 +72,11 @@ const UploadAlgos = () => {
     }
   };
 
-  const handleFileSelect = async (sha: string) => {
+  const handleFileSelect = async (path: string) => {
     if (!selectedRepo) return;
     
     try {
-      const content = await fetchFileContent(selectedRepo.owner, selectedRepo.name, sha);
+      const content = await fetchFileContent(selectedRepo.owner, selectedRepo.name, path);
       if (content.error) {
         throw new Error(content.error);
       }
