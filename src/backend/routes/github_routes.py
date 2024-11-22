@@ -5,18 +5,36 @@ import base64
 import urllib.parse
 
 async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
-    response = requests.get(
-        f"https://api.github.com/repos/{owner}/{repo}/git/trees/main?recursive=1",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github.v3+json",
-        },
-    )
-    
-    if response.status_code != 200:
-        return {"error": "Failed to fetch repository contents"}
+    try:
+        # First try to get the default branch
+        repo_response = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        )
         
-    return response.json()
+        if repo_response.status_code != 200:
+            return {"error": "Failed to fetch repository information"}
+            
+        default_branch = repo_response.json().get('default_branch', 'main')
+        
+        # Then get the tree using the default branch
+        response = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo}/git/trees/{default_branch}?recursive=1",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        )
+        
+        if response.status_code != 200:
+            return {"error": "Failed to fetch repository contents"}
+            
+        return response.json()
+    except Exception as e:
+        return {"error": str(e)}
 
 async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict:
     try:
@@ -51,10 +69,13 @@ async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict
         return {"error": str(e)}
 
 def build_tree(items: dict) -> list:
+    if "error" in items:
+        return []
+        
     root = []
     paths = {}
     
-    for item in items['tree']:
+    for item in items.get('tree', []):
         parts = item['path'].split('/')
         current = root
         

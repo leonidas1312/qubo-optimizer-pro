@@ -28,11 +28,12 @@ const fetchFileStructure = async (owner: string, repo: string) => {
     { credentials: 'include' }
   );
   if (!response.ok) throw new Error('Failed to fetch file structure');
-  return response.json();
+  const data = await response.json();
+  if (data.error) throw new Error(data.error);
+  return data;
 };
 
 const fetchFileContent = async (owner: string, repo: string, path: string) => {
-  // URL encode the path to handle special characters
   const encodedPath = encodeURIComponent(path);
   const response = await fetch(
     `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${encodedPath}`,
@@ -63,9 +64,6 @@ const UploadAlgos = () => {
       setSelectedRepo({ owner, name: repoName });
       
       const structure = await fetchFileStructure(owner, repoName);
-      if (structure.error) {
-        throw new Error(structure.error);
-      }
       setFileStructure(structure);
       
       toast.success('Repository files loaded successfully');
@@ -83,7 +81,13 @@ const UploadAlgos = () => {
       if (content.error) {
         throw new Error(content.error);
       }
-      setCode(content.content);
+      
+      // If the content is base64 encoded, decode it
+      const decodedContent = content.encoding === 'base64' 
+        ? atob(content.content.replace(/\s/g, ''))
+        : content.content;
+        
+      setCode(decodedContent);
       toast.success('File loaded successfully');
     } catch (error) {
       toast.error('Failed to load file');
