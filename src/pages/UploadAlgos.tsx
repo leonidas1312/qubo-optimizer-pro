@@ -99,7 +99,7 @@ const UploadAlgos = () => {
 
         {selectedRepo && (
           <div className="flex gap-6">
-            <div className="w-1/4 min-w-[250px]">
+            <div className="w-1/2 min-w-[250px]">
               <h3 className="text-lg font-semibold mb-4">
                 Files - {selectedRepo.name}
               </h3>

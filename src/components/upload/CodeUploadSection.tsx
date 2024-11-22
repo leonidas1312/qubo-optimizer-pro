@@ -13,20 +13,12 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
 
   return (
     <div className="flex w-full h-screen">
-      {/* Left Side Content */}
-      <div className="w-1/2 p-6">
-        <h1 className="text-2xl font-bold mb-4">Algorithm Information</h1>
-        <p className="text-lg">
-          Here you can provide some information or explanation about the algorithm.
-          This section will occupy the left half of the page.
-        </p>
-        {/* Add any additional content you want on the left side here */}
-      </div>
+
 
       {/* Right Side Code Editor */}
-      <div className="w-1/2 p-6">
+      <div className="w-full p-6">
         <label className="block text-lg font-medium mb-2">
-          Algorithm Code (Python)
+          Code
         </label>
         <div className="border rounded-lg overflow-hidden h-full">
           <MonacoEditor
