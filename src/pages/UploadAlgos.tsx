@@ -5,6 +5,7 @@ import { RepositoryGrid } from '@/components/github/RepositoryGrid';
 import { FileTree } from '@/components/github/FileTree';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface FileNode {
   name: string;
@@ -31,8 +32,10 @@ const fetchFileStructure = async (owner: string, repo: string) => {
 };
 
 const fetchFileContent = async (owner: string, repo: string, path: string) => {
+  // URL encode the path to handle special characters
+  const encodedPath = encodeURIComponent(path);
   const response = await fetch(
-    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${path}`,
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${encodedPath}`,
     { credentials: 'include' }
   );
   if (!response.ok) throw new Error('Failed to fetch file content');

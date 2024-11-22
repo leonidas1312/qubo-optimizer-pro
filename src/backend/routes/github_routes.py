@@ -2,6 +2,7 @@ from fastapi import Request
 import requests
 from typing import Optional
 import base64
+import urllib.parse
 
 async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
     response = requests.get(
@@ -19,9 +20,12 @@ async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
 
 async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict:
     try:
+        # URL encode the path to handle special characters
+        encoded_path = urllib.parse.quote(path)
+        
         # Get the file content using the contents API
         response = requests.get(
-            f"https://api.github.com/repos/{owner}/{repo}/contents/{path}",
+            f"https://api.github.com/repos/{owner}/{repo}/contents/{encoded_path}",
             headers={
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/vnd.github.v3+json",
@@ -33,7 +37,6 @@ async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict
         
         data = response.json()
         
-        # Handle both blob and contents API responses
         if isinstance(data, dict):
             return {
                 "content": data.get("content", ""),
