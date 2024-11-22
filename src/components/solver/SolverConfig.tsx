@@ -117,14 +117,14 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
 
           {result && (
             <div className="space-y-2 p-4 bg-muted rounded-lg">
-              <p className="font-medium">Results:</p>
+
               <p>Best Cost: {result.cost}</p>
               <p>Time: {result.time.toFixed(2)}s</p>
             </div>
           )}
 
           <Button 
-            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white"
+            className="w-full bg-gradient-to-r from-green-900 to-green-900 hover:from-green-800 hover:to-green-900 text-white"
             onClick={handleSolve}
             disabled={isRunning || !quboMatrix}
           >

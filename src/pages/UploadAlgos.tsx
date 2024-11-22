@@ -3,14 +3,12 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { CodeUploadSection } from '@/components/upload/CodeUploadSection';
-import { FileUploadSection } from '@/components/upload/FileUploadSection';
-import { ExecutionStatus } from '@/components/upload/ExecutionStatus';
 import { RepositoryGrid } from '@/components/github/RepositoryGrid';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchRepositories = async () => {
   const response = await fetch('http://localhost:8000/api/github/repos', {
-    credentials: 'include'
+    credentials: 'include',
   });
   if (!response.ok) throw new Error('Failed to fetch repositories');
   return response.json();
@@ -19,9 +17,10 @@ const fetchRepositories = async () => {
 const UploadAlgos = () => {
   const { isAuthenticated } = useAuth();
   const [code, setCode] = useState('');
-  const [quboFile, setQuboFile] = useState<File | null>(null);
   const [executionStatus, setExecutionStatus] = useState('');
-  const [executionResult, setExecutionResult] = useState<any>(null);
+  const [executionResult, setExecutionResult] = useState(null);
+  const [fileStructure, setFileStructure] = useState(null); // State for file structure
+  const [selectedRepo, setSelectedRepo] = useState(null); // State for selected repository
 
   const { data: repositories, isLoading } = useQuery({
     queryKey: ['repositories'],
@@ -29,10 +28,10 @@ const UploadAlgos = () => {
     enabled: isAuthenticated,
   });
 
-  const handleQuboFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setQuboFile(e.target.files[0]);
-    }
+  const handleAddFileStructure = (repo) => {
+    // Assuming that the file structure is part of the repository data
+    setFileStructure(repo.contents);
+    setSelectedRepo(repo);
   };
 
   const handleSubmit = async () => {
@@ -40,14 +39,9 @@ const UploadAlgos = () => {
       alert('Please provide your algorithm code.');
       return;
     }
-    if (!quboFile) {
-      alert('Please upload a QUBO matrix file.');
-      return;
-    }
 
     const formData = new FormData();
     formData.append('code', new Blob([code], { type: 'text/plain' }));
-    formData.append('quboFile', quboFile);
 
     setExecutionStatus('Running');
 
@@ -71,7 +65,7 @@ const UploadAlgos = () => {
         <div className="container mx-auto py-8 px-4">
           <h1 className="text-3xl font-bold mb-6">Please Login</h1>
           <p className="text-muted-foreground">
-            You need to login with GitHub to upload algorithms and view your repositories.
+            You need to login with GitHub to use the workspace.
           </p>
         </div>
       </DashboardLayout>
@@ -81,29 +75,42 @@ const UploadAlgos = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6">Upload and Test Your Algorithm</h1>
+        <h1 className="text-3xl font-bold mb-6">Choose a repository </h1>
 
         {isLoading ? (
           <div className="text-center py-8">Loading repositories...</div>
         ) : repositories ? (
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Your Repositories</h2>
-            <RepositoryGrid repositories={repositories} />
+            <RepositoryGrid
+              repositories={repositories}
+              onAddFileStructure={handleAddFileStructure}
+            />
           </div>
         ) : null}
 
-        <CodeUploadSection code={code} onCodeChange={setCode} />
-        <FileUploadSection quboFile={quboFile} onFileChange={handleQuboFileChange} />
-<<<<<<< HEAD
+        <div className="flex w-full h-screen">
+          {/* File Structure Sidebar */}
+          {fileStructure && (
+            <div className="w-1/4 p-4 border-r border-gray-300">
+              <h2 className="text-xl font-bold mb-4">
+                File Structure - {selectedRepo?.name}
+              </h2>
+              <ul className="text-sm text-muted-foreground">
+                {fileStructure.map((item) => (
+                  <li key={item.path} className="mb-2">
+                    {item.type === 'file' ? '📄' : '📁'} {item.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-=======
-        
->>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
-        <Button size="lg" onClick={handleSubmit}>
-          Run Algorithm
-        </Button>
-
-        <ExecutionStatus status={executionStatus} result={executionResult} />
+          {/* Code Editor Section */}
+          <div className={fileStructure ? 'w-3/4 p-6' : 'w-full p-6'}>
+            <CodeUploadSection code={code} onCodeChange={setCode} />
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

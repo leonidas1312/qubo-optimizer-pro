@@ -28,13 +28,6 @@ app.add_middleware(
     https_only=False
 )
 
-# GitHub OAuth configuration
-<<<<<<< HEAD
-GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
-GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
-GITHUB_REDIRECT_URI = "http://localhost:8080/auth/github/callback"
-FRONTEND_URL = "http://localhost:8080"
-
 @app.post("/api/load-matrix")
 async def load_matrix(file: UploadFile = File(...)):
     try:
@@ -93,58 +86,64 @@ async def solve(data: Dict[Any, Any]):
     except Exception as e:
         return {"error": str(e)}
 
-=======
-GITHUB_CLIENT_ID = "your-github-client-id"
-GITHUB_CLIENT_SECRET = "your-github-client-secret"
+
+GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
+GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
 GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
-FRONTEND_URL = "http://localhost:5173"
->>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
+FRONTEND_URL = "http://localhost:8080"
+
 
 @app.get("/api/auth/github")
 async def github_login():
     return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}"
+        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=read:user repo"
     )
 
 
 @app.get("/api/auth/github/callback")
 async def github_callback(request: Request, code: str):
-    # Exchange code for access token
-    token_response = requests.post(
-        "https://github.com/login/oauth/access_token",
-        data={
-            "client_id": GITHUB_CLIENT_ID,
-            "client_secret": GITHUB_CLIENT_SECRET,
-            "code": code,
-        },
-        headers={"Accept": "application/json"},
-    )
+    try:
+        # Exchange code for access token
+        token_response = requests.post(
+            "https://github.com/login/oauth/access_token",
+            data={
+                "client_id": GITHUB_CLIENT_ID,
+                "client_secret": GITHUB_CLIENT_SECRET,
+                "code": code,
+            },
+            headers={"Accept": "application/json"},
+        )
+        print("Token Response:", token_response.json())
 
-    access_token = token_response.json().get("access_token")
+        access_token = token_response.json().get("access_token")
+        if not access_token:
+            print("Failed to retrieve access token")
+            return {"error": "Failed to retrieve access token"}
 
-    # Get user data
-    user_response = requests.get(
-        "https://api.github.com/user",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json",
-        },
-    )
+        # Get user data
+        user_response = requests.get(
+            "https://api.github.com/user",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+        )
+        print("User Response:", user_response.json())
 
-    user_data = user_response.json()
-    request.session["github_token"] = access_token
-    request.session["user"] = user_data
-<<<<<<< HEAD
+        user_data = user_response.json()
+        request.session["github_token"] = access_token
+        request.session["user"] = user_data
 
-=======
-    
->>>>>>> 912d1ae3b410df385a30f91d5fe9450b939af98a
-    # Redirect back to the frontend upload page
-    return RedirectResponse(url=f"{FRONTEND_URL}/uploadalgos")
+        # Redirect back to the frontend
+        return RedirectResponse(url=f"{FRONTEND_URL}/uploadalgos")
+    except Exception as e:
+        print("Error during GitHub callback:", str(e))
+        return {"error": str(e)}
 
 @app.get("/api/auth/status")
 async def auth_status(request: Request):
     user = request.session.get("user")
+
     return {
         "authenticated": user is not None,
         "user": user

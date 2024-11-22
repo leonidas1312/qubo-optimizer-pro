@@ -12,7 +12,7 @@ export const ResultsChart = ({ data }: ResultsChartProps) => {
 
   const chartData = data.map((cost, index) => ({
     iteration: index + 1,
-    energy: cost
+    cost: cost
   }));
 
   return (
@@ -20,7 +20,7 @@ export const ResultsChart = ({ data }: ResultsChartProps) => {
       <h3 className="text-lg font-semibold mb-4">Optimization Progress</h3>
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 17 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis 
               dataKey="iteration" 
@@ -28,11 +28,15 @@ export const ResultsChart = ({ data }: ResultsChartProps) => {
               className="text-muted-foreground"
             />
             <YAxis 
-              label={{ value: 'Energy', angle: -90, position: 'left' }}
+              label={{ value: 'Cost', angle: -90, position: 'left' }}
               className="text-muted-foreground"
             />
             <Tooltip 
-              contentStyle={{ 
+              formatter={(value, name, props) => {
+                return [`Cost: ${value}`, `Iteration: ${props.payload.iteration}`];
+              }}
+              labelFormatter={() => ''}  // Hide the x-axis label in the tooltip
+              contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))'
               }}
@@ -40,9 +44,9 @@ export const ResultsChart = ({ data }: ResultsChartProps) => {
             />
             <Line
               type="monotone"
-              dataKey="energy"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
+              dataKey="cost"
+              stroke="green"
+              strokeWidth={1}
               dot={{ fill: 'hsl(var(--primary))' }}
               activeDot={{ r: 6 }}
               isAnimationActive={true}

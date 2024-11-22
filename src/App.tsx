@@ -24,6 +24,7 @@ const App = () => {
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/solvers" element={<Solvers />} />
                 <Route path="/uploadalgos" element={<UploadAlgos />} />
+                <Route path="/auth/github/callback" element={<UploadAlgos />} />
               </Routes>
               <Toaster />
               <Sonner />

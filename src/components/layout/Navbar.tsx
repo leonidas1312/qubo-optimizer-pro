@@ -39,7 +39,7 @@ export const Navbar = () => {
             Documentation
           </Link>
           <Link to="/uploadalgos" className="text-muted-foreground hover:text-foreground transition-colors">
-            Upload algorithm
+            Workspace
           </Link>
         </div>
         <div className="ml-auto flex items-center space-x-4">

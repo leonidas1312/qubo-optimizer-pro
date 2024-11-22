@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { python } from '@codemirror/lang-python';
-import { EditorView } from '@codemirror/view';
+import MonacoEditor from '@monaco-editor/react';
 
 interface CodeUploadSectionProps {
   code: string;
@@ -9,48 +7,50 @@ interface CodeUploadSectionProps {
 }
 
 export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps) => {
-  const editorTheme = EditorView.theme({
-    '&': {
-      color: '#000000',
-      backgroundColor: '#ffffff'
-    },
-    '.cm-content': {
-      fontFamily: 'monospace',
-      fontSize: '14px'
-    },
-    '.cm-scroller': {
-      overflow: 'hidden'
-    }
-  });
-
   const lineHeight = 24;
   const minHeight = lineHeight * 10;
-  const editorStyle = {
-    minHeight: `${minHeight}px`,
-    height: 'auto',
-    maxHeight: 'none'
-  };
+  const editorHeight = `${minHeight}px`;
 
   return (
-    <div className="mb-8">
-      <label className="block text-lg font-medium mb-2">
-        Algorithm Code (Python)
-      </label>
-      <div className="border rounded-lg overflow-hidden">
-        <CodeMirror
-          value={code}
-          extensions={[python(), editorTheme]}
-          onChange={onCodeChange}
-          basicSetup={{
-            lineNumbers: true,
-            foldGutter: true,
-            highlightActiveLine: true,
-            syntaxHighlighting: true,
-            bracketMatching: true,
-            autocompletion: true,
-          }}
-          style={editorStyle}
-        />
+    <div className="flex w-full h-screen">
+      {/* Left Side Content */}
+      <div className="w-1/2 p-6">
+        <h1 className="text-2xl font-bold mb-4">Algorithm Information</h1>
+        <p className="text-lg">
+          Here you can provide some information or explanation about the algorithm.
+          This section will occupy the left half of the page.
+        </p>
+        {/* Add any additional content you want on the left side here */}
+      </div>
+
+      {/* Right Side Code Editor */}
+      <div className="w-1/2 p-6">
+        <label className="block text-lg font-medium mb-2">
+          Algorithm Code (Python)
+        </label>
+        <div className="border rounded-lg overflow-hidden h-full">
+          <MonacoEditor
+            height="100%"
+            defaultLanguage="python"
+            value={code}
+            theme="vs-dark" // Monaco's built-in dark theme
+            onChange={(value) => {
+              if (value !== undefined) {
+                onCodeChange(value);
+              }
+            }}
+            options={{
+              lineNumbers: 'on',
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              fontSize: 14,
+              fontFamily: 'monospace',
+              automaticLayout: true,
+              bracketPairColorization: true,
+              wordWrap: "on",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

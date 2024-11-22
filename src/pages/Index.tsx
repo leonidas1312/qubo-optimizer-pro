@@ -7,7 +7,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/playground");
+    navigate("/uploadalgos");
   };
 
   return (
