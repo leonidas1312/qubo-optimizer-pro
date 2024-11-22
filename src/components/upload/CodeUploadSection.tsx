@@ -26,12 +26,12 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
       );
     }
 
-    const fileName = selectedFile.name.toLowerCase();
     const fileContent = selectedFile.encoding === 'base64' 
       ? atob(selectedFile.content)
       : selectedFile.content;
 
-    // Handle different file types
+    const fileName = selectedFile.name.toLowerCase();
+
     if (fileName.endsWith('.pdf')) {
       return (
         <iframe
@@ -71,7 +71,6 @@ export const CodeUploadSection = ({ code, onCodeChange }: CodeUploadSectionProps
         </div>
       );
     } else {
-      // Default to code editor for text files
       return (
         <MonacoEditor
           height="100%"

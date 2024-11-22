@@ -32,9 +32,9 @@ const fetchFileStructure = async (owner: string, repo: string) => {
   return response.json();
 };
 
-const fetchFileContent = async (owner: string, repo: string, path: string) => {
+const fetchFileContent = async (owner: string, repo: string, sha: string) => {
   const response = await fetch(
-    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${path}`,
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${sha}`,
     { credentials: 'include' }
   );
   if (!response.ok) throw new Error('Failed to fetch file content');
@@ -74,11 +74,11 @@ const UploadAlgos = () => {
     }
   };
 
-  const handleFileSelect = async (path: string) => {
+  const handleFileSelect = async (sha: string) => {
     if (!selectedRepo) return;
     
     try {
-      const content = await fetchFileContent(selectedRepo.owner, selectedRepo.name, path);
+      const content = await fetchFileContent(selectedRepo.owner, selectedRepo.name, sha);
       if (content.error) {
         throw new Error(content.error);
       }
