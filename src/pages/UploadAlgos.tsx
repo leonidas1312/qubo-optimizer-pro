@@ -4,7 +4,16 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { CodeUploadSection } from '@/components/upload/CodeUploadSection';
 import { RepositoryGrid } from '@/components/github/RepositoryGrid';
+import { FileTree } from '@/components/github/FileTree';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+interface FileNode {
+  name: string;
+  path: string;
+  type: "file" | "tree";
+  children?: FileNode[];
+}
 
 const fetchRepositories = async () => {
   const response = await fetch('http://localhost:8000/api/github/repos', {
@@ -14,13 +23,23 @@ const fetchRepositories = async () => {
   return response.json();
 };
 
+const fetchFileStructure = async (owner: string, repo: string) => {
+  const response = await fetch(
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents`,
+    { credentials: 'include' }
+  );
+  if (!response.ok) throw new Error('Failed to fetch file structure');
+  return response.json();
+};
+
 const UploadAlgos = () => {
   const { isAuthenticated } = useAuth();
   const [code, setCode] = useState('');
-  const [executionStatus, setExecutionStatus] = useState('');
-  const [executionResult, setExecutionResult] = useState(null);
-  const [fileStructure, setFileStructure] = useState(null); // State for file structure
-  const [selectedRepo, setSelectedRepo] = useState(null); // State for selected repository
+  const [selectedRepo, setSelectedRepo] = useState<{
+    owner: string;
+    name: string;
+  } | null>(null);
+  const [fileStructure, setFileStructure] = useState<FileNode[]>([]);
 
   const { data: repositories, isLoading } = useQuery({
     queryKey: ['repositories'],
@@ -28,35 +47,24 @@ const UploadAlgos = () => {
     enabled: isAuthenticated,
   });
 
-  const handleAddFileStructure = (repo) => {
-    // Assuming that the file structure is part of the repository data
-    setFileStructure(repo.contents);
-    setSelectedRepo(repo);
+  const handleAddFileStructure = async (repo: any) => {
+    try {
+      const [owner, repoName] = repo.full_name.split('/');
+      setSelectedRepo({ owner, name: repoName });
+      
+      const structure = await fetchFileStructure(owner, repoName);
+      setFileStructure(structure);
+      
+      toast.success('Repository files loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load repository files');
+      console.error('Error fetching file structure:', error);
+    }
   };
 
-  const handleSubmit = async () => {
-    if (!code) {
-      alert('Please provide your algorithm code.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('code', new Blob([code], { type: 'text/plain' }));
-
-    setExecutionStatus('Running');
-
-    try {
-      const response = await fetch('/api/execute-algorithm', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-      setExecutionResult(result);
-      setExecutionStatus('Completed');
-    } catch (error) {
-      console.error('Execution error:', error);
-      setExecutionStatus('Error');
-    }
+  const handleFileSelect = (path: string) => {
+    // Here you can implement file content fetching when a file is selected
+    console.log('Selected file:', path);
   };
 
   if (!isAuthenticated) {
@@ -75,7 +83,7 @@ const UploadAlgos = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6">Choose a repository </h1>
+        <h1 className="text-3xl font-bold mb-6">Choose a repository</h1>
 
         {isLoading ? (
           <div className="text-center py-8">Loading repositories...</div>
@@ -89,28 +97,19 @@ const UploadAlgos = () => {
           </div>
         ) : null}
 
-        <div className="flex w-full h-screen">
-          {/* File Structure Sidebar */}
-          {fileStructure && (
-            <div className="w-1/4 p-4 border-r border-gray-300">
-              <h2 className="text-xl font-bold mb-4">
-                File Structure - {selectedRepo?.name}
-              </h2>
-              <ul className="text-sm text-muted-foreground">
-                {fileStructure.map((item) => (
-                  <li key={item.path} className="mb-2">
-                    {item.type === 'file' ? '📄' : '📁'} {item.name}
-                  </li>
-                ))}
-              </ul>
+        {selectedRepo && (
+          <div className="flex gap-6">
+            <div className="w-1/4 min-w-[250px]">
+              <h3 className="text-lg font-semibold mb-4">
+                Files - {selectedRepo.name}
+              </h3>
+              <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
             </div>
-          )}
-
-          {/* Code Editor Section */}
-          <div className={fileStructure ? 'w-3/4 p-6' : 'w-full p-6'}>
-            <CodeUploadSection code={code} onCodeChange={setCode} />
+            <div className="flex-1">
+              <CodeUploadSection code={code} onCodeChange={setCode} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );
