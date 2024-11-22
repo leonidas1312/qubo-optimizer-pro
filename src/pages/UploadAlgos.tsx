@@ -32,6 +32,15 @@ const fetchFileStructure = async (owner: string, repo: string) => {
   return response.json();
 };
 
+const fetchFileContent = async (owner: string, repo: string, path: string) => {
+  const response = await fetch(
+    `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${path}`,
+    { credentials: 'include' }
+  );
+  if (!response.ok) throw new Error('Failed to fetch file content');
+  return response.json();
+};
+
 const UploadAlgos = () => {
   const { isAuthenticated } = useAuth();
   const [code, setCode] = useState('');
@@ -65,9 +74,20 @@ const UploadAlgos = () => {
     }
   };
 
-  const handleFileSelect = (path: string) => {
-    // Here you can implement file content fetching when a file is selected
-    console.log('Selected file:', path);
+  const handleFileSelect = async (path: string) => {
+    if (!selectedRepo) return;
+    
+    try {
+      const content = await fetchFileContent(selectedRepo.owner, selectedRepo.name, path);
+      if (content.error) {
+        throw new Error(content.error);
+      }
+      setCode(content.content);
+      toast.success('File loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load file');
+      console.error('Error fetching file content:', error);
+    }
   };
 
   if (!isAuthenticated) {

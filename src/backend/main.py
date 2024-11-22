@@ -2,13 +2,12 @@ from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from typing import Dict, Any
-import json
 from backend.solver import solve_qubo
 import tempfile
 import os
-import requests
 from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
+from backend.routes.github_routes import get_repo_tree, get_file_content, build_tree
 
 app = FastAPI()
 
@@ -35,50 +34,23 @@ async def get_repo_contents(owner: str, repo: str, path: str = "", request: Requ
         return {"error": "Not authenticated"}
     
     try:
-        response = requests.get(
-            f"https://api.github.com/repos/{owner}/{repo}/git/trees/main?recursive=1",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github.v3+json",
-            },
-        )
-        
-        if response.status_code != 200:
-            return {"error": "Failed to fetch repository contents"}
-            
-        data = response.json()
-        
-        def build_tree(items):
-            root = []
-            paths = {}
-            
-            for item in items['tree']:
-                parts = item['path'].split('/')
-                current = root
-                
-                for i, part in enumerate(parts):
-                    full_path = '/'.join(parts[:i+1])
-                    
-                    if full_path not in paths:
-                        new_node = {
-                            'name': part,
-                            'path': full_path,
-                            'type': 'tree' if i < len(parts) - 1 or item['type'] == 'tree' else 'file',
-                            'children': [] if i < len(parts) - 1 or item['type'] == 'tree' else None
-                        }
-                        current.append(new_node)
-                        paths[full_path] = new_node
-                        current = new_node['children'] if new_node['children'] is not None else []
-                    else:
-                        current = paths[full_path]['children'] if paths[full_path]['children'] is not None else []
-            
-            return root
+        data = await get_repo_tree(owner, repo, token)
+        if "error" in data:
+            return data
             
         tree = build_tree(data)
         return tree
         
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/api/github/repos/{owner}/{repo}/contents/{path:path}")
+async def get_contents(owner: str, repo: str, path: str, request: Request):
+    token = request.session.get("github_token")
+    if not token:
+        return {"error": "Not authenticated"}
+    
+    return await get_file_content(owner, repo, path, token)
 
 @app.post("/api/load-matrix")
 async def load_matrix(file: UploadFile = File(...)):
