@@ -36,19 +36,13 @@ const fetchFileStructure = async (owner: string, repo: string) => {
 
 const fetchFileContent = async (owner: string, repo: string, path: string) => {
   const url = `http://localhost:8000/api/github/repos/${owner}/${repo}/contents/${path}`;
-  console.log('Fetching file content from:', url);
-
   const response = await fetch(url, { credentials: 'include' });
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Failed to fetch file content: ${response.status} - ${errorText}`);
   }
-
   const data = await response.json();
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
+  if (data.error) throw new Error(data.error);
   return data;
 };
 
@@ -72,10 +66,8 @@ const UploadAlgos = () => {
     try {
       const [owner, repoName] = repo.full_name.split('/');
       setSelectedRepo({ owner, name: repoName });
-
       const structure = await fetchFileStructure(owner, repoName);
       setFileStructure(structure);
-
       toast.success('Repository files loaded successfully');
     } catch (error) {
       toast.error('Failed to load repository files');
@@ -85,22 +77,14 @@ const UploadAlgos = () => {
 
   const handleFileSelect = async (path: string) => {
     if (!selectedRepo) return;
-
     try {
       const file = await fetchFileContent(selectedRepo.owner, selectedRepo.name, path);
-
-      if (file.error) {
-        toast.error(`Error: ${file.error}`);
-        return;
-      }
-
       const sanitizedContent =
         file.encoding === 'base64'
-          ? atob(file.content.replace(/\s/g, '')) // Remove whitespace and decode
+          ? atob(file.content.replace(/\s/g, ''))
           : file.content;
-
       setCode(sanitizedContent);
-      setSelectedFileName(path.split('/').pop() || null); // Set the file name
+      setSelectedFileName(path.split('/').pop() || null);
       toast.success('File loaded successfully');
     } catch (error) {
       toast.error(`Failed to load file: ${error.message}`);
@@ -124,37 +108,41 @@ const UploadAlgos = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6">Choose a repository</h1>
-
-        {isLoading ? (
-          <div className="text-center py-8">Loading repositories...</div>
-        ) : repositories ? (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Your Repositories</h2>
-            <RepositoryGrid
-              repositories={repositories}
-              onAddFileStructure={handleAddFileStructure}
-            />
+        <h1 className="text-3xl font-bold mb-6">Workspace</h1>
+        
+        <div className="flex h-[calc(100vh-12rem)]">
+          <div className="w-80 border-r border-border">
+            <div className="p-4 border-b border-border">
+              <h2 className="text-lg font-semibold">Repositories</h2>
+            </div>
+            {isLoading ? (
+              <div className="p-4 text-center">Loading repositories...</div>
+            ) : repositories ? (
+              <RepositoryGrid
+                repositories={repositories}
+                onAddFileStructure={handleAddFileStructure}
+              />
+            ) : null}
           </div>
-        ) : null}
 
-        {selectedRepo && (
-          <div className="border border-border rounded-lg overflow-hidden bg-background h-[calc(100vh-24rem)]">
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel defaultSize={25} minSize={20}>
-                <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={75} minSize={30}>
-                <CodeUploadSection
-                  code={code}
-                  fileName={selectedFileName}
-                  onCodeChange={setCode}
-                />
-              </ResizablePanel>
-            </ResizablePanelGroup>
+          <div className="flex-1">
+            {selectedRepo && (
+              <ResizablePanelGroup direction="horizontal">
+                <ResizablePanel defaultSize={25} minSize={20}>
+                  <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                </ResizablePanel>
+                <ResizableHandle withHandle />
+                <ResizablePanel defaultSize={75} minSize={30}>
+                  <CodeUploadSection
+                    code={code}
+                    fileName={selectedFileName}
+                    onCodeChange={setCode}
+                  />
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </DashboardLayout>
   );
