@@ -9,7 +9,7 @@ import os
 import requests
 from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
-
+from backend.routes.github_routes import get_file_content,build_tree
 app = FastAPI()
 
 # Configure CORS and Session
@@ -27,6 +27,30 @@ app.add_middleware(
     same_site="lax",
     https_only=False
 )
+
+GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
+GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
+GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
+FRONTEND_URL = "http://localhost:8080"
+
+
+@app.get("/api/github/repos/{owner}/{repo}/contents/{path:path}")
+async def get_file_content_endpoint(owner: str, repo: str, path: str, request: Request):
+    token = request.session.get("github_token")
+    if not token:
+        return {"error": "Not authenticated"}
+
+    print(f"Fetching file content for: owner={owner}, repo={repo}, path={path}")
+    result = await get_file_content(owner, repo, path, token)
+
+    if "error" in result:
+        print(f"Error fetching file content: {result['error']}")
+    else:
+        print(f"File content fetched successfully: {result['name']}")
+
+    return result
+
+
 
 
 @app.get("/api/github/repos/{owner}/{repo}/tree")
@@ -49,31 +73,7 @@ async def get_repo_contents(owner: str, repo: str, request: Request):
             
         data = response.json()
         
-        def build_tree(items):
-            root = []
-            paths = {}
-            
-            for item in items['tree']:
-                parts = item['path'].split('/')
-                current = root
-                
-                for i, part in enumerate(parts):
-                    full_path = '/'.join(parts[:i+1])
-                    
-                    if full_path not in paths:
-                        new_node = {
-                            'name': part,
-                            'path': full_path,
-                            'type': 'tree' if i < len(parts) - 1 or item['type'] == 'tree' else 'file',
-                            'children': [] if i < len(parts) - 1 or item['type'] == 'tree' else None
-                        }
-                        current.append(new_node)
-                        paths[full_path] = new_node
-                        current = new_node['children'] if new_node['children'] is not None else []
-                    else:
-                        current = paths[full_path]['children'] if paths[full_path]['children'] is not None else []
-            
-            return root
+
             
         tree = build_tree(data)
         return tree
@@ -140,10 +140,7 @@ async def solve(data: Dict[Any, Any]):
         return {"error": str(e)}
 
 
-GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
-GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
-GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
-FRONTEND_URL = "http://localhost:8080"
+
 
 
 @app.get("/api/auth/github")

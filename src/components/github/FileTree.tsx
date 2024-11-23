@@ -20,6 +20,7 @@ interface FileTreeProps {
 
 export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
 
   const toggleNode = (path: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -31,19 +32,31 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
     setExpandedNodes(newExpanded);
   };
 
+  const handleFileSelect = (path: string) => {
+    setSelectedFilePath(path);
+    onFileSelect?.(path);
+  };
+
   const renderNode = (node: FileNode, level: number = 0) => {
     const isExpanded = expandedNodes.has(node.path);
-    const paddingLeft = `${level * 1.5}rem`;
+    const isSelected = selectedFilePath === node.path;
+    const paddingLeft = `${level * 1.2}rem`; // Smaller indent for nested items
 
     if (node.type === "file") {
       return (
         <div
           key={node.path}
-          className="flex items-center py-1 px-2 hover:bg-accent cursor-pointer"
+          className={`flex items-center py-1 px-2 cursor-pointer ${
+            isSelected ? "bg-gray-700 text-white" : "hover:bg-gray-700 text-gray-200"
+          }`}
           style={{ paddingLeft }}
-          onClick={() => onFileSelect?.(node.path)}
+          onClick={() => handleFileSelect(node.path)}
         >
-          <File className="h-4 w-4 mr-2" />
+          <File
+            className={`h-4 w-4 mr-2 ${
+              isSelected ? "text-white" : "text-gray-400"
+            }`}
+          />
           <span className="text-sm">{node.name}</span>
         </div>
       );
@@ -55,18 +68,36 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
         open={isExpanded}
         onOpenChange={() => toggleNode(node.path)}
       >
-        <CollapsibleTrigger className="flex items-center w-full py-1 px-2 hover:bg-accent">
+        <CollapsibleTrigger className="flex items-center w-full py-1 px-2 hover:bg-gray-700">
           <div style={{ paddingLeft }} className="flex items-center">
             {isExpanded ? (
-              <ChevronDown className="h-4 w-4 mr-2" />
+              <ChevronDown
+                className={`h-4 w-4 mr-2 ${
+                  isSelected ? "text-white" : "text-gray-400"
+                }`}
+              />
             ) : (
-              <ChevronRight className="h-4 w-4 mr-2" />
+              <ChevronRight
+                className={`h-4 w-4 mr-2 ${
+                  isSelected ? "text-white" : "text-gray-400"
+                }`}
+              />
             )}
-            <Folder className="h-4 w-4 mr-2" />
-            <span className="text-sm">{node.name}</span>
+            <Folder
+              className={`h-4 w-4 mr-2 ${
+                isSelected ? "text-white" : "text-gray-400"
+              }`}
+            />
+            <span
+              className={`text-sm ${
+                isSelected ? "text-white" : "text-gray-200"
+              }`}
+            >
+              {node.name}
+            </span>
           </div>
         </CollapsibleTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent className="pl-2">
           {node.children?.map((child) => renderNode(child, level + 1))}
         </CollapsibleContent>
       </Collapsible>
@@ -74,7 +105,7 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
   };
 
   return (
-    <div className="w-full border rounded-lg overflow-hidden">
+    <div className="w-full max-h-64 overflow-y-auto bg-black border border-gray-700 rounded-lg">
       {files.map((file) => renderNode(file))}
     </div>
   );
