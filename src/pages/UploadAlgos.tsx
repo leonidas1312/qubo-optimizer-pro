@@ -139,7 +139,7 @@ const UploadAlgos = () => {
         ) : null}
 
         {selectedRepo && (
-          <div className="border border-border rounded-lg overflow-hidden bg-background">
+          <div className="border border-border rounded-lg overflow-hidden bg-background h-[calc(100vh-24rem)]">
             <ResizablePanelGroup direction="horizontal">
               <ResizablePanel defaultSize={25} minSize={20}>
                 <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
