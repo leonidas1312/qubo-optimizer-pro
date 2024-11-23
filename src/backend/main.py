@@ -28,8 +28,9 @@ app.add_middleware(
     https_only=False
 )
 
+
 @app.get("/api/github/repos/{owner}/{repo}/tree")
-async def get_repo_contents(owner: str, repo: str, path: str = "", request: Request):
+async def get_repo_contents(owner: str, repo: str, request: Request):
     token = request.session.get("github_token")
     if not token:
         return {"error": "Not authenticated"}
