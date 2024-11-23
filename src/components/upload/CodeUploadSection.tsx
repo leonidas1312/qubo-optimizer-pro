@@ -40,7 +40,7 @@ export const CodeUploadSection = ({
   const renderFileContent = () => {
     if (!fileName) {
       return (
-        <div className="flex items-center justify-center h-full text-gray-500">
+        <div className="flex items-center justify-center h-full text-muted-foreground">
           Select a file to view its contents
         </div>
       );
@@ -74,7 +74,7 @@ export const CodeUploadSection = ({
     } else {
       return (
         <MonacoEditor
-          height="calc(100vh - 12rem)"
+          height="calc(50vh - 3rem)"
           defaultLanguage="python"
           value={code}
           theme="vs-dark"
@@ -100,15 +100,15 @@ export const CodeUploadSection = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-200">
-        <h2 className="text-sm font-medium text-gray-700">
+    <div className="flex flex-col h-[50vh] bg-background border border-border rounded-lg overflow-hidden">
+      <div className="flex justify-between items-center p-3 bg-muted/50 border-b border-border">
+        <h2 className="text-sm font-medium">
           {fileName || "No file selected"}
         </h2>
         <div className="flex space-x-2">
           <button
             onClick={() => setIsEditable(!isEditable)}
-            className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-3 py-1 text-sm bg-muted hover:bg-muted/80 rounded-md transition-colors"
           >
             {isEditable ? "Cancel Edit" : "Edit"}
           </button>
@@ -117,14 +117,14 @@ export const CodeUploadSection = ({
               setIsEditable(false);
               console.log("Code saved:", code);
             }}
-            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+            className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
             disabled={!isEditable}
           >
             Save
           </button>
         </div>
       </div>
-      <div className="flex-1">{renderFileContent()}</div>
+      <div className="flex-1 overflow-hidden">{renderFileContent()}</div>
     </div>
   );
 };

@@ -46,13 +46,13 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
       return (
         <div
           key={node.path}
-          className={`flex items-center py-1.5 px-3 cursor-pointer text-sm ${
-            isSelected ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100"
+          className={`flex items-center py-1.5 px-3 cursor-pointer text-sm transition-colors ${
+            isSelected ? "bg-accent text-accent-foreground" : "hover:bg-muted"
           }`}
           style={{ paddingLeft }}
           onClick={() => handleFileSelect(node.path)}
         >
-          <File className="h-4 w-4 mr-2 text-gray-500" />
+          <File className="h-4 w-4 mr-2 text-muted-foreground" />
           <span>{node.name}</span>
         </div>
       );
@@ -64,9 +64,9 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
         open={isExpanded}
         onOpenChange={() => toggleNode(node.path)}
       >
-        <CollapsibleTrigger className="flex items-center w-full py-1.5 px-3 hover:bg-gray-100">
+        <CollapsibleTrigger className="flex items-center w-full py-1.5 px-3 hover:bg-muted transition-colors">
           <div style={{ paddingLeft }} className="flex items-center text-sm">
-            <Folder className="h-4 w-4 mr-2 text-blue-500" />
+            <Folder className="h-4 w-4 mr-2 text-blue-400" />
             <span>{node.name}</span>
           </div>
         </CollapsibleTrigger>
@@ -78,11 +78,11 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
   };
 
   return (
-    <div className="w-full overflow-y-auto bg-white border border-gray-200 rounded-lg">
-      <div className="p-3 border-b border-gray-200 bg-gray-50">
-        <h3 className="text-sm font-medium text-gray-700">Repository Files</h3>
+    <div className="w-full overflow-y-auto bg-background border border-border rounded-lg h-[50vh]">
+      <div className="p-3 border-b border-border bg-muted/50">
+        <h3 className="text-sm font-medium">Repository Files</h3>
       </div>
-      <div className="max-h-[calc(100vh-20rem)]">
+      <div className="h-[calc(50vh-3rem)] overflow-y-auto">
         {files.map((file) => renderNode(file))}
       </div>
     </div>
