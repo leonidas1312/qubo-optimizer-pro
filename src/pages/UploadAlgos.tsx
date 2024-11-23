@@ -6,6 +6,7 @@ import { FileTree } from '@/components/github/FileTree';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 interface FileNode {
   name: string;
@@ -138,20 +139,20 @@ const UploadAlgos = () => {
         ) : null}
 
         {selectedRepo && (
-          <div className="flex gap-6">
-            <div className="w-1/4 min-w-[250px]">
-              <h3 className="text-lg font-semibold mb-4">
-                Files - {selectedRepo.name}
-              </h3>
-              <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-            </div>
-            <div className="flex-1">
-              <CodeUploadSection
-                code={code}
-                fileName={selectedFileName}
-                onCodeChange={setCode}
-              />
-            </div>
+          <div className="border border-border rounded-lg overflow-hidden bg-background">
+            <ResizablePanelGroup direction="horizontal">
+              <ResizablePanel defaultSize={25} minSize={20}>
+                <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={75} minSize={30}>
+                <CodeUploadSection
+                  code={code}
+                  fileName={selectedFileName}
+                  onCodeChange={setCode}
+                />
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </div>
         )}
       </div>
