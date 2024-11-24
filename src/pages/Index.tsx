@@ -1,106 +1,119 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Cpu, Zap, Target, Code, Users } from "lucide-react";
+import { ArrowRight, Cpu, Zap, Target, Code, Users, Database, Trophy, FileText } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/uploadalgos");
+    navigate("/playground");
   };
+
+  const features = [
+    {
+      icon: <Cpu className="h-6 w-6" />,
+      title: "Quantum-Inspired Algorithms",
+      description: "Leverage cutting-edge optimization techniques powered by quantum computing principles."
+    },
+    {
+      icon: <Database className="h-6 w-6" />,
+      title: "Extensive Problem Library",
+      description: "Access a growing collection of QUBO problems and their optimal solutions."
+    },
+    {
+      icon: <Trophy className="h-6 w-6" />,
+      title: "Community Challenges",
+      description: "Compete with others and showcase your optimization expertise."
+    }
+  ];
+
+  const sections = [
+    {
+      icon: <Code className="h-6 w-6" />,
+      title: "Interactive Playground",
+      description: "Experiment with QUBO problems in real-time and visualize solutions instantly.",
+      action: () => navigate("/playground")
+    },
+    {
+      icon: <FileText className="h-6 w-6" />,
+      title: "Create QUBOt Solver",
+      description: "Build and share your own optimization algorithms with the community.",
+      action: () => navigate("/uploadalgos")
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      title: "Join the Community",
+      description: "Connect with other optimization enthusiasts and share knowledge.",
+      action: () => navigate("/leaderboard")
+    }
+  ];
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1400px] mx-auto">
+      <div className="min-h-screen">
         {/* Hero Section */}
-        <section className="min-h-[80vh] flex flex-col items-center justify-center text-center animate-fade-in-slow">
-          <h1 className="text-6xl font-bold mb-6 gradient-text leading-tight max-w-4xl">
-            A Collaborative Platform for Optimization Algorithms
-          </h1>
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Discover, experiment with, and contribute to a diverse range of optimization algorithms.
-            Upload your own algorithms, solve complex QUBO problems, and collaborate with a community
-            of optimization enthusiasts.
-          </p>
-          <Button onClick={handleGetStarted} size="lg" className="group">
-            Try the Playground
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-24 animate-fade-in">
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                <Cpu className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Diverse Algorithm Library</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Access a rich collection of optimization algorithms, from classical methods to quantum-inspired techniques, all in one place.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Contribute Your Algorithms</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Upload and test your own optimization algorithms in a secure environment. Share your innovations with the community.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                <Target className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Interactive Playground</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Experiment with different algorithms and parameters. Upload your QUBO matrices and visualize optimization results instantly.
-              </p>
-            </div>
+        <section className="relative py-20 px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-accent/20 z-0" />
+          <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 leading-tight animate-fade-in">
+              Next-Generation QUBO Optimization Platform
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in">
+              Discover, experiment with, and contribute to a diverse range of quantum-inspired optimization algorithms.
+            </p>
+            <Button 
+              onClick={handleGetStarted} 
+              size="lg" 
+              className="group bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/20 text-white animate-fade-in"
+            >
+              Try the Playground
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
         </section>
 
-        {/* New Open Source Section */}
-        <section className="py-24 bg-background animate-fade-in">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-6">Embracing Open Source</h2>
-            <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
-              We believe in the power of open-source collaboration to drive innovation in optimization algorithms. By sharing knowledge and resources, we can solve complex problems more effectively.
-            </p>
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Open Source Feature */}
-              <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors flex flex-col items-center">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                  <Code className="h-6 w-6 text-primary" />
+        {/* Features Grid */}
+        <section className="py-20 px-6">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="p-6 rounded-xl bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-colors duration-300 animate-fade-in"
+              >
+                <div className="h-12 w-12 rounded-lg bg-accent/20 flex items-center justify-center mb-6">
+                  {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Open Source Contribution</h3>
+                <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Contribute to our open-source repository. Share your algorithms, improve existing ones, and collaborate with developers worldwide.
+                  {feature.description}
                 </p>
               </div>
+            ))}
+          </div>
+        </section>
 
-              {/* Community Collaboration Feature */}
-              <div className="p-8 rounded-2xl bg-card hover:bg-card/80 transition-colors flex flex-col items-center">
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                  <Users className="h-6 w-6 text-primary" />
+        {/* Sections Grid */}
+        <section className="py-20 px-6 bg-accent/5">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+            {sections.map((section, index) => (
+              <button
+                key={index}
+                onClick={section.action}
+                className="p-6 rounded-xl bg-white/5 backdrop-blur-lg border border-white/10 hover:bg-white/10 transition-colors duration-300 text-left animate-fade-in group"
+              >
+                <div className="h-12 w-12 rounded-lg bg-accent/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  {section.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Join Our Community</h3>
+                <h3 className="text-xl font-semibold mb-4 flex items-center justify-between">
+                  {section.title}
+                  <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Engage with a network of optimization enthusiasts. Share insights, ask questions, and work together to advance the field.
+                  {section.description}
                 </p>
-              </div>
-            </div>
-            <Button onClick={handleGetStarted} size="lg" className="mt-12 group">
-              Get Involved
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
+              </button>
+            ))}
           </div>
         </section>
       </div>
