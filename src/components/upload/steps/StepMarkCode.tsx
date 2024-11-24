@@ -2,6 +2,8 @@ import { Card } from "@/components/ui/card";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { Selection } from "@/types/qubot";
 import { Code2, Lightbulb } from "lucide-react";
+import { SolverTemplateSelector } from "@/components/solver/SolverTemplateSelector";
+import { useState } from "react";
 
 interface StepMarkCodeProps {
   code: string;
@@ -18,6 +20,27 @@ export const StepMarkCode = ({
   setCostFunction,
   setAlgorithmLogic,
 }: StepMarkCodeProps) => {
+  const [showTemplates, setShowTemplates] = useState(!code);
+
+  const handleTemplateSelect = (template: any) => {
+    setCode(`# ${template.name} Implementation\n\n# Cost Function\n${template.costFunction}\n\n# Algorithm Logic\n${template.algorithmLogic}`);
+    
+    // Pre-select the cost function and algorithm logic
+    setCostFunction({
+      start: 0,
+      end: template.costFunction.length,
+      text: template.costFunction
+    });
+    
+    setAlgorithmLogic({
+      start: 0,
+      end: template.algorithmLogic.length,
+      text: template.algorithmLogic
+    });
+    
+    setShowTemplates(false);
+  };
+
   return (
     <Card className="p-6 space-y-6">
       <div className="flex items-center gap-4">
@@ -27,12 +50,14 @@ export const StepMarkCode = ({
         <div>
           <h2 className="text-xl font-semibold">Mark Your Code</h2>
           <p className="text-muted-foreground">
-            Highlight and identify the key parts of your algorithm
+            Choose a template or customize your own algorithm
           </p>
         </div>
       </div>
 
-      {code ? (
+      {showTemplates ? (
+        <SolverTemplateSelector onSelectTemplate={handleTemplateSelect} />
+      ) : (
         <div className="flex flex-col gap-6">
           <div className="flex items-start gap-4 p-4 bg-amber-500/10 rounded-lg">
             <Lightbulb className="h-6 w-6 text-amber-500 mt-1 flex-shrink-0" />
@@ -55,10 +80,6 @@ export const StepMarkCode = ({
             language="python"
             className="h-[500px]"
           />
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-[400px] text-muted-foreground">
-          <p>Select a Python file from step 1 to start marking your code</p>
         </div>
       )}
     </Card>
