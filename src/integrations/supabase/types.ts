@@ -9,6 +9,80 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      datasets: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          file_path: string | null
+          format: string
+          id: string
+          is_public: boolean
+          name: string
+          size: number | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          file_path?: string | null
+          format: string
+          id?: string
+          is_public?: boolean
+          name: string
+          size?: number | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          file_path?: string | null
+          format?: string
+          id?: string
+          is_public?: boolean
+          name?: string
+          size?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hardware_providers: {
+        Row: {
+          availability: boolean
+          cost_per_hour: number
+          description: string | null
+          id: string
+          name: string
+          provider_type: string
+          specs: Json
+        }
+        Insert: {
+          availability?: boolean
+          cost_per_hour: number
+          description?: string | null
+          id?: string
+          name: string
+          provider_type: string
+          specs?: Json
+        }
+        Update: {
+          availability?: boolean
+          cost_per_hour?: number
+          description?: string | null
+          id?: string
+          name?: string
+          provider_type?: string
+          specs?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

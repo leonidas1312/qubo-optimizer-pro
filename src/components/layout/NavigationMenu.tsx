@@ -2,14 +2,13 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2, Trophy, Book, Beaker, FileText, Puzzle } from "lucide-react";
+import { Code2, Trophy, Book, Beaker, FileText, Puzzle, Cpu, Database } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
@@ -44,16 +43,22 @@ export function CustomNavigationMenu() {
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
-                  <ListItem to="/playground" title="Interactive Workspace">
+                  <ListItem to="/solvers" title="Solvers">
                     <div className="flex items-center gap-2">
                       <Beaker className="h-4 w-4" />
-                      <span>Experiment with QUBO problems and solutions</span>
+                      <span>Browse available QUBO solvers</span>
                     </div>
                   </ListItem>
-                  <ListItem to="/uploadalgos" title="Create a QUBOt solver">
+                  <ListItem to="/hardware" title="Hardware">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>Build and test your own QUBO solver</span>
+                      <Cpu className="h-4 w-4" />
+                      <span>Available computing resources</span>
+                    </div>
+                  </ListItem>
+                  <ListItem to="/datasets" title="Datasets">
+                    <div className="flex items-center gap-2">
+                      <Database className="h-4 w-4" />
+                      <span>Manage QUBO problem datasets</span>
                     </div>
                   </ListItem>
                 </ul>
@@ -75,10 +80,10 @@ export function CustomNavigationMenu() {
                       <span>View top performing solvers and users</span>
                     </div>
                   </ListItem>
-                  <ListItem to="/qubots" title="QUBOts created">
+                  <ListItem to="/qubots" title="QUBOts">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      <span>Browse community-created solvers</span>
+                      <span>Browse and create QUBOts</span>
                     </div>
                   </ListItem>
                 </ul>
@@ -95,13 +100,13 @@ export function CustomNavigationMenu() {
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
                   <ListItem to="/docs/introduction" title="Introduction">
-                    Overview of the platform and its features.
+                    Overview of the platform and its features
                   </ListItem>
                   <ListItem to="/docs/getting-started" title="Getting Started">
-                    How to get started with the platform.
+                    How to get started with the platform
                   </ListItem>
                   <ListItem to="/docs/api" title="API Reference">
-                    Detailed API documentation.
+                    Detailed API documentation
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
@@ -119,10 +124,9 @@ export function CustomNavigationMenu() {
               Log In
             </Button>
           )}
-
           {isAuthenticated && <UserMenu />}
         </div>
       </div>
     </div>
   );
-};
+}
