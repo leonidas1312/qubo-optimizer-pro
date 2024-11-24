@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-
+import { Code2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-// Remove unused imports
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,8 +17,25 @@ import {
 } from "@/components/ui/navigation-menu";
 
 export function CustomNavigationMenu() {
+  const { isAuthenticated, user, login, logout } = useAuth();
+
+  const handleAuth = () => {
+    if (isAuthenticated) {
+      logout();
+    } else {
+      login();
+    }
+  };
+
   return (
-    <div className="flex justify-center"> {/* Center the menu */}
+    <div className="flex justify-between w-full items-center px-4"> 
+      {/* Brand Logo - Left Side */}
+      <Link to="/" className="flex items-center space-x-2 mr-8">
+        <Code2 className="h-6 w-6 text-primary" />
+        <span className="font-bold text-xl">QUBOt</span>
+      </Link>
+
+      {/* Navigation Menu - Center */}
       <NavigationMenu>
         <NavigationMenuList>
           {/* Playground Tab */}
@@ -45,7 +63,6 @@ export function CustomNavigationMenu() {
                 <ListItem to="/docs/api" title="API Reference">
                   Detailed API documentation.
                 </ListItem>
-                {/* Add more documentation links as needed */}
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
@@ -53,13 +70,21 @@ export function CustomNavigationMenu() {
           {/* Workspace Tab */}
           <NavigationMenuItem>
             <NavigationMenuLink asChild>
-              <Link to="/workspace" className={navigationMenuTriggerStyle()}>
+              <Link to="/uploadalgos" className={navigationMenuTriggerStyle()}>
                 Workspace
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
+
+      {/* Auth Button - Right Side */}
+      <button
+        onClick={handleAuth}
+        className="opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm text-muted-foreground hover:text-foreground"
+      >
+        {isAuthenticated ? 'Logout' : 'Login with Github'}
+      </button>
     </div>
   );
 }
