@@ -1,5 +1,4 @@
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { Editor } from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
 
 interface CodeEditorProps {
@@ -7,47 +6,52 @@ interface CodeEditorProps {
   onChange: (value: string) => void;
   error?: boolean;
   className?: string;
+  language?: string;
 }
 
-export const CodeEditor = ({ value, onChange, error, className }: CodeEditorProps) => {
+export const CodeEditor = ({ 
+  value, 
+  onChange, 
+  error, 
+  className,
+  language = "javascript" 
+}: CodeEditorProps) => {
   return (
     <div className={cn(
-      "border rounded-md overflow-hidden",
+      "border rounded-lg overflow-hidden bg-background",
       error && "border-destructive",
       className
     )}>
-      <CodeMirror
+      <Editor
+        height="100%"
+        defaultLanguage={language}
         value={value}
-        height="200px"
-        extensions={[javascript()]}
-        onChange={onChange}
-        theme="light"
-        basicSetup={{
-          lineNumbers: true,
-          highlightActiveLineGutter: true,
-          highlightSpecialChars: true,
-          history: true,
-          foldGutter: true,
-          drawSelection: true,
-          dropCursor: true,
-          allowMultipleSelections: true,
-          indentOnInput: true,
-          syntaxHighlighting: true,
-          bracketMatching: true,
-          closeBrackets: true,
-          autocompletion: true,
-          rectangularSelection: true,
-          crosshairCursor: true,
-          highlightActiveLine: true,
-          highlightSelectionMatches: true,
-          closeBracketsKeymap: true,
-          defaultKeymap: true,
-          searchKeymap: true,
-          historyKeymap: true,
-          foldKeymap: true,
-          completionKeymap: true,
-          lintKeymap: true,
+        onChange={(value) => onChange(value || "")}
+        theme="vs-dark"
+        options={{
+          minimap: { enabled: true },
+          fontSize: 14,
+          lineHeight: 21,
+          padding: { top: 16, bottom: 16 },
+          scrollBeyondLastLine: false,
+          smoothScrolling: true,
+          cursorBlinking: "smooth",
+          cursorSmoothCaretAnimation: "on",
+          formatOnPaste: true,
+          formatOnType: true,
+          renderLineHighlight: "all",
+          fontFamily: "'JetBrains Mono', monospace",
+          fontLigatures: true,
+          renderWhitespace: "selection",
+          bracketPairColorization: {
+            enabled: true
+          },
+          guides: {
+            bracketPairs: true,
+            indentation: true
+          }
         }}
+        className="min-h-[300px]"
       />
     </div>
   );
