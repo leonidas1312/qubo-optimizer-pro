@@ -4,28 +4,48 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Cpu, Server, HardDrive, AlertCircle } from "lucide-react";
+import { Database, FileJson, AlertCircle, Download } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
-type HardwareProvider = Tables<"hardware_providers">;
+type Dataset = Tables<"datasets">;
 
-const Hardware = () => {
-  const { data: providers, isLoading } = useQuery({
-    queryKey: ['hardware-providers'],
+const Datasets = () => {
+  const { data: datasets, isLoading } = useQuery({
+    queryKey: ['datasets'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('hardware_providers')
-        .select('*')
-        .eq('availability', true);
+        .from('datasets')
+        .select('*, profiles(username)')
+        .eq('is_public', true);
       
       if (error) throw error;
       return data;
     }
   });
 
-  const handleSelect = (provider: HardwareProvider) => {
-    toast.success(`Selected ${provider.name} for computation`);
+  const handleDownload = (dataset: Dataset) => {
+    if (!dataset.file_path) {
+      toast.error("Download link not available");
+      return;
+    }
+    toast.success(`Downloading ${dataset.name}`);
+    // Implement actual download logic here
+  };
+
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes) return "Unknown size";
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let unitIndex = 0;
+    
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+    
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
   };
 
   return (
@@ -34,10 +54,10 @@ const Hardware = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-              Computing Resources
+              QUBO Datasets
             </h1>
             <p className="text-muted-foreground text-lg">
-              Select hardware resources for running your QUBO optimization tasks. Each provider offers different specifications and pricing options.
+              Browse and download curated datasets for QUBO optimization problems. These datasets are designed to help you test and benchmark your solvers.
             </p>
           </div>
 
@@ -49,48 +69,48 @@ const Hardware = () => {
                 </Card>
               ))}
             </div>
-          ) : providers && providers.length > 0 ? (
+          ) : datasets && datasets.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {providers.map((provider: HardwareProvider) => (
+              {datasets.map((dataset) => (
                 <Card 
-                  key={provider.id} 
+                  key={dataset.id} 
                   className="p-6 hover:border-primary/50 transition-colors duration-300 hover:shadow-lg"
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <h3 className="text-xl font-semibold">{provider.name}</h3>
-                        <p className="text-sm text-muted-foreground">{provider.description}</p>
+                        <h3 className="text-xl font-semibold">{dataset.name}</h3>
+                        <p className="text-sm text-muted-foreground">{dataset.description}</p>
                       </div>
-                      {provider.provider_type === 'CPU' ? (
-                        <Cpu className="h-6 w-6 text-blue-500" />
-                      ) : provider.provider_type === 'GPU' ? (
-                        <Server className="h-6 w-6 text-purple-500" />
+                      {dataset.format === 'json' ? (
+                        <FileJson className="h-6 w-6 text-yellow-500" />
                       ) : (
-                        <HardDrive className="h-6 w-6 text-green-500" />
+                        <Database className="h-6 w-6 text-blue-500" />
                       )}
                     </div>
 
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Specifications</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(provider.specs as Record<string, string>).map(([key, value]) => (
-                          <Badge key={key} variant="outline" className="bg-background">
-                            {key}: {value}
-                          </Badge>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="bg-background">
+                        Format: {dataset.format}
+                      </Badge>
+                      <Badge variant="outline" className="bg-background">
+                        Size: {formatFileSize(dataset.size)}
+                      </Badge>
+                      <Badge variant="outline" className="bg-background">
+                        Added {formatDistanceToNow(new Date(dataset.created_at), { addSuffix: true })}
+                      </Badge>
                     </div>
 
                     <div className="flex items-center justify-between pt-2">
-                      <span className="text-lg font-bold text-primary">
-                        ${provider.cost_per_hour}/hour
+                      <span className="text-sm text-muted-foreground">
+                        By {(dataset.profiles as any)?.username || "Anonymous"}
                       </span>
                       <Button 
-                        onClick={() => handleSelect(provider)}
+                        onClick={() => handleDownload(dataset)}
                         className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                       >
-                        Select
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
                       </Button>
                     </div>
                   </div>
@@ -102,7 +122,7 @@ const Hardware = () => {
               <div className="flex flex-col items-center gap-2">
                 <AlertCircle className="h-8 w-8 text-muted-foreground" />
                 <p className="text-muted-foreground">
-                  No hardware providers available at the moment.
+                  No datasets available at the moment.
                 </p>
               </div>
             </Card>
@@ -113,4 +133,4 @@ const Hardware = () => {
   );
 };
 
-export default Hardware;
+export default Datasets;

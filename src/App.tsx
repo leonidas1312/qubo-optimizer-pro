@@ -11,6 +11,7 @@ import Solvers from "./pages/Solvers";
 import Hardware from "./pages/Hardware";
 import Playground from "./pages/Playground";
 import QUBOts from "./pages/QUBOts";
+import Datasets from "./pages/Datasets";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +30,7 @@ const App = () => {
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/leaderboard" element={<div>Leaderboard Coming Soon</div>} />
                 <Route path="/qubots" element={<QUBOts />} />
-                <Route path="/datasets" element={<div>Datasets Coming Soon</div>} />
+                <Route path="/datasets" element={<Datasets />} />
               </Routes>
               <Toaster />
               <Sonner />
