@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { FileTree } from "@/components/github/FileTree";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
+import { toast } from "sonner";
 
 interface StepOneProps {
   name: string;
@@ -30,6 +31,29 @@ export const StepOne = ({
   setFileStructure,
   onFileSelect,
 }: StepOneProps) => {
+  const handleSelectRepository = async (repo: any) => {
+    try {
+      const [owner, repoName] = repo.full_name.split('/');
+      setSelectedRepo({ owner, name: repoName, full_name: repo.full_name });
+      
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${owner}/${repoName}/tree`,
+        { credentials: 'include' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch repository structure');
+      }
+      
+      const structure = await response.json();
+      setFileStructure(structure);
+      toast.success('Repository files loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load repository files');
+      console.error('Error fetching repository structure:', error);
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center gap-2 mb-6">
@@ -43,7 +67,7 @@ export const StepOne = ({
           <h3 className="text-lg font-semibold">Repository Files</h3>
           <RepositoryCombobox
             repositories={repositories}
-            onSelectRepository={setSelectedRepo}
+            onSelectRepository={handleSelectRepository}
           />
           <div className="h-[400px] border rounded-md">
             {selectedRepo ? (
