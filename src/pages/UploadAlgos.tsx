@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { CodeUploadSection } from '@/components/upload/CodeUploadSection';
 import { RepositoryCombobox } from '@/components/github/RepositoryCombobox';
 import { FileTree } from '@/components/github/FileTree';
+import { CodeEditor } from '@/components/playground/editor/CodeEditor';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -71,7 +71,6 @@ const UploadAlgos = () => {
     try {
       const [owner, repoName] = repo.full_name.split('/');
       setSelectedRepo({ owner, name: repoName });
-      // Fetch file structure
       const structure = await fetchFileStructure(owner, repoName);
       setFileStructure(structure);
       toast.success('Repository files loaded successfully');
@@ -145,21 +144,23 @@ const UploadAlgos = () => {
               </div>
             </ResizablePanel>
             <ResizableHandle />
-            {/* Right Panel: CodeUploadSection */}
-            <ResizablePanel defaultSize={44.66} minSize={30}>
-              {code ? (
-                <CodeUploadSection
-                  code={code}
-                  fileName={selectedFileName}
-                  onCodeChange={setCode}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-muted-foreground">
-                    Select a file to view its code.
-                  </p>
-                </div>
-              )}
+            {/* Right Panel: Code Editor */}
+            <ResizablePanel defaultSize={66.67} minSize={30}>
+              <div className="h-full p-4">
+                {code ? (
+                  <CodeEditor
+                    value={code}
+                    onChange={setCode}
+                    className="h-full"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-muted-foreground">
+                      Select a file from the repository to view its code.
+                    </p>
+                  </div>
+                )}
+              </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
