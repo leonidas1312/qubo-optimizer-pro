@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { Code2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 import {
   NavigationMenu,
@@ -25,6 +27,14 @@ export function CustomNavigationMenu() {
     } else {
       login();
     }
+  };
+
+  const handleContact = () => {
+    toast.info("Contact feature coming soon!");
+  };
+
+  const handleSignUp = () => {
+    toast.info("Sign up feature coming soon!");
   };
 
   return (
@@ -78,13 +88,30 @@ export function CustomNavigationMenu() {
         </NavigationMenuList>
       </NavigationMenu>
 
-      {/* Auth Button - Right Side */}
-      <button
-        onClick={handleAuth}
-        className="opacity-0 hover:opacity-100 transition-opacity duration-200 text-sm text-muted-foreground hover:text-foreground"
-      >
-        {isAuthenticated ? 'Logout' : 'Login with Github'}
-      </button>
+      {/* Auth Buttons - Right Side */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          onClick={handleAuth}
+          className="text-sm hover:bg-accent"
+        >
+          {isAuthenticated ? 'Log Out' : 'Log In'}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={handleContact}
+          className="text-sm hover:bg-accent"
+        >
+          Contact
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleSignUp}
+          className="text-sm bg-white text-black hover:bg-accent"
+        >
+          Sign Up
+        </Button>
+      </div>
     </div>
   );
 }
