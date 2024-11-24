@@ -32,6 +32,12 @@ export const StepOne = ({
 }: StepOneProps) => {
   return (
     <Card className="p-6">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-semibold">
+          1
+        </div>
+        <h2 className="text-xl font-semibold">Select Repository & Basic Information</h2>
+      </div>
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Repository Files</h3>

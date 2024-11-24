@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Selection } from "@/types/qubot";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { SolverPreview } from "@/components/solver/SolverPreview";
@@ -61,6 +63,12 @@ export const StepTwo = ({
 
   return (
     <Card className="p-6">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-semibold">
+          2
+        </div>
+        <h2 className="text-xl font-semibold">Code Editor & Preview</h2>
+      </div>
       <div className="grid grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -101,13 +109,53 @@ export const StepTwo = ({
               Create QUBOt
             </Button>
           </div>
-          <Card className="p-4 bg-black/50 backdrop-blur-sm border-white/10">
-            <SolverPreview
-              name={name}
-              inputParameters={inputParameters}
-              costFunction={costFunction}
-              algorithmLogic={algorithmLogic}
-            />
+          <Card className="p-4 space-y-4 bg-black/50 backdrop-blur-sm border-white/10">
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Input Parameters</h4>
+              <div className="flex flex-wrap gap-2">
+                {inputParameters ? (
+                  inputParameters.text.split(',').map((param, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="px-3 py-1 bg-blue-500/10 hover:bg-blue-500/20 cursor-pointer"
+                    >
+                      {param.trim()}
+                    </Badge>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground">
+                    No parameters selected. Mark a section in the code as input parameters.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Cost Function</h4>
+              {costFunction ? (
+                <div className="bg-black/30 p-3 rounded-md">
+                  <pre className="text-xs whitespace-pre-wrap">{costFunction.text}</pre>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  No cost function selected. Mark a section in the code as cost function.
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Algorithm Logic</h4>
+              {algorithmLogic ? (
+                <div className="bg-black/30 p-3 rounded-md">
+                  <pre className="text-xs whitespace-pre-wrap">{algorithmLogic.text}</pre>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  No algorithm logic selected. Mark a section in the code as algorithm logic.
+                </div>
+              )}
+            </div>
           </Card>
         </div>
       </div>
