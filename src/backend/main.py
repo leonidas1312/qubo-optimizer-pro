@@ -9,7 +9,8 @@ import os
 import requests
 from fastapi.responses import RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
-from backend.routes.github_routes import get_file_content,build_tree
+from backend.routes.github_routes import get_file_content, build_tree
+
 app = FastAPI()
 
 # Configure CORS and Session
@@ -28,127 +29,24 @@ app.add_middleware(
     https_only=False
 )
 
-GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"  # Replace with your GitHub OAuth App client ID
-GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"  # Replace with your GitHub OAuth App client secret
+GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"
+GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"
 GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
 FRONTEND_URL = "http://localhost:8080"
 
+# Move GitHub-related routes to a separate file
+from backend.routes.github_routes import router as github_router
+app.include_router(github_router, prefix="/api/github")
 
-@app.get("/api/github/repos/{owner}/{repo}/contents/{path:path}")
-async def get_file_content_endpoint(owner: str, repo: str, path: str, request: Request):
-    token = request.session.get("github_token")
-    if not token:
-        return {"error": "Not authenticated"}
-
-    print(f"Fetching file content for: owner={owner}, repo={repo}, path={path}")
-    result = await get_file_content(owner, repo, path, token)
-
-    if "error" in result:
-        print(f"Error fetching file content: {result['error']}")
-    else:
-        print(f"File content fetched successfully: {result['name']}")
-
-    return result
-
-
-
-
-@app.get("/api/github/repos/{owner}/{repo}/tree")
-async def get_repo_contents(owner: str, repo: str, request: Request):
-    token = request.session.get("github_token")
-    if not token:
-        return {"error": "Not authenticated"}
-    
-    try:
-        response = requests.get(
-            f"https://api.github.com/repos/{owner}/{repo}/git/trees/main?recursive=1",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github.v3+json",
-            },
-        )
-        
-        if response.status_code != 200:
-            return {"error": "Failed to fetch repository contents"}
-            
-        data = response.json()
-        
-
-            
-        tree = build_tree(data)
-        return tree
-        
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.post("/api/load-matrix")
-async def load_matrix(file: UploadFile = File(...)):
-    try:
-        # Create a temporary file to save the uploaded content
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            content = await file.read()
-            temp_file.write(content)
-            temp_file.flush()
-
-            # Load the numpy array from the temporary file
-            data = np.load(temp_file.name, allow_pickle=True)
-
-        # Clean up the temporary file
-        os.unlink(temp_file.name)
-
-        # Extract matrix and constant from the loaded data
-        if isinstance(data, np.ndarray) and data.shape == (2,):
-            matrix = data[0]
-            constant = float(data[1])
-        else:
-            raise ValueError("Invalid file format: Expected array with shape (2,)")
-
-        # Convert numpy array to Python list for JSON serialization
-        matrix_list = matrix.tolist()
-
-        return {
-            "matrix": matrix_list,
-            "constant": constant
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-
-@app.post("/api/solve")
-async def solve(data: Dict[Any, Any]):
-    try:
-        matrix = np.array(data["matrix"])
-        constant = float(data.get("constant", 0.0))
-        solver_type = data.get("solver", "tabu-search")
-        parameters = data.get("parameters", {})
-
-        # Call the solver function
-        best_solution, best_cost, iterations_cost, time_taken = solve_qubo(
-            qubo_matrix=matrix,
-            solver_type=solver_type,
-            parameters=parameters,
-            constant=constant
-        )
-
-        return {
-            "solution": best_solution.tolist(),
-            "cost": float(best_cost),
-            "iterations_cost": [float(c) for c in iterations_cost],
-            "time": time_taken
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-
-
-
+# Move solver-related routes to a separate file
+from backend.routes.solver_routes import router as solver_router
+app.include_router(solver_router, prefix="/api")
 
 @app.get("/api/auth/github")
 async def github_login():
     return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=read:user repo"
+        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=read:user,user:email repo"
     )
-
 
 @app.get("/api/auth/github/callback")
 async def github_callback(request: Request, code: str):
@@ -163,14 +61,12 @@ async def github_callback(request: Request, code: str):
             },
             headers={"Accept": "application/json"},
         )
-        print("Token Response:", token_response.json())
 
         access_token = token_response.json().get("access_token")
         if not access_token:
-            print("Failed to retrieve access token")
             return {"error": "Failed to retrieve access token"}
 
-        # Get user data
+        # Get user data including email
         user_response = requests.get(
             "https://api.github.com/user",
             headers={
@@ -178,14 +74,26 @@ async def github_callback(request: Request, code: str):
                 "Accept": "application/json",
             },
         )
-        print("User Response:", user_response.json())
-
         user_data = user_response.json()
+
+        # Get user's email
+        emails_response = requests.get(
+            "https://api.github.com/user/emails",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+        )
+        emails = emails_response.json()
+        primary_email = next((email["email"] for email in emails if email["primary"]), None)
+        
+        if primary_email:
+            user_data["email"] = primary_email
+
         request.session["github_token"] = access_token
         request.session["user"] = user_data
 
-        # Redirect back to the frontend
-        return RedirectResponse(url=f"{FRONTEND_URL}/uploadalgos")
+        return RedirectResponse(url=f"{FRONTEND_URL}/auth/callback")
     except Exception as e:
         print("Error during GitHub callback:", str(e))
         return {"error": str(e)}
@@ -193,7 +101,6 @@ async def github_callback(request: Request, code: str):
 @app.get("/api/auth/status")
 async def auth_status(request: Request):
     user = request.session.get("user")
-
     return {
         "authenticated": user is not None,
         "user": user
@@ -203,22 +110,6 @@ async def auth_status(request: Request):
 async def logout(request: Request):
     request.session.clear()
     return {"message": "Logged out successfully"}
-
-@app.get("/api/github/repos")
-async def get_repos(request: Request):
-    token = request.session.get("github_token")
-    if not token:
-        return {"error": "Not authenticated"}
-    
-    response = requests.get(
-        "https://api.github.com/user/repos",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json",
-        },
-    )
-    
-    return response.json()
 
 if __name__ == "__main__":
     import uvicorn

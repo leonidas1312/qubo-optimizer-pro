@@ -8,10 +8,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   session: Session | null;
-  login: (provider?: 'github') => void;
+  login: () => void;
   logout: () => Promise<void>;
-  loginWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -20,8 +18,6 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
   login: () => {},
   logout: async () => {},
-  loginWithEmail: async () => {},
-  signUpWithEmail: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -50,53 +46,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (provider: 'github' = 'github') => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) throw error;
-    } catch (error) {
-      toast.error('Error logging in with GitHub');
-      console.error('Error:', error);
-    }
-  };
-
-  const loginWithEmail = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      navigate('/');
-    } catch (error) {
-      toast.error('Error logging in with email');
-      console.error('Error:', error);
-    }
-  };
-
-  const signUpWithEmail = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      if (error) throw error;
-      toast.success('Signup successful! Please check your email for verification.');
-    } catch (error) {
-      toast.error('Error signing up');
-      console.error('Error:', error);
-    }
+  const login = () => {
+    window.location.href = 'http://localhost:8000/api/auth/github';
   };
 
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Logout from both GitHub session and Supabase
+      await fetch('http://localhost:8000/api/auth/logout', {
+        credentials: 'include'
+      });
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setUser(null);
+      setSession(null);
       navigate('/');
     } catch (error) {
       toast.error('Error logging out');
@@ -112,8 +75,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         login, 
         logout,
-        loginWithEmail,
-        signUpWithEmail,
       }}
     >
       {children}
