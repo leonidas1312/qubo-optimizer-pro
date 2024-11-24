@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2 } from "lucide-react";
+import { Code2, UserRound, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,18 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function CustomNavigationMenu() {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, user, login, logout } = useAuth();
 
   const handleAuth = async () => {
     if (isAuthenticated) {
@@ -76,8 +85,8 @@ export function CustomNavigationMenu() {
         </NavigationMenuList>
       </NavigationMenu>
 
-      {/* Auth Button - Right Side */}
-      <div className="flex items-center gap-2">
+      {/* Auth Button and Avatar - Right Side */}
+      <div className="flex items-center gap-4">
         <Button
           variant="outline"
           onClick={handleAuth}
@@ -85,6 +94,38 @@ export function CustomNavigationMenu() {
         >
           {isAuthenticated ? 'Log Out' : 'Log In'}
         </Button>
+
+        {isAuthenticated && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage src={user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} />
+                <AvatarFallback>
+                  <UserRound className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.email}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.github_username || 'User'}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAuth}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );
