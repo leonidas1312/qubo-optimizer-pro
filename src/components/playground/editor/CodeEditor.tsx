@@ -1,6 +1,12 @@
 import { Editor } from "@monaco-editor/react";
 import { cn } from "@/lib/utils";
-import { CodeSelectionMenu } from "@/components/solver/CodeSelectionMenu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { toast } from "sonner";
 
 interface CodeEditorProps {
   value: string;
@@ -23,17 +29,42 @@ export const CodeEditor = ({
   onSelectCostFunction,
   onSelectAlgorithmLogic
 }: CodeEditorProps) => {
+  const handleSelection = (type: "input" | "cost" | "algorithm") => {
+    const selection = window.getSelection();
+    if (!selection || !selection.toString()) {
+      toast.error("Please select some code first");
+      return;
+    }
+
+    const selectionObj = {
+      start: selection.anchorOffset,
+      end: selection.focusOffset,
+      text: selection.toString(),
+    };
+
+    switch (type) {
+      case "input":
+        onSelectInputParameters?.(selectionObj);
+        toast.success("Input parameters selected");
+        break;
+      case "cost":
+        onSelectCostFunction?.(selectionObj);
+        toast.success("Cost function selected");
+        break;
+      case "algorithm":
+        onSelectAlgorithmLogic?.(selectionObj);
+        toast.success("Algorithm logic selected");
+        break;
+    }
+  };
+
   return (
-    <div className={cn(
-      "border rounded-lg overflow-hidden bg-background",
-      error && "border-destructive",
-      className
-    )}>
-      <CodeSelectionMenu
-        onSelectInputParameters={onSelectInputParameters || (() => {})}
-        onSelectCostFunction={onSelectCostFunction || (() => {})}
-        onSelectAlgorithmLogic={onSelectAlgorithmLogic || (() => {})}
-      >
+    <ContextMenu>
+      <ContextMenuTrigger className={cn(
+        "border rounded-lg overflow-hidden bg-background",
+        error && "border-destructive",
+        className
+      )}>
         <Editor
           height="100%"
           defaultLanguage={language}
@@ -66,7 +97,18 @@ export const CodeEditor = ({
           }}
           className="min-h-[300px]"
         />
-      </CodeSelectionMenu>
-    </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem onClick={() => handleSelection("input")}>
+          Mark as Input Parameters
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => handleSelection("cost")}>
+          Mark as Cost Function
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => handleSelection("algorithm")}>
+          Mark as Algorithm Logic
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
