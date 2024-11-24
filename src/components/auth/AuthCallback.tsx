@@ -18,7 +18,7 @@ export const AuthCallback = () => {
           // Sign up new user in Supabase
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: data.user.email,
-            password: crypto.randomUUID(),
+            password: data.user.id, // Use GitHub user ID as password
             options: {
               data: {
                 avatar_url: data.user.avatar_url,
@@ -33,14 +33,17 @@ export const AuthCallback = () => {
           }
 
           // Sign in user
-          const { error: signInError } = await supabase.auth.signInWithPassword({
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: data.user.email,
-            password: signUpData?.user?.id || data.user.id
+            password: data.user.id
           });
 
           if (signInError) {
             throw signInError;
           }
+
+          // Wait for the profile to be created by the trigger
+          await new Promise(resolve => setTimeout(resolve, 1000));
 
           navigate('/uploadalgos');
           toast.success('Successfully logged in!');
