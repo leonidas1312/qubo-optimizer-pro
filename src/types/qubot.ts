@@ -7,10 +7,10 @@ export interface Selection {
 export interface QubotInput {
   name: string;
   description?: string;
-  repository_url?: string;
-  file_path?: string;
+  repository_url?: string | null;
+  file_path?: string | null;
   input_parameters: Record<string, any>[];
-  cost_function?: string;
-  algorithm_logic?: string;
+  cost_function?: string | null;
+  algorithm_logic?: string | null;
   is_public: boolean;
 }

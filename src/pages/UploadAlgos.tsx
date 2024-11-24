@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { SolverPreview } from '@/components/solver/SolverPreview';
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
 
@@ -66,20 +67,17 @@ const UploadAlgos = () => {
 
       if (!profile) throw new Error('Profile not found');
 
-      // Transform the input parameters to a format compatible with JSONB
-      const transformedParams = inputParameters ? [{
-        start: inputParameters.start,
-        end: inputParameters.end,
-        text: inputParameters.text
-      }] : [];
-
-      const qubotData: QubotInput = {
+      const qubotData: QubotInput & { creator_id: string } = {
         name,
         description,
         creator_id: profile.id,
         repository_url: selectedRepo ? `https://github.com/${selectedRepo.full_name}` : null,
         file_path: selectedFileName,
-        input_parameters: transformedParams,
+        input_parameters: inputParameters ? [{
+          start: inputParameters.start,
+          end: inputParameters.end,
+          text: inputParameters.text
+        }] : [],
         cost_function: costFunction?.text,
         algorithm_logic: algorithmLogic?.text,
         is_public: true
@@ -166,144 +164,155 @@ const UploadAlgos = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6">Create a QUBOt Solver</h1>
-        
-        <div className="mb-6 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Solver Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter a name for your solver"
-            />
+      <ScrollArea className="h-[calc(100vh-4rem)]">
+        <div className="container mx-auto py-8 px-4">
+          <h1 className="text-3xl font-bold mb-6">Create a QUBOt Solver</h1>
+          
+          <div className="mb-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Solver Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter a name for your solver"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe your solver"
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your solver"
-            />
-          </div>
-        </div>
 
-        <div className="h-[calc(100vh-20rem)]">
-          <ResizablePanelGroup direction="horizontal">
-            {/* Left Panel: RepositoryCombobox and FileTree */}
-            <ResizablePanel defaultSize={25} minSize={20}>
-              <div className="border-r border-border h-full p-4">
-                <h2 className="text-lg font-semibold mb-4">Select Repository</h2>
-                {isLoading ? (
-                  <div className="text-center">Loading repositories...</div>
-                ) : repositories ? (
-                  <>
-                    <RepositoryCombobox
-                      repositories={repositories}
-                      onSelectRepository={handleSelectRepository}
-                    />
-                    {selectedRepo && (
-                      <div className="mt-4 h-[calc(100vh-24rem)]">
-                        <ScrollArea className="h-full rounded-md border">
-                          <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                        </ScrollArea>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <ResizablePanelGroup direction="horizontal">
+                <ResizablePanel defaultSize={25} minSize={20}>
+                  <div className="border-r border-border h-full p-4">
+                    <h2 className="text-lg font-semibold mb-4">Select Repository</h2>
+                    {isLoading ? (
+                      <div className="text-center">Loading repositories...</div>
+                    ) : repositories ? (
+                      <>
+                        <RepositoryCombobox
+                          repositories={repositories}
+                          onSelectRepository={handleSelectRepository}
+                        />
+                        {selectedRepo && (
+                          <div className="mt-4 h-[calc(100vh-24rem)]">
+                            <ScrollArea className="h-full rounded-md border">
+                              <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                            </ScrollArea>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        No repositories found.
                       </div>
                     )}
-                  </>
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    No repositories found.
                   </div>
-                )}
-              </div>
-            </ResizablePanel>
-            
-            <ResizableHandle />
-            
-            {/* Right Panel: Code Editor and Selection Tools */}
-            <ResizablePanel defaultSize={75} minSize={30}>
-              <div className="h-full p-4 space-y-4">
-                <div className="flex gap-4 mb-4">
-                  <Button
-                    variant={inputParameters ? "default" : "outline"}
-                    onClick={() => {
-                      const selection = window.getSelection();
-                      if (selection && selection.toString()) {
-                        setInputParameters({
-                          start: selection.anchorOffset,
-                          end: selection.focusOffset,
-                          text: selection.toString(),
-                        });
-                        toast.success('Input parameters selected');
-                      }
-                    }}
-                  >
-                    Mark Input Parameters
-                  </Button>
-                  <Button
-                    variant={costFunction ? "default" : "outline"}
-                    onClick={() => {
-                      const selection = window.getSelection();
-                      if (selection && selection.toString()) {
-                        setCostFunction({
-                          start: selection.anchorOffset,
-                          end: selection.focusOffset,
-                          text: selection.toString(),
-                        });
-                        toast.success('Cost function selected');
-                      }
-                    }}
-                  >
-                    Mark Cost Function
-                  </Button>
-                  <Button
-                    variant={algorithmLogic ? "default" : "outline"}
-                    onClick={() => {
-                      const selection = window.getSelection();
-                      if (selection && selection.toString()) {
-                        setAlgorithmLogic({
-                          start: selection.anchorOffset,
-                          end: selection.focusOffset,
-                          text: selection.toString(),
-                        });
-                        toast.success('Algorithm logic selected');
-                      }
-                    }}
-                  >
-                    Mark Algorithm Logic
-                  </Button>
-                </div>
+                </ResizablePanel>
+                
+                <ResizableHandle />
+                
+                <ResizablePanel defaultSize={75} minSize={30}>
+                  <div className="h-full p-4 space-y-4">
+                    <div className="flex gap-4 mb-4">
+                      <Button
+                        variant={inputParameters ? "default" : "outline"}
+                        onClick={() => {
+                          const selection = window.getSelection();
+                          if (selection && selection.toString()) {
+                            setInputParameters({
+                              start: selection.anchorOffset,
+                              end: selection.focusOffset,
+                              text: selection.toString(),
+                            });
+                            toast.success('Input parameters selected');
+                          }
+                        }}
+                      >
+                        Mark Input Parameters
+                      </Button>
+                      <Button
+                        variant={costFunction ? "default" : "outline"}
+                        onClick={() => {
+                          const selection = window.getSelection();
+                          if (selection && selection.toString()) {
+                            setCostFunction({
+                              start: selection.anchorOffset,
+                              end: selection.focusOffset,
+                              text: selection.toString(),
+                            });
+                            toast.success('Cost function selected');
+                          }
+                        }}
+                      >
+                        Mark Cost Function
+                      </Button>
+                      <Button
+                        variant={algorithmLogic ? "default" : "outline"}
+                        onClick={() => {
+                          const selection = window.getSelection();
+                          if (selection && selection.toString()) {
+                            setAlgorithmLogic({
+                              start: selection.anchorOffset,
+                              end: selection.focusOffset,
+                              text: selection.toString(),
+                            });
+                            toast.success('Algorithm logic selected');
+                          }
+                        }}
+                      >
+                        Mark Algorithm Logic
+                      </Button>
+                    </div>
 
-                {code ? (
-                  <CodeEditor
-                    value={code}
-                    onChange={setCode}
-                    className="h-[calc(100vh-28rem)]"
-                    language="python"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-muted-foreground">
-                      Select a Python file from the repository to create your solver.
-                    </p>
+                    {code ? (
+                      <CodeEditor
+                        value={code}
+                        onChange={setCode}
+                        className="h-[calc(100vh-28rem)]"
+                        language="python"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <p className="text-muted-foreground">
+                          Select a Python file from the repository to create your solver.
+                        </p>
+                      </div>
+                    )}
+
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      onClick={handleCreateSolver}
+                      disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
+                    >
+                      Create QUBOt Solver
+                    </Button>
                   </div>
-                )}
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </div>
 
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleCreateSolver}
-                  disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
-                >
-                  Create QUBOt Solver
-                </Button>
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+            <div className="lg:col-span-1">
+              <SolverPreview
+                name={name}
+                inputParameters={inputParameters}
+                costFunction={costFunction}
+                algorithmLogic={algorithmLogic}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      </ScrollArea>
     </DashboardLayout>
   );
 };

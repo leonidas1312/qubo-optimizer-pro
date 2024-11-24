@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2, Trophy, Database, FileText, Puzzle, Beaker, Book } from "lucide-react";
+import { Code2, Trophy, Book, Beaker, FileText, Puzzle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { UserMenu } from "./navigation/UserMenu";
 import { ListItem } from "./navigation/ListItem";
@@ -29,38 +28,45 @@ export function CustomNavigationMenu() {
   return (
     <div className="w-full bg-black/50 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto flex justify-between items-center h-16 px-4">
-        {/* Brand Logo - Left Side */}
         <Link to="/" className="flex items-center space-x-2">
           <Code2 className="h-6 w-6 text-primary" />
           <span className="font-bold text-xl">QUBOt</span>
         </Link>
 
-        {/* Navigation Menu - Center */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
-            {/* Playground Tab */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>
                 <div className="flex items-center gap-2">
-                  <Beaker className="h-4 w-4" />
-                  Playground
+                  <Puzzle className="h-4 w-4" />
+                  Optimization Lab
                 </div>
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
-                  <ListItem to="/playground" title="Playground">
-                    Experiment with QUBO problems and solutions
+                  <ListItem to="/playground" title="Interactive Workspace">
+                    <div className="flex items-center gap-2">
+                      <Beaker className="h-4 w-4" />
+                      <span>Experiment with QUBO problems and solutions</span>
+                    </div>
                   </ListItem>
                   <ListItem to="/uploadalgos" title="Create a QUBOt solver">
-                    Build and test your own QUBO solver
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      <span>Build and test your own QUBO solver</span>
+                    </div>
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Community Tab */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Community</NavigationMenuTrigger>
+              <NavigationMenuTrigger>
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  Community
+                </div>
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
                   <ListItem to="/leaderboard" title="Leaderboard">
@@ -79,7 +85,6 @@ export function CustomNavigationMenu() {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {/* Documentation Tab */}
             <NavigationMenuItem>
               <NavigationMenuTrigger>
                 <div className="flex items-center gap-2">
@@ -104,7 +109,6 @@ export function CustomNavigationMenu() {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Auth Button and Avatar - Right Side */}
         <div className="flex items-center gap-4">
           {!isAuthenticated && (
             <Button
@@ -121,4 +125,4 @@ export function CustomNavigationMenu() {
       </div>
     </div>
   );
-}
+};
