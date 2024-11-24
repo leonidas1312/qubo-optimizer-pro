@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { AuthCallback } from "@/components/auth/AuthCallback";
 import Index from "./pages/Index";
 import Solvers from "./pages/Solvers";
 import Playground from "./pages/Playground";
@@ -16,21 +17,21 @@ const App = () => {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
+            <TooltipProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/solvers" element={<Solvers />} />
                 <Route path="/uploadalgos" element={<UploadAlgos />} />
-                <Route path="/auth/github/callback" element={<UploadAlgos />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
               </Routes>
               <Toaster />
               <Sonner />
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
+            </TooltipProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </QueryClientProvider>
     </React.StrictMode>
   );
