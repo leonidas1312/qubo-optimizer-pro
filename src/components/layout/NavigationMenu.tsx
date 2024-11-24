@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2, UserRound, LogOut, Settings } from "lucide-react";
+import { Code2, UserRound, LogOut, Settings, Palette, Bell, Shield } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,6 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,13 +38,20 @@ interface ExtendedUser extends User {
 export function CustomNavigationMenu() {
   const { isAuthenticated, user, login, logout } = useAuth();
   const extendedUser = user as ExtendedUser;
+  const { toast } = useToast();
 
   const handleAuth = async () => {
-    if (isAuthenticated) {
-      await logout();
-    } else {
+    if (!isAuthenticated) {
       login();
     }
+  };
+
+  const handleSettingsAction = (action: string) => {
+    toast({
+      title: "Settings Update",
+      description: `${action} settings will be available soon!`,
+      duration: 2000,
+    });
   };
 
   return (
@@ -94,13 +105,15 @@ export function CustomNavigationMenu() {
 
       {/* Auth Button and Avatar - Right Side */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          onClick={handleAuth}
-          className="text-sm bg-black text-white border-white hover:bg-white hover:text-black transition-colors"
-        >
-          {isAuthenticated ? 'Log Out' : 'Log In'}
-        </Button>
+        {!isAuthenticated && (
+          <Button
+            variant="outline"
+            onClick={handleAuth}
+            className="text-sm bg-black text-white border-white hover:bg-white hover:text-black transition-colors"
+          >
+            Log In
+          </Button>
+        )}
 
         {isAuthenticated && (
           <DropdownMenu>
@@ -122,11 +135,34 @@ export function CustomNavigationMenu() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+              
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette className="mr-2 h-4 w-4" />
+                  <span>Appearance</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => handleSettingsAction('Theme')}>
+                    <span>Theme</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSettingsAction('Layout')}>
+                    <span>Layout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuItem onClick={() => handleSettingsAction('Notifications')}>
+                <Bell className="mr-2 h-4 w-4" />
+                <span>Notifications</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleAuth}>
+
+              <DropdownMenuItem onClick={() => handleSettingsAction('Security')}>
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Security</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
