@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Cpu, Server, HardDrive } from "lucide-react";
+import { Tables } from "@/integrations/supabase/types";
+
+type HardwareProvider = Tables<"hardware_providers">;
 
 const Hardware = () => {
   const { data: providers, isLoading } = useQuery({
@@ -36,7 +39,7 @@ const Hardware = () => {
               <Card className="p-8">
                 <p className="text-center text-muted-foreground">Loading available hardware...</p>
               </Card>
-            ) : providers?.map((provider) => (
+            ) : providers?.map((provider: HardwareProvider) => (
               <Card key={provider.id} className="p-6 hover:border-primary/50 transition-colors">
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
@@ -56,7 +59,7 @@ const Hardware = () => {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium">Specifications</h4>
                     <div className="flex flex-wrap gap-2">
-                      {Object.entries(provider.specs).map(([key, value]) => (
+                      {Object.entries(provider.specs as Record<string, string>).map(([key, value]) => (
                         <Badge key={key} variant="outline">
                           {key}: {value}
                         </Badge>
