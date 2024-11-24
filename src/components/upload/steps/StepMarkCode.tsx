@@ -20,7 +20,7 @@ export const StepMarkCode = ({
 }: StepMarkCodeProps) => {
   return (
     <Card className="p-6 space-y-6">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-full bg-purple-600/10 flex items-center justify-center">
           <Code2 className="h-6 w-6 text-purple-600" />
         </div>
@@ -33,9 +33,9 @@ export const StepMarkCode = ({
       </div>
 
       {code ? (
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <div className="flex items-start gap-4 p-4 bg-amber-500/10 rounded-lg">
-            <Lightbulb className="h-6 w-6 text-amber-500 mt-1" />
+            <Lightbulb className="h-6 w-6 text-amber-500 mt-1 flex-shrink-0" />
             <div className="space-y-2">
               <h3 className="font-medium">How to mark your code:</h3>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
