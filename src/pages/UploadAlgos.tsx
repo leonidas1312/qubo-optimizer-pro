@@ -3,18 +3,12 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { SolverPreview } from '@/components/solver/SolverPreview';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
-import { RepositorySection } from '@/components/upload/RepositorySection';
-import { EditorSection } from '@/components/upload/EditorSection';
-import { Card } from '@/components/ui/card';
-import { Steps } from '@/components/ui/steps';
+import { StepOne } from '@/components/upload/StepOne';
+import { StepTwo } from '@/components/upload/StepTwo';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -134,100 +128,40 @@ const UploadAlgos = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8">
-            {/* Step 1: Basic Information */}
-            <Card className="p-6 space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-semibold">1</span>
-                </div>
-                <h2 className="text-xl font-semibold">Basic Information</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Solver Name</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter a name for your solver"
-                    className="max-w-md"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe what your solver does and how it works"
-                    className="max-w-md"
-                  />
-                </div>
-              </div>
-            </Card>
+          <div className="space-y-8">
+            <StepOne
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              repositories={repositories}
+              selectedRepo={selectedRepo}
+              setSelectedRepo={setSelectedRepo}
+              fileStructure={fileStructure}
+              setFileStructure={setFileStructure}
+              onFileSelect={handleFileSelect}
+            />
 
-            {/* Step 2: Code Selection */}
-            <Card className="p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-semibold">2</span>
-                </div>
-                <h2 className="text-xl font-semibold">Select Your Code</h2>
-              </div>
+            <StepTwo
+              code={code}
+              setCode={setCode}
+              name={name}
+              inputParameters={inputParameters}
+              costFunction={costFunction}
+              algorithmLogic={algorithmLogic}
+              setInputParameters={setInputParameters}
+              setCostFunction={setCostFunction}
+              setAlgorithmLogic={setAlgorithmLogic}
+            />
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <ResizablePanelGroup direction="horizontal">
-                    <ResizablePanel defaultSize={25} minSize={20}>
-                      <RepositorySection
-                        repositories={repositories}
-                        selectedRepo={selectedRepo}
-                        setSelectedRepo={setSelectedRepo}
-                        fileStructure={fileStructure}
-                        setFileStructure={setFileStructure}
-                        onFileSelect={handleFileSelect}
-                      />
-                    </ResizablePanel>
-                    
-                    <ResizableHandle />
-                    
-                    <ResizablePanel defaultSize={75} minSize={30}>
-                      <EditorSection
-                        code={code}
-                        setCode={setCode}
-                        setInputParameters={setInputParameters}
-                        setCostFunction={setCostFunction}
-                        setAlgorithmLogic={setAlgorithmLogic}
-                        handleCreateSolver={() => createQubot.mutate()}
-                        name={name}
-                        inputParameters={inputParameters}
-                        costFunction={costFunction}
-                        algorithmLogic={algorithmLogic}
-                      />
-                    </ResizablePanel>
-                  </ResizablePanelGroup>
-                </div>
-
-                <div className="lg:col-span-1">
-                  <Card className="p-4 bg-black/50 backdrop-blur-sm border-white/10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-semibold">3</span>
-                      </div>
-                      <h2 className="text-xl font-semibold">Preview</h2>
-                    </div>
-                    <SolverPreview
-                      name={name}
-                      inputParameters={inputParameters}
-                      costFunction={costFunction}
-                      algorithmLogic={algorithmLogic}
-                    />
-                  </Card>
-                </div>
-              </div>
-            </Card>
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => createQubot.mutate()}
+              disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
+            >
+              Create QUBOt Solver
+            </Button>
           </div>
         </div>
       </ScrollArea>
