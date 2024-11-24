@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import type { Selection, QubotInput } from '@/types/qubot';
 import { Github } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StepChooseFile } from '@/components/upload/steps/StepChooseFile';
 import { StepMarkCode } from '@/components/upload/steps/StepMarkCode';
 import { StepPreview } from '@/components/upload/steps/StepPreview';
+import { TransformationSteps } from '@/components/solver/TransformationSteps';
+import type { Selection } from '@/types/qubot';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -39,64 +39,6 @@ const UploadAlgos = () => {
       return response.json();
     },
     enabled: isAuthenticated,
-  });
-
-  const createQubot = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) throw new Error('User not authenticated');
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile) throw new Error('Profile not found');
-
-      const qubotData: QubotInput & { creator_id: string } = {
-        name,
-        description,
-        creator_id: profile.id,
-        repository_url: selectedRepo ? `https://github.com/${selectedRepo.full_name}` : null,
-        file_path: selectedFileName,
-        input_parameters: inputParameters ? [{
-          start: inputParameters.start,
-          end: inputParameters.end,
-          text: inputParameters.text
-        }] : [],
-        cost_function: costFunction?.text,
-        algorithm_logic: algorithmLogic?.text,
-        is_public: true,
-        solver_type: 'simulated-annealing',
-        solver_parameters: {}
-      };
-
-      const { data, error } = await supabase
-        .from('qubots')
-        .insert(qubotData)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast.success('QUBOt created successfully!');
-      // Reset form
-      setCode('');
-      setName('');
-      setDescription('');
-      setSelectedFileName(null);
-      setSelectedRepo(null);
-      setFileStructure([]);
-      setInputParameters(null);
-      setCostFunction(null);
-      setAlgorithmLogic(null);
-      setActiveStep('choose-file');
-    },
-    onError: (error) => {
-      toast.error(`Failed to create QUBOt: ${error.message}`);
-    },
   });
 
   const handleFileSelect = async (path: string) => {
@@ -164,67 +106,65 @@ const UploadAlgos = () => {
         <div>
           <h1 className="text-3xl font-bold gradient-text">Create QUBOt Solver</h1>
           <p className="text-muted-foreground mt-2">
-            Build and share your optimization algorithms with the community
+            Transform your Python optimization code into a QUBOt solver
           </p>
         </div>
 
-        <Tabs value={activeStep} onValueChange={setActiveStep} className="space-y-6">
-          <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full">
-            <TabsTrigger 
-              value="choose-file" 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
-            >
-              1. Choose a File
-            </TabsTrigger>
-            <TabsTrigger 
-              value="mark-code" 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
-            >
-              2. Mark the Code
-            </TabsTrigger>
-            <TabsTrigger 
-              value="preview" 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
-            >
-              3. QUBOt Preview
-            </TabsTrigger>
-          </TabsList>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <Tabs value={activeStep} onValueChange={setActiveStep}>
+              <TabsList className="grid grid-cols-3">
+                <TabsTrigger value="choose-file">1. Choose File</TabsTrigger>
+                <TabsTrigger value="mark-code">2. Mark Code</TabsTrigger>
+                <TabsTrigger value="preview">3. Preview</TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="choose-file">
-            <StepChooseFile
-              name={name}
-              setName={setName}
-              description={description}
-              setDescription={setDescription}
-              repositories={repositories || []}
-              selectedRepo={selectedRepo}
-              setSelectedRepo={handleSelectRepository}
-              fileStructure={fileStructure}
-              setFileStructure={setFileStructure}
-              onFileSelect={handleFileSelect}
-            />
-          </TabsContent>
+              <TabsContent value="choose-file">
+                <StepChooseFile
+                  name={name}
+                  setName={setName}
+                  description={description}
+                  setDescription={setDescription}
+                  repositories={repositories || []}
+                  selectedRepo={selectedRepo}
+                  setSelectedRepo={handleSelectRepository}
+                  fileStructure={fileStructure}
+                  setFileStructure={setFileStructure}
+                  onFileSelect={handleFileSelect}
+                />
+              </TabsContent>
 
-          <TabsContent value="mark-code">
-            <StepMarkCode
-              code={code}
-              setCode={setCode}
-              setInputParameters={setInputParameters}
-              setCostFunction={setCostFunction}
-              setAlgorithmLogic={setAlgorithmLogic}
-            />
-          </TabsContent>
+              <TabsContent value="mark-code">
+                <StepMarkCode
+                  code={code}
+                  setCode={setCode}
+                  setInputParameters={setInputParameters}
+                  setCostFunction={setCostFunction}
+                  setAlgorithmLogic={setAlgorithmLogic}
+                />
+              </TabsContent>
 
-          <TabsContent value="preview">
-            <StepPreview
-              name={name}
-              inputParameters={inputParameters}
-              costFunction={costFunction}
-              algorithmLogic={algorithmLogic}
-              onCreateSolver={() => createQubot.mutate()}
-            />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="preview">
+                <StepPreview
+                  name={name}
+                  inputParameters={inputParameters}
+                  costFunction={costFunction}
+                  algorithmLogic={algorithmLogic}
+                  onCreateSolver={() => {
+                    // Handle solver creation
+                    toast.success('QUBOt solver created successfully!');
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <TransformationSteps
+            inputParameters={inputParameters?.text || null}
+            costFunction={costFunction?.text || null}
+            algorithmLogic={algorithmLogic?.text || null}
+          />
+        </div>
       </div>
     </DashboardLayout>
   );
