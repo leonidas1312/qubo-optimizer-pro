@@ -24,9 +24,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User } from '@supabase/supabase-js';
+
+interface ExtendedUser extends User {
+  avatar_url?: string;
+  github_username?: string;
+}
 
 export function CustomNavigationMenu() {
   const { isAuthenticated, user, login, logout } = useAuth();
+  const extendedUser = user as ExtendedUser;
 
   const handleAuth = async () => {
     if (isAuthenticated) {
@@ -99,7 +106,7 @@ export function CustomNavigationMenu() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
-                <AvatarImage src={user?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} />
+                <AvatarImage src={extendedUser?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${extendedUser?.email}`} />
                 <AvatarFallback>
                   <UserRound className="h-4 w-4" />
                 </AvatarFallback>
@@ -108,9 +115,9 @@ export function CustomNavigationMenu() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.email}</p>
+                  <p className="text-sm font-medium leading-none">{extendedUser?.email}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user?.github_username || 'User'}
+                    {extendedUser?.github_username || 'User'}
                   </p>
                 </div>
               </DropdownMenuLabel>
