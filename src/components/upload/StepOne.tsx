@@ -39,11 +39,15 @@ export const StepOne = ({
             repositories={repositories}
             onSelectRepository={setSelectedRepo}
           />
-          {selectedRepo && (
-            <div className="h-[400px] border rounded-md">
+          <div className="h-[400px] border rounded-md">
+            {selectedRepo ? (
               <FileTree files={fileStructure} onFileSelect={onFileSelect} />
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                Select a repository to view files
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="space-y-6">

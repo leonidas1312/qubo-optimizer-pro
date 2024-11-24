@@ -4,7 +4,6 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
 import { StepOne } from '@/components/upload/StepOne';
@@ -152,16 +151,8 @@ const UploadAlgos = () => {
               setInputParameters={setInputParameters}
               setCostFunction={setCostFunction}
               setAlgorithmLogic={setAlgorithmLogic}
+              onCreateSolver={() => createQubot.mutate()}
             />
-
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={() => createQubot.mutate()}
-              disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
-            >
-              Create QUBOt Solver
-            </Button>
           </div>
         </div>
       </ScrollArea>

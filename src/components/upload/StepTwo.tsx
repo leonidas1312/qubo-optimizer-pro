@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Selection } from "@/types/qubot";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { SolverPreview } from "@/components/solver/SolverPreview";
@@ -20,6 +21,7 @@ interface StepTwoProps {
   setInputParameters: (selection: Selection | null) => void;
   setCostFunction: (selection: Selection | null) => void;
   setAlgorithmLogic: (selection: Selection | null) => void;
+  onCreateSolver: () => void;
 }
 
 export const StepTwo = ({
@@ -32,6 +34,7 @@ export const StepTwo = ({
   setInputParameters,
   setCostFunction,
   setAlgorithmLogic,
+  onCreateSolver,
 }: StepTwoProps) => {
   const handleMenuAction = (type: "input" | "cost" | "algorithm") => {
     const selection = window.getSelection();
@@ -88,7 +91,16 @@ export const StepTwo = ({
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Preview</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Preview</h3>
+            <Button
+              onClick={onCreateSolver}
+              disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
+              className="bg-gradient-to-r from-blue-600 to-blue-800 text-white"
+            >
+              Create QUBOt
+            </Button>
+          </div>
           <Card className="p-4 bg-black/50 backdrop-blur-sm border-white/10">
             <SolverPreview
               name={name}
