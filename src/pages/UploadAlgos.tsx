@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
 import { RepositorySection } from '@/components/upload/RepositorySection';
 import { EditorSection } from '@/components/upload/EditorSection';
+import { Card } from '@/components/ui/card';
+import { Steps } from '@/components/ui/steps';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -124,71 +126,108 @@ const UploadAlgos = () => {
   return (
     <DashboardLayout>
       <ScrollArea className="h-[calc(100vh-4rem)]">
-        <div className="container mx-auto py-8 px-4">
-          <h1 className="text-3xl font-bold mb-6">Create a QUBOt Solver</h1>
-          
-          <div className="mb-6 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Solver Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter a name for your solver"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your solver"
-              />
-            </div>
+        <div className="container mx-auto py-8 px-4 space-y-8">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold gradient-text">Create a QUBOt Solver</h1>
+            <p className="text-muted-foreground">
+              Follow these steps to create your custom QUBO solver.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={25} minSize={20}>
-                  <RepositorySection
-                    repositories={repositories}
-                    selectedRepo={selectedRepo}
-                    setSelectedRepo={setSelectedRepo}
-                    fileStructure={fileStructure}
-                    setFileStructure={setFileStructure}
-                    onFileSelect={handleFileSelect}
+          <div className="grid grid-cols-1 gap-8">
+            {/* Step 1: Basic Information */}
+            <Card className="p-6 space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-semibold">1</span>
+                </div>
+                <h2 className="text-xl font-semibold">Basic Information</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Solver Name</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter a name for your solver"
+                    className="max-w-md"
                   />
-                </ResizablePanel>
-                
-                <ResizableHandle />
-                
-                <ResizablePanel defaultSize={75} minSize={30}>
-                  <EditorSection
-                    code={code}
-                    setCode={setCode}
-                    setInputParameters={setInputParameters}
-                    setCostFunction={setCostFunction}
-                    setAlgorithmLogic={setAlgorithmLogic}
-                    handleCreateSolver={() => createQubot.mutate()}
-                    name={name}
-                    inputParameters={inputParameters}
-                    costFunction={costFunction}
-                    algorithmLogic={algorithmLogic}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe what your solver does and how it works"
+                    className="max-w-md"
                   />
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </div>
+                </div>
+              </div>
+            </Card>
 
-            <div className="lg:col-span-1">
-              <SolverPreview
-                name={name}
-                inputParameters={inputParameters}
-                costFunction={costFunction}
-                algorithmLogic={algorithmLogic}
-              />
-            </div>
+            {/* Step 2: Code Selection */}
+            <Card className="p-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-semibold">2</span>
+                </div>
+                <h2 className="text-xl font-semibold">Select Your Code</h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <ResizablePanelGroup direction="horizontal">
+                    <ResizablePanel defaultSize={25} minSize={20}>
+                      <RepositorySection
+                        repositories={repositories}
+                        selectedRepo={selectedRepo}
+                        setSelectedRepo={setSelectedRepo}
+                        fileStructure={fileStructure}
+                        setFileStructure={setFileStructure}
+                        onFileSelect={handleFileSelect}
+                      />
+                    </ResizablePanel>
+                    
+                    <ResizableHandle />
+                    
+                    <ResizablePanel defaultSize={75} minSize={30}>
+                      <EditorSection
+                        code={code}
+                        setCode={setCode}
+                        setInputParameters={setInputParameters}
+                        setCostFunction={setCostFunction}
+                        setAlgorithmLogic={setAlgorithmLogic}
+                        handleCreateSolver={() => createQubot.mutate()}
+                        name={name}
+                        inputParameters={inputParameters}
+                        costFunction={costFunction}
+                        algorithmLogic={algorithmLogic}
+                      />
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                </div>
+
+                <div className="lg:col-span-1">
+                  <Card className="p-4 bg-black/50 backdrop-blur-sm border-white/10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-primary font-semibold">3</span>
+                      </div>
+                      <h2 className="text-xl font-semibold">Preview</h2>
+                    </div>
+                    <SolverPreview
+                      name={name}
+                      inputParameters={inputParameters}
+                      costFunction={costFunction}
+                      algorithmLogic={algorithmLogic}
+                    />
+                  </Card>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </ScrollArea>
