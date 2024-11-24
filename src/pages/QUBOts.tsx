@@ -84,15 +84,17 @@ const QUBOts = () => {
     }
 
     try {
-      const { error } = await supabase.from('qubots').insert({
-        name,
-        description,
-        creator_id: user?.id,
-        solver_id: selectedSolver,
-        dataset_id: selectedDataset,
-        hardware_id: selectedHardware,
-        is_public: true
-      });
+      const { error } = await supabase
+        .from('qubots')
+        .insert({
+          name,
+          description,
+          creator_id: user?.id,
+          solver_id: selectedSolver,
+          dataset_id: selectedDataset,
+          hardware_id: selectedHardware,
+          is_public: true
+        });
 
       if (error) throw error;
 
