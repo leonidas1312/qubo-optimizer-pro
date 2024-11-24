@@ -27,12 +27,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAuthenticated(!!session);
-    });
+    // Check active sessions
+    const checkSessions = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setSession(session);
+        setUser(session.user);
+        setIsAuthenticated(true);
+      } else {
+        // Check GitHub session if no Supabase session
+        try {
+          const response = await fetch('http://localhost:8000/api/auth/status', {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          if (data.authenticated) {
+            setIsAuthenticated(true);
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error('Error checking GitHub session:', error);
+        }
+      }
+    };
+
+    checkSessions();
 
     // Listen for auth changes
     const {
@@ -57,10 +76,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         credentials: 'include'
       });
       await supabase.auth.signOut();
+      
       setIsAuthenticated(false);
       setUser(null);
       setSession(null);
+      
       navigate('/');
+      toast.success('Successfully logged out!');
     } catch (error) {
       toast.error('Error logging out');
       console.error('Error:', error);
