@@ -22,35 +22,38 @@ export const CodeSelectionMenu = ({
 }: CodeSelectionMenuProps) => {
   const handleSelection = (type: "input" | "cost" | "algorithm") => {
     const selection = window.getSelection();
-    if (selection && selection.toString()) {
-      const selectionObj = {
-        start: selection.anchorOffset,
-        end: selection.focusOffset,
-        text: selection.toString(),
-      };
-
-      switch (type) {
-        case "input":
-          onSelectInputParameters(selectionObj);
-          toast.success("Input parameters selected");
-          break;
-        case "cost":
-          onSelectCostFunction(selectionObj);
-          toast.success("Cost function selected");
-          break;
-        case "algorithm":
-          onSelectAlgorithmLogic(selectionObj);
-          toast.success("Algorithm logic selected");
-          break;
-      }
-    } else {
+    if (!selection || !selection.toString()) {
       toast.error("Please select some code first");
+      return;
+    }
+
+    const selectionObj = {
+      start: selection.anchorOffset,
+      end: selection.focusOffset,
+      text: selection.toString(),
+    };
+
+    switch (type) {
+      case "input":
+        onSelectInputParameters(selectionObj);
+        toast.success("Input parameters selected");
+        break;
+      case "cost":
+        onSelectCostFunction(selectionObj);
+        toast.success("Cost function selected");
+        break;
+      case "algorithm":
+        onSelectAlgorithmLogic(selectionObj);
+        toast.success("Algorithm logic selected");
+        break;
     }
   };
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger>{children}</ContextMenuTrigger>
+      <ContextMenuTrigger asChild>
+        {children}
+      </ContextMenuTrigger>
       <ContextMenuContent className="w-64">
         <ContextMenuItem onClick={() => handleSelection("input")}>
           Mark as Input Parameters
