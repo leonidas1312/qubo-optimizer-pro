@@ -1,194 +1,114 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { AlgorithmCard } from "@/components/solver/AlgorithmCard";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Star, Cpu, Target, Dna } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Play, Star, Cpu, Target, Dna } from "lucide-react";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
-const simulatedAnnealingInfo = [
+const templates = [
   {
-    title: "Overview",
-    description: "A probabilistic optimization technique that mimics the physical process of annealing in metallurgy. Starting with a high temperature, the algorithm gradually 'cools' while exploring the solution space, allowing it to escape local optima and find better solutions.",
+    id: "simulated-annealing",
+    name: "Simulated Annealing",
+    icon: <Star className="h-8 w-8" />,
+    description: "A probabilistic technique for approximating the global optimum.",
+    parameters: {
+      initial_temperature: 1000,
+      cooling_rate: 0.99,
+      max_iterations: 1000
+    }
   },
   {
-    title: "Implementation Details",
-    description: "• Random initial solution generation\n• Temperature-based acceptance probability\n• Controlled cooling schedule\n• Neighbor generation through bit flipping\n• Best solution tracking\n• Cost computation using QUBO matrix",
+    id: "quantum-inspired",
+    name: "Quantum-Inspired",
+    icon: <Cpu className="h-8 w-8" />,
+    description: "A hybrid quantum-classical algorithm combining quantum circuit simulation with reinforcement learning.",
+    parameters: {
+      num_layers: 2,
+      max_iterations: 100,
+      num_samples: 1000
+    }
   },
   {
-    title: "Parameters",
-    description: "• Initial Temperature: Controls initial exploration (default: 1000)\n• Cooling Rate: How quickly temperature decreases (default: 0.99)\n• Maximum Iterations: Number of search steps (default: 1000)\n\nHigher temperatures allow more exploration, while lower temperatures focus on exploitation.",
+    id: "tabu-search",
+    name: "Tabu Search",
+    icon: <Target className="h-8 w-8" />,
+    description: "A metaheuristic search method using memory structures.",
+    parameters: {
+      tabu_tenure: 10,
+      max_iterations: 1000,
+      neighborhood_size: 20
+    }
   },
   {
-    title: "Applications",
-    description: "• Portfolio optimization\n• Resource allocation\n• Network design\n• Circuit layout optimization\n• Production scheduling\n• Logistics optimization\n• Pattern recognition",
-  }
-];
-
-const quantumInspiredInfo = [
-  {
-    title: "Overview",
-    description: "A hybrid quantum-classical algorithm that combines quantum circuit simulation with reinforcement learning. It uses minimal encoding to represent classical variables with quantum bits, allowing for efficient problem solving with logarithmic qubit requirements.",
-  },
-  {
-    title: "Implementation Details",
-    description: "• Quantum circuit simulation using PennyLane\n• Hardware efficient ansatz implementation\n• Minimal encoding scheme\n• ADAM optimization for quantum parameters\n• Reinforcement learning local search\n• UCB-based exploitation phase\n• Softmax-based exploration phase",
-  },
-  {
-    title: "Parameters",
-    description: "• Number of Layers: Quantum circuit depth\n• Maximum Iterations: Optimizer+RL cycles\n• Number of Bitstrings: Samples from quantum circuit\n• Optimizer Time: ADAM optimization duration\n• RL Search Time: Local search duration\n• Initial Temperature: Controls RL exploration",
-  },
-  {
-    title: "Key Features",
-    description: "• Logarithmic qubit scaling\n• Hybrid classical-quantum approach\n• Adaptive learning mechanisms\n• Multi-phase optimization\n• Quantum state preparation\n• Efficient classical post-processing\n• Scalable to large problems",
-  }
-];
-
-const tabuSearchInfo = [
-  {
-    title: "Overview",
-    description: "A metaheuristic search method that uses memory structures (tabu lists) to avoid revisiting recent solutions. This allows the algorithm to escape local optima and explore new regions of the solution space effectively.",
-  },
-  {
-    title: "Implementation Details",
-    description: "• Dynamic tabu list management\n• Neighborhood exploration\n• Best solution tracking\n• Cost computation using QUBO matrix\n• Memory-based search guidance\n• Efficient solution space traversal",
-  },
-  {
-    title: "Parameters",
-    description: "• Maximum Iterations: Length of search process\n• Tabu Tenure: Duration solutions remain tabu\n• Neighborhood Size: Solutions evaluated per iteration\n\nLarger tenure prevents cycling, while larger neighborhood size increases exploration.",
-  },
-  {
-    title: "Applications",
-    description: "• Job scheduling\n• Vehicle routing\n• Network optimization\n• Facility location\n• Resource allocation\n• Pattern sequencing\n• Graph coloring",
-  }
-];
-
-const geneticAlgorithmInfo = [
-  {
-    title: "Overview",
-    description: "An evolutionary algorithm that mimics natural selection to optimize solutions. It maintains a population of candidate solutions and evolves them through selection, crossover, and mutation operations.",
-  },
-  {
-    title: "Implementation Details",
-    description: "• Population initialization\n• Fitness-proportional selection\n• Single-point crossover\n• Bit-flip mutation\n• Population evolution tracking\n• Cost-based fitness evaluation\n• Best solution preservation",
-  },
-  {
-    title: "Parameters",
-    description: "• Population Size: Number of solutions maintained\n• Number of Generations: Evolution cycles\n• Mutation Rate: Probability of bit flips\n\nLarger populations increase diversity, while higher mutation rates promote exploration.",
-  },
-  {
-    title: "Applications",
-    description: "• Circuit design\n• Parameter optimization\n• Feature selection\n• Path planning\n• Schedule optimization\n• Portfolio optimization\n• Network design",
+    id: "genetic-algorithm",
+    name: "Genetic Algorithm",
+    icon: <Dna className="h-8 w-8" />,
+    description: "An evolutionary algorithm that mimics natural selection.",
+    parameters: {
+      population_size: 100,
+      mutation_rate: 0.01,
+      num_generations: 50
+    }
   }
 ];
 
 const Solvers = () => {
+  const navigate = useNavigate();
+
+  const handleUseSolver = (template: typeof templates[0]) => {
+    toast.success(`Selected ${template.name} solver`);
+    navigate('/playground', { state: { selectedSolver: template } });
+  };
+
   return (
     <DashboardLayout>
-      <div className="container py-8 max-w-[95%] mx-auto space-y-16">
-        <div className="space-y-12">
-          <section>
-            <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Star className="h-8 w-8" />
-              Simulated Annealing
-            </h2>
-            <Carousel className="w-[95%] mx-auto" opts={{ 
-              align: "start",
-              containScroll: "trimSnaps",
-              slidesToScroll: 1
-            }}>
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {simulatedAnnealingInfo.map((info, index) => (
-                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
-                    <AlgorithmCard
-                      title={info.title}
-                      description={info.description}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </section>
+      <div className="container space-y-12 py-8">
+        <div className="space-y-4">
+          <h2 className="text-3xl font-bold text-center">Solver Templates</h2>
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto">
+            Get started with our pre-built solver templates. Each template includes optimized implementations
+            of popular algorithms for solving QUBO problems.
+          </p>
+        </div>
 
-          <section>
-            <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Cpu className="h-8 w-8" />
-              Quantum-Inspired Optimization
-            </h2>
-            <Carousel className="w-[95%] mx-auto" opts={{ 
-              align: "start",
-              containScroll: "trimSnaps",
-              slidesToScroll: 1
-            }}>
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {quantumInspiredInfo.map((info, index) => (
-                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
-                    <AlgorithmCard
-                      title={info.title}
-                      description={info.description}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+          {templates.map((template) => (
+            <Card 
+              key={template.id} 
+              className="p-6 bg-black/50 backdrop-blur-sm border-white/10 hover:border-white/20 transition-all duration-300"
+            >
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    {template.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">{template.name}</h3>
+                    <p className="text-sm text-muted-foreground">{template.description}</p>
+                  </div>
+                </div>
 
-          <section>
-            <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Target className="h-8 w-8" />
-              Tabu Search
-            </h2>
-            <Carousel className="w-[95%] mx-auto" opts={{ 
-              align: "start",
-              containScroll: "trimSnaps",
-              slidesToScroll: 1
-            }}>
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {tabuSearchInfo.map((info, index) => (
-                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
-                    <AlgorithmCard
-                      title={info.title}
-                      description={info.description}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </section>
+                <div className="space-y-2">
+                  <h4 className="font-medium">Parameters:</h4>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                    {Object.entries(template.parameters).map(([key, value]) => (
+                      <li key={key}>
+                        {key}: <span className="text-primary">{value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-          <section>
-            <h2 className="text-3xl font-bold mb-8 gradient-text flex items-center gap-2">
-              <Dna className="h-8 w-8" />
-              Genetic Algorithm
-            </h2>
-            <Carousel className="w-[95%] mx-auto" opts={{ 
-              align: "start",
-              containScroll: "trimSnaps",
-              slidesToScroll: 1
-            }}>
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {geneticAlgorithmInfo.map((info, index) => (
-                  <CarouselItem key={index} className="pl-2 md:pl-4 basis-1/2">
-                    <AlgorithmCard
-                      title={info.title}
-                      description={info.description}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          </section>
+                <Button 
+                  onClick={() => handleUseSolver(template)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800"
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  Use Solver
+                </Button>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
     </DashboardLayout>
