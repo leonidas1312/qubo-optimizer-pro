@@ -65,9 +65,9 @@ export const Navbar = () => {
               'Login with Github'
             )}
           </Button>
-          {isAuthenticated && (
+          {isAuthenticated && user && (
             <span className="text-sm text-muted-foreground">
-              {user?.login}
+              {user.email}
             </span>
           )}
         </div>

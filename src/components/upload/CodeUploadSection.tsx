@@ -5,7 +5,13 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
-export function CodeUploadSection() {
+interface CodeUploadSectionProps {
+  code?: string;
+  fileName?: string | null;
+  onCodeChange?: (code: string) => void;
+}
+
+export function CodeUploadSection({ code, fileName, onCodeChange }: CodeUploadSectionProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -78,7 +84,6 @@ export function CodeUploadSection() {
       <Button
         onClick={handleUpload}
         disabled={!selectedFile || isUploading}
-        variant="default"
         className="w-full"
       >
         {isUploading ? "Uploading..." : "Upload"}
