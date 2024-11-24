@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import type { Selection } from '@/types/qubot';
+import type { Selection, QubotInput } from '@/types/qubot';
 import { Github } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
