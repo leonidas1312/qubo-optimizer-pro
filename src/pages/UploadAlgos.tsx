@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StepChooseFile } from '@/components/upload/steps/StepChooseFile';
 import { StepMarkCode } from '@/components/upload/steps/StepMarkCode';
 import { StepPreview } from '@/components/upload/steps/StepPreview';
-import { AlgorithmTemplatesOverview } from '@/components/upload/AlgorithmTemplatesOverview';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -28,7 +27,7 @@ const UploadAlgos = () => {
   const [inputParameters, setInputParameters] = useState<Selection | null>(null);
   const [costFunction, setCostFunction] = useState<Selection | null>(null);
   const [algorithmLogic, setAlgorithmLogic] = useState<Selection | null>(null);
-  const [activeStep, setActiveStep] = useState('templates');
+  const [activeStep, setActiveStep] = useState('choose-file');
 
   const { data: repositories } = useQuery({
     queryKey: ['repositories'],
@@ -143,12 +142,6 @@ const UploadAlgos = () => {
     }
   };
 
-  const handleTemplateSelect = (template: any) => {
-    setName(template.name);
-    setDescription(template.description);
-    setActiveStep('choose-file');
-  };
-
   if (!isAuthenticated) {
     return (
       <DashboardLayout>
@@ -177,15 +170,25 @@ const UploadAlgos = () => {
 
         <Tabs value={activeStep} onValueChange={setActiveStep} className="space-y-6">
           <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full">
-            <TabsTrigger value="templates">1. Choose Template</TabsTrigger>
-            <TabsTrigger value="choose-file">2. Upload Code</TabsTrigger>
-            <TabsTrigger value="mark-code">3. Mark Code</TabsTrigger>
-            <TabsTrigger value="preview">4. Preview</TabsTrigger>
+            <TabsTrigger 
+              value="choose-file" 
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
+            >
+              1. Choose a File
+            </TabsTrigger>
+            <TabsTrigger 
+              value="mark-code" 
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
+            >
+              2. Mark the Code
+            </TabsTrigger>
+            <TabsTrigger 
+              value="preview" 
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm flex-1"
+            >
+              3. QUBOt Preview
+            </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="templates">
-            <AlgorithmTemplatesOverview onSelectTemplate={handleTemplateSelect} />
-          </TabsContent>
 
           <TabsContent value="choose-file">
             <StepChooseFile
