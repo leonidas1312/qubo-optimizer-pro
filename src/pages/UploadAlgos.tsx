@@ -1,31 +1,18 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { RepositoryCombobox } from '@/components/github/RepositoryCombobox';
-import { FileTree } from '@/components/github/FileTree';
-import { CodeEditor } from '@/components/playground/editor/CodeEditor';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SolverPreview } from '@/components/solver/SolverPreview';
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from '@/components/ui/resizable';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
-
-interface FileNode {
-  name: string;
-  path: string;
-  type: 'file' | 'tree';
-  children?: FileNode[];
-}
+import { RepositorySection } from '@/components/upload/RepositorySection';
+import { EditorSection } from '@/components/upload/EditorSection';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -38,7 +25,7 @@ const UploadAlgos = () => {
     name: string;
     full_name: string;
   } | null>(null);
-  const [fileStructure, setFileStructure] = useState<FileNode[]>([]);
+  const [fileStructure, setFileStructure] = useState<any[]>([]);
   const [inputParameters, setInputParameters] = useState<Selection | null>(null);
   const [costFunction, setCostFunction] = useState<Selection | null>(null);
   const [algorithmLogic, setAlgorithmLogic] = useState<Selection | null>(null);
@@ -80,7 +67,9 @@ const UploadAlgos = () => {
         }] : [],
         cost_function: costFunction?.text,
         algorithm_logic: algorithmLogic?.text,
-        is_public: true
+        is_public: true,
+        solver_type: 'simulated-annealing',
+        solver_parameters: {}
       };
 
       const { data, error } = await supabase
@@ -100,24 +89,6 @@ const UploadAlgos = () => {
     },
   });
 
-  const handleSelectRepository = async (repo: any) => {
-    try {
-      const [owner, repoName] = repo.full_name.split('/');
-      setSelectedRepo({ owner, name: repoName, full_name: repo.full_name });
-      const response = await fetch(
-        `http://localhost:8000/api/github/repos/${owner}/${repoName}/tree`,
-        { credentials: 'include' }
-      );
-      if (!response.ok) throw new Error('Failed to fetch file structure');
-      const structure = await response.json();
-      setFileStructure(structure);
-      toast.success('Repository files loaded successfully');
-    } catch (error) {
-      toast.error('Failed to load repository files');
-      console.error('Error fetching file structure:', error);
-    }
-  };
-
   const handleFileSelect = async (path: string) => {
     if (!selectedRepo) return;
     try {
@@ -135,18 +106,6 @@ const UploadAlgos = () => {
       toast.error('Failed to load file');
       console.error('Error fetching file content:', error);
     }
-  };
-
-  const handleCreateSolver = () => {
-    if (!name) {
-      toast.error('Please provide a name for your solver');
-      return;
-    }
-    if (!inputParameters || !costFunction || !algorithmLogic) {
-      toast.error('Please select all required code sections');
-      return;
-    }
-    createQubot.mutate();
   };
 
   if (!isAuthenticated) {
@@ -193,53 +152,31 @@ const UploadAlgos = () => {
             <div className="lg:col-span-2">
               <ResizablePanelGroup direction="horizontal">
                 <ResizablePanel defaultSize={25} minSize={20}>
-                  <div className="border-r border-border h-full p-4">
-                    <h2 className="text-lg font-semibold mb-4">Select Repository</h2>
-                    <RepositoryCombobox
-                      repositories={repositories}
-                      onSelectRepository={handleSelectRepository}
-                    />
-                    {selectedRepo && (
-                      <div className="mt-4 h-[calc(100vh-24rem)]">
-                        <ScrollArea className="h-full rounded-md border">
-                          <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                        </ScrollArea>
-                      </div>
-                    )}
-                  </div>
+                  <RepositorySection
+                    repositories={repositories}
+                    selectedRepo={selectedRepo}
+                    setSelectedRepo={setSelectedRepo}
+                    fileStructure={fileStructure}
+                    setFileStructure={setFileStructure}
+                    onFileSelect={handleFileSelect}
+                  />
                 </ResizablePanel>
                 
                 <ResizableHandle />
                 
                 <ResizablePanel defaultSize={75} minSize={30}>
-                  <div className="h-full p-4 space-y-4">
-                    {code ? (
-                      <CodeEditor
-                        value={code}
-                        onChange={setCode}
-                        className="h-[calc(100vh-28rem)]"
-                        language="python"
-                        onSelectInputParameters={setInputParameters}
-                        onSelectCostFunction={setCostFunction}
-                        onSelectAlgorithmLogic={setAlgorithmLogic}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <p className="text-muted-foreground">
-                          Select a Python file from the repository to create your solver.
-                        </p>
-                      </div>
-                    )}
-
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      onClick={handleCreateSolver}
-                      disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
-                    >
-                      Create QUBOt Solver
-                    </Button>
-                  </div>
+                  <EditorSection
+                    code={code}
+                    setCode={setCode}
+                    setInputParameters={setInputParameters}
+                    setCostFunction={setCostFunction}
+                    setAlgorithmLogic={setAlgorithmLogic}
+                    handleCreateSolver={() => createQubot.mutate()}
+                    name={name}
+                    inputParameters={inputParameters}
+                    costFunction={costFunction}
+                    algorithmLogic={algorithmLogic}
+                  />
                 </ResizablePanel>
               </ResizablePanelGroup>
             </div>

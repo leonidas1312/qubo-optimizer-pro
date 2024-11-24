@@ -61,7 +61,7 @@ export const CodeEditor = ({
   return (
     <ContextMenu>
       <ContextMenuTrigger className={cn(
-        "border rounded-lg overflow-hidden bg-background",
+        "border rounded-lg overflow-hidden bg-background h-[500px]",
         error && "border-destructive",
         className
       )}>
@@ -72,7 +72,7 @@ export const CodeEditor = ({
           onChange={(value) => onChange(value || "")}
           theme="vs-dark"
           options={{
-            minimap: { enabled: true },
+            minimap: { enabled: false },
             fontSize: 14,
             lineHeight: 21,
             padding: { top: 16, bottom: 16 },
@@ -93,9 +93,8 @@ export const CodeEditor = ({
               bracketPairs: true,
               indentation: true
             },
-            contextmenu: false // Disable default context menu
+            contextmenu: false
           }}
-          className="min-h-[300px]"
         />
       </ContextMenuTrigger>
       <ContextMenuContent className="w-64">
