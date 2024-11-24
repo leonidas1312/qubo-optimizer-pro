@@ -36,6 +36,59 @@ export type Database = {
         }
         Relationships: []
       }
+      qubots: {
+        Row: {
+          algorithm_logic: string | null
+          cost_function: string | null
+          created_at: string
+          creator_id: string
+          description: string | null
+          file_path: string | null
+          id: string
+          input_parameters: Json
+          is_public: boolean
+          name: string
+          repository_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          algorithm_logic?: string | null
+          cost_function?: string | null
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          input_parameters?: Json
+          is_public?: boolean
+          name: string
+          repository_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          algorithm_logic?: string | null
+          cost_function?: string | null
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          input_parameters?: Json
+          is_public?: boolean
+          name?: string
+          repository_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qubots_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2, Trophy, Database, FileText, Puzzle } from "lucide-react";
+import { Code2, Trophy, Database, FileText, Puzzle, Beaker, Book } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,7 @@ export function CustomNavigationMenu() {
   };
 
   return (
-    <div className="flex justify-between w-full items-center px-4">
+    <div className="flex justify-between w-full items-center px-4 bg-black/50 backdrop-blur-md border-b border-white/10">
       {/* Brand Logo - Left Side */}
       <Link to="/" className="flex items-center space-x-2 mr-8">
         <Code2 className="h-6 w-6 text-primary" />
@@ -39,7 +39,12 @@ export function CustomNavigationMenu() {
         <NavigationMenuList>
           {/* Playground Tab */}
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Playground</NavigationMenuTrigger>
+            <NavigationMenuTrigger>
+              <div className="flex items-center gap-2">
+                <Beaker className="h-4 w-4" />
+                Playground
+              </div>
+            </NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-4 w-[400px]">
                 <ListItem to="/playground" title="Playground">
@@ -73,24 +78,14 @@ export function CustomNavigationMenu() {
             </NavigationMenuContent>
           </NavigationMenuItem>
 
-          {/* Datasets Tab */}
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Datasets</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid gap-3 p-4 w-[400px]">
-                <ListItem to="/datasets" title="Browse Datasets">
-                  <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4" />
-                    <span>Explore and use community datasets</span>
-                  </div>
-                </ListItem>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-
           {/* Documentation Tab */}
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Documentation</NavigationMenuTrigger>
+            <NavigationMenuTrigger>
+              <div className="flex items-center gap-2">
+                <Book className="h-4 w-4" />
+                Documentation
+              </div>
+            </NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
                 <ListItem to="/docs/introduction" title="Introduction">
