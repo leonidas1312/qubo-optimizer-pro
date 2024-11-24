@@ -27,10 +27,13 @@ export const Navbar = () => {
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
+        {/* Logo and Brand Name - Left Side */}
         <Link to="/" className="flex items-center space-x-2">
           <Code2 className="h-6 w-6 text-primary" />
           <span className="font-bold text-xl">QUBOt</span>
         </Link>
+
+        {/* Navigation Links - Center */}
         <div className="flex items-center space-x-6 ml-8">
           <Link to="/playground" className="text-muted-foreground hover:text-foreground transition-colors">
             Playground
@@ -42,11 +45,17 @@ export const Navbar = () => {
             Workspace
           </Link>
         </div>
+
+        {/* Right Side Controls */}
         <div className="ml-auto flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={handleSettings}>
             <Settings className="h-5 w-5" />
           </Button>
-          <Button onClick={handleAuth} className="flex items-center space-x-2">
+          <Button 
+            onClick={handleAuth} 
+            variant="ghost"
+            className="opacity-0 hover:opacity-100 transition-opacity duration-200"
+          >
             {isAuthenticated ? (
               <>
                 <LogOut className="h-4 w-4 mr-2" />
