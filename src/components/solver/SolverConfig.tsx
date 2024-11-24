@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { AlgorithmParameters } from "./AlgorithmParameters";
 import { toast } from "sonner";
 import { ResultsChart } from "../visualization/ResultsChart";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface SolverConfigProps {
   quboMatrix: number[][] | null;
@@ -29,6 +31,19 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
     time: number;
     iterations_cost?: number[];
   } | null>(null);
+
+  const { data: customSolvers } = useQuery({
+    queryKey: ['custom-solvers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('qubots')
+        .select('*')
+        .eq('is_public', true);
+      
+      if (error) throw error;
+      return data;
+    }
+  });
 
   const handleParameterChange = (param: string, value: number) => {
     setParameters((prevParams) => {
@@ -98,6 +113,11 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
                 <SelectItem value="quantum-inspired">Quantum Inspired</SelectItem>
                 <SelectItem value="tabu-search">Tabu Search</SelectItem>
                 <SelectItem value="genetic-algorithm">Genetic Algorithm</SelectItem>
+                {customSolvers?.map((solver) => (
+                  <SelectItem key={solver.id} value={`custom-${solver.id}`}>
+                    {solver.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -117,7 +137,6 @@ export const SolverConfig = ({ quboMatrix, constant }: SolverConfigProps) => {
 
           {result && (
             <div className="space-y-2 p-4 bg-muted rounded-lg">
-
               <p>Best Cost: {result.cost}</p>
               <p>Time: {result.time.toFixed(2)}s</p>
             </div>

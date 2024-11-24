@@ -49,6 +49,8 @@ export type Database = {
           is_public: boolean
           name: string
           repository_url: string | null
+          solver_parameters: Json
+          solver_type: string
           updated_at: string
         }
         Insert: {
@@ -63,6 +65,8 @@ export type Database = {
           is_public?: boolean
           name: string
           repository_url?: string | null
+          solver_parameters?: Json
+          solver_type?: string
           updated_at?: string
         }
         Update: {
@@ -77,6 +81,8 @@ export type Database = {
           is_public?: boolean
           name?: string
           repository_url?: string | null
+          solver_parameters?: Json
+          solver_type?: string
           updated_at?: string
         }
         Relationships: [

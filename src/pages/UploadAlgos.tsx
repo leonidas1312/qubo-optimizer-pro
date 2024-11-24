@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/resizable';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
+import { CodeSelectionMenu } from '@/components/solver/CodeSelectionMenu';
 
 interface FileNode {
   name: string;
@@ -223,71 +224,26 @@ const UploadAlgos = () => {
                 
                 <ResizablePanel defaultSize={75} minSize={30}>
                   <div className="h-full p-4 space-y-4">
-                    <div className="flex gap-4 mb-4">
-                      <Button
-                        variant={inputParameters ? "default" : "outline"}
-                        onClick={() => {
-                          const selection = window.getSelection();
-                          if (selection && selection.toString()) {
-                            setInputParameters({
-                              start: selection.anchorOffset,
-                              end: selection.focusOffset,
-                              text: selection.toString(),
-                            });
-                            toast.success('Input parameters selected');
-                          }
-                        }}
-                      >
-                        Mark Input Parameters
-                      </Button>
-                      <Button
-                        variant={costFunction ? "default" : "outline"}
-                        onClick={() => {
-                          const selection = window.getSelection();
-                          if (selection && selection.toString()) {
-                            setCostFunction({
-                              start: selection.anchorOffset,
-                              end: selection.focusOffset,
-                              text: selection.toString(),
-                            });
-                            toast.success('Cost function selected');
-                          }
-                        }}
-                      >
-                        Mark Cost Function
-                      </Button>
-                      <Button
-                        variant={algorithmLogic ? "default" : "outline"}
-                        onClick={() => {
-                          const selection = window.getSelection();
-                          if (selection && selection.toString()) {
-                            setAlgorithmLogic({
-                              start: selection.anchorOffset,
-                              end: selection.focusOffset,
-                              text: selection.toString(),
-                            });
-                            toast.success('Algorithm logic selected');
-                          }
-                        }}
-                      >
-                        Mark Algorithm Logic
-                      </Button>
-                    </div>
-
-                    {code ? (
-                      <CodeEditor
-                        value={code}
-                        onChange={setCode}
-                        className="h-[calc(100vh-28rem)]"
-                        language="python"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <p className="text-muted-foreground">
-                          Select a Python file from the repository to create your solver.
-                        </p>
-                      </div>
-                    )}
+                    <CodeSelectionMenu
+                      onSelectInputParameters={setInputParameters}
+                      onSelectCostFunction={setCostFunction}
+                      onSelectAlgorithmLogic={setAlgorithmLogic}
+                    >
+                      {code ? (
+                        <CodeEditor
+                          value={code}
+                          onChange={setCode}
+                          className="h-[calc(100vh-28rem)]"
+                          language="python"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <p className="text-muted-foreground">
+                            Select a Python file from the repository to create your solver.
+                          </p>
+                        </div>
+                      )}
+                    </CodeSelectionMenu>
 
                     <Button
                       className="w-full"
