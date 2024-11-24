@@ -25,12 +25,12 @@ interface Repository {
 }
 
 interface RepositoryComboboxProps {
-  repositories: Repository[];
+  repositories?: Repository[];
   onSelectRepository: (repo: Repository) => void;
 }
 
 export function RepositoryCombobox({
-  repositories,
+  repositories = [],
   onSelectRepository,
 }: RepositoryComboboxProps) {
   const [open, setOpen] = useState(false);
