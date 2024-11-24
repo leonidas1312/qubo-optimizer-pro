@@ -7,6 +7,13 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import {
   NavigationMenu,
@@ -20,12 +27,11 @@ import {
 
 export function CustomNavigationMenu() {
   const { isAuthenticated, user, login, logout } = useAuth();
+  const [open, setOpen] = React.useState(false);
 
   const handleAuth = () => {
     if (isAuthenticated) {
       logout();
-    } else {
-      login();
     }
   };
 
@@ -37,8 +43,18 @@ export function CustomNavigationMenu() {
     toast.info("Sign up feature coming soon!");
   };
 
+  const handleGitHubLogin = () => {
+    login();
+    setOpen(false);
+  };
+
+  const handleEmailLogin = () => {
+    toast.info("Email login coming soon! Please connect Supabase first.");
+    setOpen(false);
+  };
+
   return (
-    <div className="flex justify-between w-full items-center px-4"> 
+    <div className="flex justify-between w-full items-center px-4">
       {/* Brand Logo - Left Side */}
       <Link to="/" className="flex items-center space-x-2 mr-8">
         <Code2 className="h-6 w-6 text-primary" />
@@ -90,13 +106,48 @@ export function CustomNavigationMenu() {
 
       {/* Auth Buttons - Right Side */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          onClick={handleAuth}
-          className="text-sm hover:bg-accent"
-        >
-          {isAuthenticated ? 'Log Out' : 'Log In'}
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="text-sm hover:bg-accent"
+            >
+              {isAuthenticated ? 'Log Out' : 'Log In'}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-2xl font-semibold mb-8">Log in to QUBOt</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-3">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 py-6"
+                onClick={handleGitHubLogin}
+              >
+                <Code2 className="h-5 w-5" />
+                Continue with GitHub
+              </Button>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full py-6"
+                onClick={handleEmailLogin}
+              >
+                Continue with Email →
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <Button
           variant="ghost"
           onClick={handleContact}
