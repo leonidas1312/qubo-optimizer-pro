@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Solvers from "./pages/Solvers";
 import Playground from "./pages/Playground";
 import UploadAlgos from "./pages/UploadAlgos";
+import QUBOts from "./pages/QUBOts";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +28,7 @@ const App = () => {
                 <Route path="/uploadalgos" element={<UploadAlgos />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/leaderboard" element={<div>Leaderboard Coming Soon</div>} />
-                <Route path="/qubots" element={<div>QUBOts Created Coming Soon</div>} />
+                <Route path="/qubots" element={<QUBOts />} />
                 <Route path="/datasets" element={<div>Datasets Coming Soon</div>} />
               </Routes>
               <Toaster />
