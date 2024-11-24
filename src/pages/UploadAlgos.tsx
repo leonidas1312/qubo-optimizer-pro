@@ -3,19 +3,14 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
+import { Github } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { FileTree } from '@/components/github/FileTree';
-import { RepositoryCombobox } from '@/components/github/RepositoryCombobox';
-import { CodeEditor } from '@/components/playground/editor/CodeEditor';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, Github, Code, Settings } from 'lucide-react';
+import { StepChooseFile } from '@/components/upload/steps/StepChooseFile';
+import { StepMarkCode } from '@/components/upload/steps/StepMarkCode';
+import { StepPreview } from '@/components/upload/steps/StepPreview';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -32,8 +27,9 @@ const UploadAlgos = () => {
   const [inputParameters, setInputParameters] = useState<Selection | null>(null);
   const [costFunction, setCostFunction] = useState<Selection | null>(null);
   const [algorithmLogic, setAlgorithmLogic] = useState<Selection | null>(null);
+  const [activeStep, setActiveStep] = useState('choose-file');
 
-  const { data: repositories, isLoading } = useQuery({
+  const { data: repositories } = useQuery({
     queryKey: ['repositories'],
     queryFn: async () => {
       const response = await fetch('http://localhost:8000/api/github/repos', {
@@ -86,6 +82,17 @@ const UploadAlgos = () => {
     },
     onSuccess: () => {
       toast.success('QUBOt created successfully!');
+      // Reset form
+      setCode('');
+      setName('');
+      setDescription('');
+      setSelectedFileName(null);
+      setSelectedRepo(null);
+      setFileStructure([]);
+      setInputParameters(null);
+      setCostFunction(null);
+      setAlgorithmLogic(null);
+      setActiveStep('choose-file');
     },
     onError: (error) => {
       toast.error(`Failed to create QUBOt: ${error.message}`);
@@ -105,6 +112,7 @@ const UploadAlgos = () => {
       setCode(content);
       setSelectedFileName(path);
       toast.success('File loaded successfully');
+      setActiveStep('mark-code');
     } catch (error) {
       toast.error('Failed to load file');
       console.error('Error fetching file content:', error);
@@ -153,140 +161,59 @@ const UploadAlgos = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold gradient-text">Create QUBOt Solver</h1>
-            <p className="text-muted-foreground mt-2">
-              Build and share your optimization algorithms with the community
-            </p>
-          </div>
-          <Button
-            onClick={() => createQubot.mutate()}
-            disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
-            className="bg-gradient-to-r from-blue-600 to-blue-800"
-          >
-            Create QUBOt
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">Create QUBOt Solver</h1>
+          <p className="text-muted-foreground mt-2">
+            Build and share your optimization algorithms with the community
+          </p>
         </div>
 
-        <Tabs defaultValue="repository" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-            <TabsTrigger value="repository" className="flex items-center gap-2">
-              <Github className="h-4 w-4" />
-              Repository
+        <Tabs value={activeStep} onValueChange={setActiveStep} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="choose-file" className="data-[state=active]:bg-blue-600/10 data-[state=active]:text-blue-600">
+              1. Choose a File
             </TabsTrigger>
-            <TabsTrigger value="code" className="flex items-center gap-2">
-              <Code className="h-4 w-4" />
-              Code
+            <TabsTrigger value="mark-code" className="data-[state=active]:bg-purple-600/10 data-[state=active]:text-purple-600">
+              2. Mark the Code
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="data-[state=active]:bg-green-600/10 data-[state=active]:text-green-600">
+              3. QUBOt Preview
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="repository" className="space-y-6">
-            <Card className="p-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Basic Information</label>
-                  <Input
-                    placeholder="Solver Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <Textarea
-                    placeholder="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="h-24"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Repository</label>
-                  <RepositoryCombobox
-                    repositories={repositories || []}
-                    onSelectRepository={handleSelectRepository}
-                  />
-                </div>
-
-                {selectedRepo && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Repository Files</label>
-                    <Card className="h-[400px] overflow-hidden">
-                      <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                    </Card>
-                  </div>
-                )}
-              </div>
-            </Card>
+          <TabsContent value="choose-file">
+            <StepChooseFile
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              repositories={repositories || []}
+              selectedRepo={selectedRepo}
+              setSelectedRepo={handleSelectRepository}
+              fileStructure={fileStructure}
+              setFileStructure={setFileStructure}
+              onFileSelect={handleFileSelect}
+            />
           </TabsContent>
 
-          <TabsContent value="code" className="space-y-6">
-            <Card className="p-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <label className="text-sm font-medium">Code Editor</label>
-                  <CodeEditor
-                    value={code}
-                    onChange={setCode}
-                    onSelectInputParameters={setInputParameters}
-                    onSelectCostFunction={setCostFunction}
-                    onSelectAlgorithmLogic={setAlgorithmLogic}
-                    language="python"
-                  />
-                </div>
+          <TabsContent value="mark-code">
+            <StepMarkCode
+              code={code}
+              setCode={setCode}
+              setInputParameters={setInputParameters}
+              setCostFunction={setCostFunction}
+              setAlgorithmLogic={setAlgorithmLogic}
+            />
+          </TabsContent>
 
-                <div className="space-y-6">
-                  <Card className="p-4 space-y-4 bg-black/50">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Input Parameters</label>
-                      <div className="flex flex-wrap gap-2">
-                        {inputParameters ? (
-                          inputParameters.text.split(',').map((param, index) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className="px-3 py-1 bg-blue-500/10"
-                            >
-                              {param.trim()}
-                            </Badge>
-                          ))
-                        ) : (
-                          <p className="text-sm text-muted-foreground">
-                            Select input parameters in the code editor
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Cost Function</label>
-                      {costFunction ? (
-                        <pre className="bg-black/30 p-3 rounded-md text-xs overflow-x-auto">
-                          {costFunction.text}
-                        </pre>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          Select cost function in the code editor
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Algorithm Logic</label>
-                      {algorithmLogic ? (
-                        <pre className="bg-black/30 p-3 rounded-md text-xs overflow-x-auto">
-                          {algorithmLogic.text}
-                        </pre>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          Select algorithm logic in the code editor
-                        </p>
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            </Card>
+          <TabsContent value="preview">
+            <StepPreview
+              name={name}
+              inputParameters={inputParameters}
+              costFunction={costFunction}
+              algorithmLogic={algorithmLogic}
+              onCreateSolver={() => createQubot.mutate()}
+            />
           </TabsContent>
         </Tabs>
       </div>
