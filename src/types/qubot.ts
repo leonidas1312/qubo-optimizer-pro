@@ -13,4 +13,6 @@ export interface QubotInput {
   cost_function?: string | null;
   algorithm_logic?: string | null;
   is_public: boolean;
+  solver_type: string;
+  solver_parameters?: Record<string, any>;
 }
