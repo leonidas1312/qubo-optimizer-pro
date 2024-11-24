@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { CodeUploadSection } from '@/components/upload/CodeUploadSection';
-import { RepositoryGrid } from '@/components/github/RepositoryGrid';
+import { RepositoryCombobox } from '@/components/github/RepositoryCombobox';
 import { FileTree } from '@/components/github/FileTree';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from '@/components/ui/resizable';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface FileNode {
   name: string;
@@ -62,10 +67,11 @@ const UploadAlgos = () => {
     enabled: isAuthenticated,
   });
 
-  const handleAddFileStructure = async (repo: any) => {
+  const handleSelectRepository = async (repo: any) => {
     try {
       const [owner, repoName] = repo.full_name.split('/');
       setSelectedRepo({ owner, name: repoName });
+      // Fetch file structure
       const structure = await fetchFileStructure(owner, repoName);
       setFileStructure(structure);
       toast.success('Repository files loaded successfully');
@@ -109,39 +115,53 @@ const UploadAlgos = () => {
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-bold mb-6">Workspace</h1>
-        
-        <div className="flex h-[calc(100vh-12rem)]">
-          <div className="w-80 border-r border-border">
-            <div className="p-4 border-b border-border">
-              <h2 className="text-lg font-semibold">Repositories</h2>
-            </div>
-            {isLoading ? (
-              <div className="p-4 text-center">Loading repositories...</div>
-            ) : repositories ? (
-              <RepositoryGrid
-                repositories={repositories}
-                onAddFileStructure={handleAddFileStructure}
-              />
-            ) : null}
-          </div>
-
-          <div className="flex-1">
-            {selectedRepo && (
-              <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={25} minSize={20}>
-                  <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                </ResizablePanel>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={75} minSize={30}>
-                  <CodeUploadSection
-                    code={code}
-                    fileName={selectedFileName}
-                    onCodeChange={setCode}
-                  />
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            )}
-          </div>
+        <div className="h-[calc(100vh-12rem)]">
+          <ResizablePanelGroup direction="horizontal">
+            {/* Left Panel: RepositoryCombobox and FileTree */}
+            <ResizablePanel defaultSize={33.33} minSize={20}>
+              <div className="border-r border-border h-full p-4">
+                <h2 className="text-lg font-semibold mb-4">Select a Repository</h2>
+                {isLoading ? (
+                  <div className="text-center">Loading repositories...</div>
+                ) : repositories ? (
+                  <>
+                    <RepositoryCombobox
+                      repositories={repositories}
+                      onSelectRepository={handleSelectRepository}
+                    />
+                    {selectedRepo && (
+                      <div className="mt-4 h-[calc(100vh-20rem)]">
+                        <ScrollArea className="h-full rounded-md border">
+                          <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                        </ScrollArea>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    No repositories found.
+                  </div>
+                )}
+              </div>
+            </ResizablePanel>
+            <ResizableHandle />
+            {/* Right Panel: CodeUploadSection */}
+            <ResizablePanel defaultSize={44.66} minSize={30}>
+              {code ? (
+                <CodeUploadSection
+                  code={code}
+                  fileName={selectedFileName}
+                  onCodeChange={setCode}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">
+                    Select a file to view its code.
+                  </p>
+                </div>
+              )}
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </div>
     </DashboardLayout>

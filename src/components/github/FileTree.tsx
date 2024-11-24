@@ -5,6 +5,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface FileNode {
   name: string;
@@ -78,13 +80,20 @@ export const FileTree = ({ files, onFileSelect }: FileTreeProps) => {
   };
 
   return (
-    <div className="w-full overflow-y-auto bg-background border border-border rounded-lg h-[50vh]">
-      <div className="p-3 border-b border-border bg-muted/50">
+    <div className="w-full h-72 rounded-md border">
+      <div className="p-3 border-b bg-muted/50">
         <h3 className="text-sm font-medium">Repository Files</h3>
       </div>
-      <div className="h-[calc(50vh-3rem)] overflow-y-auto">
-        {files.map((file) => renderNode(file))}
-      </div>
+      <ScrollArea className="h-[calc(100%-3rem)]">
+        <div className="p-2">
+          {files.map((file, index) => (
+            <div key={file.path}>
+              {renderNode(file)}
+              {index < files.length - 1 && <Separator className="my-1" />}
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

@@ -1,5 +1,23 @@
 import { useEffect, useState } from "react";
 import MonacoEditor from "@monaco-editor/react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CodeUploadSectionProps {
   code: string;
@@ -14,6 +32,9 @@ export const CodeUploadSection = ({
 }: CodeUploadSectionProps) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [showCreateQubotDialog, setShowCreateQubotDialog] = useState<boolean>(false);
+  const [qubotName, setQubotName] = useState<string>("");
+  const [framework, setFramework] = useState<string>("");
 
   useEffect(() => {
     if (fileName?.toLowerCase().endsWith(".pdf")) {
@@ -74,7 +95,7 @@ export const CodeUploadSection = ({
     } else {
       return (
         <MonacoEditor
-          height="calc(50vh - 3rem)"
+          height="100%"
           defaultLanguage="python"
           value={code}
           theme="vs-dark"
@@ -86,10 +107,11 @@ export const CodeUploadSection = ({
           options={{
             readOnly: !isEditable,
             lineNumbers: "on",
-            minimap: { enabled: true },
+            minimap: { enabled: false },
             scrollBeyondLastLine: false,
             fontSize: 14,
-            fontFamily: "Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace",
+            fontFamily:
+              "Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace",
             automaticLayout: true,
             bracketPairColorization: { enabled: true },
             wordWrap: "on",
@@ -99,32 +121,80 @@ export const CodeUploadSection = ({
     }
   };
 
+  const handleCreateQubot = () => {
+    // Implement the logic to create a qubot
+    console.log("Creating qubot with name:", qubotName, "and framework:", framework);
+    // Close the dialog
+    setShowCreateQubotDialog(false);
+    // Reset form fields
+    setQubotName("");
+    setFramework("");
+  };
+
   return (
-    <div className="flex flex-col h-[50vh] bg-background border border-border rounded-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-background border border-border rounded-lg overflow-hidden">
       <div className="flex justify-between items-center p-3 bg-muted/50 border-b border-border">
         <h2 className="text-sm font-medium">
           {fileName || "No file selected"}
         </h2>
         <div className="flex space-x-2">
-          <button
-            onClick={() => setIsEditable(!isEditable)}
-            className="px-3 py-1 text-sm bg-muted hover:bg-muted/80 rounded-md transition-colors"
-          >
+          <Button onClick={() => setIsEditable(!isEditable)} variant="secondary">
             {isEditable ? "Cancel Edit" : "Edit"}
-          </button>
-          <button
-            onClick={() => {
-              setIsEditable(false);
-              console.log("Code saved:", code);
-            }}
-            className="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-            disabled={!isEditable}
-          >
-            Save
-          </button>
+          </Button>
+          <Button onClick={() => setShowCreateQubotDialog(true)} variant="primary">
+            Create qubot
+          </Button>
         </div>
       </div>
       <div className="flex-1 overflow-hidden">{renderFileContent()}</div>
+
+      {/* Dialog for Creating Qubot */}
+      <Dialog open={showCreateQubotDialog} onOpenChange={setShowCreateQubotDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Move to the playground</DialogTitle>
+            <DialogDescription>
+              Give your QUBOt a name and select a framework.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="qubot-name">QUBOt Name</Label>
+              <Input
+                id="qubot-name"
+                placeholder="TSPsolver24"
+                value={qubotName}
+                onChange={(e) => setQubotName(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="framework">Framework</Label>
+              <Select
+                value={framework}
+                onValueChange={(value) => setFramework(value)}
+              >
+                <SelectTrigger id="framework">
+                  <SelectValue placeholder="Select framework" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                  <SelectItem value="java">Java</SelectItem>
+                  <SelectItem value="csharp">C#</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateQubotDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateQubot} disabled={!qubotName || !framework}>
+              Create QUBOt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
