@@ -6,8 +6,16 @@ import { useAuth } from '@/context/AuthContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
-import { StepOne } from '@/components/upload/StepOne';
-import { StepTwo } from '@/components/upload/StepTwo';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { FileTree } from '@/components/github/FileTree';
+import { RepositoryCombobox } from '@/components/github/RepositoryCombobox';
+import { CodeEditor } from '@/components/playground/editor/CodeEditor';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowRight, Github, Code, Settings } from 'lucide-react';
 
 const UploadAlgos = () => {
   const { isAuthenticated, user } = useAuth();
@@ -103,14 +111,40 @@ const UploadAlgos = () => {
     }
   };
 
+  const handleSelectRepository = async (repo: any) => {
+    try {
+      const [owner, repoName] = repo.full_name.split('/');
+      setSelectedRepo({ owner, name: repoName, full_name: repo.full_name });
+      
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${owner}/${repoName}/tree`,
+        { credentials: 'include' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch repository structure');
+      }
+      
+      const structure = await response.json();
+      setFileStructure(structure);
+      toast.success('Repository files loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load repository files');
+      console.error('Error fetching repository structure:', error);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <DashboardLayout>
         <div className="container mx-auto py-8 px-4">
-          <h1 className="text-3xl font-bold mb-6">Please Login</h1>
-          <p className="text-muted-foreground">
-            You need to login with GitHub to use the workspace.
-          </p>
+          <Card className="p-8 text-center space-y-4">
+            <Github className="w-12 h-12 mx-auto text-muted-foreground" />
+            <h1 className="text-2xl font-bold">GitHub Authentication Required</h1>
+            <p className="text-muted-foreground">
+              Please login with GitHub to create and manage your QUBOt solvers.
+            </p>
+          </Card>
         </div>
       </DashboardLayout>
     );
@@ -118,44 +152,144 @@ const UploadAlgos = () => {
 
   return (
     <DashboardLayout>
-      <ScrollArea className="h-[calc(100vh-4rem)]">
-        <div className="container mx-auto py-8 px-4 space-y-8">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold gradient-text">Create a QUBOt Solver</h1>
-            <p className="text-muted-foreground">
-              Follow these steps to create your custom QUBO solver.
+      <div className="container mx-auto py-8 px-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">Create QUBOt Solver</h1>
+            <p className="text-muted-foreground mt-2">
+              Build and share your optimization algorithms with the community
             </p>
           </div>
-
-          <div className="space-y-8">
-            <StepOne
-              name={name}
-              setName={setName}
-              description={description}
-              setDescription={setDescription}
-              repositories={repositories}
-              selectedRepo={selectedRepo}
-              setSelectedRepo={setSelectedRepo}
-              fileStructure={fileStructure}
-              setFileStructure={setFileStructure}
-              onFileSelect={handleFileSelect}
-            />
-
-            <StepTwo
-              code={code}
-              setCode={setCode}
-              name={name}
-              inputParameters={inputParameters}
-              costFunction={costFunction}
-              algorithmLogic={algorithmLogic}
-              setInputParameters={setInputParameters}
-              setCostFunction={setCostFunction}
-              setAlgorithmLogic={setAlgorithmLogic}
-              onCreateSolver={() => createQubot.mutate()}
-            />
-          </div>
+          <Button
+            onClick={() => createQubot.mutate()}
+            disabled={!name || !inputParameters || !costFunction || !algorithmLogic}
+            className="bg-gradient-to-r from-blue-600 to-blue-800"
+          >
+            Create QUBOt
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
-      </ScrollArea>
+
+        <Tabs defaultValue="repository" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+            <TabsTrigger value="repository" className="flex items-center gap-2">
+              <Github className="h-4 w-4" />
+              Repository
+            </TabsTrigger>
+            <TabsTrigger value="code" className="flex items-center gap-2">
+              <Code className="h-4 w-4" />
+              Code
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="repository" className="space-y-6">
+            <Card className="p-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Basic Information</label>
+                  <Input
+                    placeholder="Solver Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                  <Textarea
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="h-24"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select Repository</label>
+                  <RepositoryCombobox
+                    repositories={repositories || []}
+                    onSelectRepository={handleSelectRepository}
+                  />
+                </div>
+
+                {selectedRepo && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Repository Files</label>
+                    <Card className="h-[400px] overflow-hidden">
+                      <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                    </Card>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="code" className="space-y-6">
+            <Card className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <label className="text-sm font-medium">Code Editor</label>
+                  <CodeEditor
+                    value={code}
+                    onChange={setCode}
+                    onSelectInputParameters={setInputParameters}
+                    onSelectCostFunction={setCostFunction}
+                    onSelectAlgorithmLogic={setAlgorithmLogic}
+                    language="python"
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  <Card className="p-4 space-y-4 bg-black/50">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Input Parameters</label>
+                      <div className="flex flex-wrap gap-2">
+                        {inputParameters ? (
+                          inputParameters.text.split(',').map((param, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="px-3 py-1 bg-blue-500/10"
+                            >
+                              {param.trim()}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            Select input parameters in the code editor
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Cost Function</label>
+                      {costFunction ? (
+                        <pre className="bg-black/30 p-3 rounded-md text-xs overflow-x-auto">
+                          {costFunction.text}
+                        </pre>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Select cost function in the code editor
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Algorithm Logic</label>
+                      {algorithmLogic ? (
+                        <pre className="bg-black/30 p-3 rounded-md text-xs overflow-x-auto">
+                          {algorithmLogic.text}
+                        </pre>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Select algorithm logic in the code editor
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </DashboardLayout>
   );
 };
