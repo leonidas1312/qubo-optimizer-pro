@@ -1,20 +1,38 @@
-from fastapi import Request
+from fastapi import APIRouter, Request
 import requests
 from typing import Optional
 import base64
 import urllib.parse
 
+router = APIRouter()
+
+@router.get("/repos")
+async def get_repos(request: Request):
+    token = request.session.get("github_token")
+    if not token:
+        return {"error": "Not authenticated"}
+    
+    try:
+        response = requests.get(
+            "https://api.github.com/user/repos",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        )
+        if response.status_code != 200:
+            return {"error": "Failed to fetch repositories"}
+        return response.json()
+    except Exception as e:
+        print(f"Error fetching repositories: {e}")
+        return {"error": str(e)}
 
 def is_valid_base64(s: str) -> bool:
-    """
-    Check if a string is valid Base64.
-    """
     try:
         base64.b64decode(s, validate=True)
         return True
     except Exception:
         return False
-
 
 async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
     try:
@@ -48,8 +66,21 @@ async def get_repo_tree(owner: str, repo: str, token: str) -> dict:
     except Exception as e:
         return {"error": str(e)}
 
+@router.get("/repos/{owner}/{repo}/tree")
+async def get_repository_tree(owner: str, repo: str, request: Request):
+    token = request.session.get("github_token")
+    if not token:
+        return {"error": "Not authenticated"}
+    
+    tree_data = await get_repo_tree(owner, repo, token)
+    return build_tree(tree_data)
 
-async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict:
+@router.get("/repos/{owner}/{repo}/contents/{path:path}")
+async def get_file_contents(owner: str, repo: str, path: str, request: Request):
+    token = request.session.get("github_token")
+    if not token:
+        return {"error": "Not authenticated"}
+    
     try:
         encoded_path = urllib.parse.quote(path)
         response = requests.get(
@@ -88,11 +119,6 @@ async def get_file_content(owner: str, repo: str, path: str, token: str) -> dict
     except Exception as e:
         print(f"Error fetching file content: {e}")
         return {"error": str(e)}
-
-
-
-
-
 
 def build_tree(items: dict) -> list:
     if "error" in items:
