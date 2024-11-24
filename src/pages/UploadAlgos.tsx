@@ -17,18 +17,13 @@ import {
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
+import type { Selection, QubotInput } from '@/types/qubot';
 
 interface FileNode {
   name: string;
   path: string;
   type: 'file' | 'tree';
   children?: FileNode[];
-}
-
-interface Selection {
-  start: number;
-  end: number;
-  text: string;
 }
 
 const UploadAlgos = () => {
@@ -71,16 +66,30 @@ const UploadAlgos = () => {
 
       if (!profile) throw new Error('Profile not found');
 
-      const { data, error } = await supabase.from('qubots').insert({
+      // Transform the input parameters to a format compatible with JSONB
+      const transformedParams = inputParameters ? [{
+        start: inputParameters.start,
+        end: inputParameters.end,
+        text: inputParameters.text
+      }] : [];
+
+      const qubotData: QubotInput = {
         name,
         description,
         creator_id: profile.id,
         repository_url: selectedRepo ? `https://github.com/${selectedRepo.full_name}` : null,
         file_path: selectedFileName,
-        input_parameters: inputParameters ? [inputParameters] : [],
+        input_parameters: transformedParams,
         cost_function: costFunction?.text,
         algorithm_logic: algorithmLogic?.text,
-      }).select().single();
+        is_public: true
+      };
+
+      const { data, error } = await supabase
+        .from('qubots')
+        .insert(qubotData)
+        .select()
+        .single();
 
       if (error) throw error;
       return data;
