@@ -2,11 +2,9 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Code2, UserRound, LogOut, Settings, Palette, Bell, Shield } from "lucide-react";
+import { Code2, Trophy, Database, FileText, Puzzle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,42 +14,16 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from '@supabase/supabase-js';
-
-interface ExtendedUser extends User {
-  avatar_url?: string;
-  github_username?: string;
-}
+import { UserMenu } from "./navigation/UserMenu";
+import { ListItem } from "./navigation/ListItem";
 
 export function CustomNavigationMenu() {
-  const { isAuthenticated, user, login, logout } = useAuth();
-  const extendedUser = user as ExtendedUser;
-  const { toast } = useToast();
+  const { isAuthenticated, login } = useAuth();
 
   const handleAuth = async () => {
     if (!isAuthenticated) {
       login();
     }
-  };
-
-  const handleSettingsAction = (action: string) => {
-    toast({
-      title: "Settings Update",
-      description: `${action} settings will be available soon!`,
-      duration: 2000,
-    });
   };
 
   return (
@@ -67,11 +39,53 @@ export function CustomNavigationMenu() {
         <NavigationMenuList>
           {/* Playground Tab */}
           <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/playground" className={navigationMenuTriggerStyle()}>
-                Playground
-              </Link>
-            </NavigationMenuLink>
+            <NavigationMenuTrigger>Playground</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-4 w-[400px]">
+                <ListItem to="/playground" title="Playground">
+                  Experiment with QUBO problems and solutions
+                </ListItem>
+                <ListItem to="/uploadalgos" title="Create a QUBOt solver">
+                  Build and test your own QUBO solver
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          {/* Community Tab */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Community</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-4 w-[400px]">
+                <ListItem to="/leaderboard" title="Leaderboard">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4" />
+                    <span>View top performing solvers and users</span>
+                  </div>
+                </ListItem>
+                <ListItem to="/qubots" title="QUBOts created">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    <span>Browse community-created solvers</span>
+                  </div>
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          {/* Datasets Tab */}
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Datasets</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-4 w-[400px]">
+                <ListItem to="/datasets" title="Browse Datasets">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4" />
+                    <span>Explore and use community datasets</span>
+                  </div>
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
           </NavigationMenuItem>
 
           {/* Documentation Tab */}
@@ -91,15 +105,6 @@ export function CustomNavigationMenu() {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-
-          {/* Workspace Tab */}
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/uploadalgos" className={navigationMenuTriggerStyle()}>
-                Workspace
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
 
@@ -115,88 +120,8 @@ export function CustomNavigationMenu() {
           </Button>
         )}
 
-        {isAuthenticated && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
-                <AvatarImage src={extendedUser?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${extendedUser?.email}`} />
-                <AvatarFallback>
-                  <UserRound className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{extendedUser?.email}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {extendedUser?.github_username || 'User'}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Palette className="mr-2 h-4 w-4" />
-                  <span>Appearance</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => handleSettingsAction('Theme')}>
-                    <span>Theme</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleSettingsAction('Layout')}>
-                    <span>Layout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuItem onClick={() => handleSettingsAction('Notifications')}>
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Notifications</span>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={() => handleSettingsAction('Security')}>
-                <Shield className="mr-2 h-4 w-4" />
-                <span>Security</span>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {isAuthenticated && <UserMenu />}
       </div>
     </div>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { title: string; to: string }
->(({ className, title, children, to, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          to={to}
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";

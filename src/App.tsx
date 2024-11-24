@@ -26,6 +26,9 @@ const App = () => {
                 <Route path="/solvers" element={<Solvers />} />
                 <Route path="/uploadalgos" element={<UploadAlgos />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/leaderboard" element={<div>Leaderboard Coming Soon</div>} />
+                <Route path="/qubots" element={<div>QUBOts Created Coming Soon</div>} />
+                <Route path="/datasets" element={<div>Datasets Coming Soon</div>} />
               </Routes>
               <Toaster />
               <Sonner />
