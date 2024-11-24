@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/resizable';
 import { supabase } from '@/integrations/supabase/client';
 import type { Selection, QubotInput } from '@/types/qubot';
-import { CodeSelectionMenu } from '@/components/solver/CodeSelectionMenu';
 
 interface FileNode {
   name: string;
@@ -196,25 +195,15 @@ const UploadAlgos = () => {
                 <ResizablePanel defaultSize={25} minSize={20}>
                   <div className="border-r border-border h-full p-4">
                     <h2 className="text-lg font-semibold mb-4">Select Repository</h2>
-                    {isLoading ? (
-                      <div className="text-center">Loading repositories...</div>
-                    ) : repositories ? (
-                      <>
-                        <RepositoryCombobox
-                          repositories={repositories}
-                          onSelectRepository={handleSelectRepository}
-                        />
-                        {selectedRepo && (
-                          <div className="mt-4 h-[calc(100vh-24rem)]">
-                            <ScrollArea className="h-full rounded-md border">
-                              <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                            </ScrollArea>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-center text-muted-foreground">
-                        No repositories found.
+                    <RepositoryCombobox
+                      repositories={repositories}
+                      onSelectRepository={handleSelectRepository}
+                    />
+                    {selectedRepo && (
+                      <div className="mt-4 h-[calc(100vh-24rem)]">
+                        <ScrollArea className="h-full rounded-md border">
+                          <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                        </ScrollArea>
                       </div>
                     )}
                   </div>
@@ -224,26 +213,23 @@ const UploadAlgos = () => {
                 
                 <ResizablePanel defaultSize={75} minSize={30}>
                   <div className="h-full p-4 space-y-4">
-                    <CodeSelectionMenu
-                      onSelectInputParameters={setInputParameters}
-                      onSelectCostFunction={setCostFunction}
-                      onSelectAlgorithmLogic={setAlgorithmLogic}
-                    >
-                      {code ? (
-                        <CodeEditor
-                          value={code}
-                          onChange={setCode}
-                          className="h-[calc(100vh-28rem)]"
-                          language="python"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <p className="text-muted-foreground">
-                            Select a Python file from the repository to create your solver.
-                          </p>
-                        </div>
-                      )}
-                    </CodeSelectionMenu>
+                    {code ? (
+                      <CodeEditor
+                        value={code}
+                        onChange={setCode}
+                        className="h-[calc(100vh-28rem)]"
+                        language="python"
+                        onSelectInputParameters={setInputParameters}
+                        onSelectCostFunction={setCostFunction}
+                        onSelectAlgorithmLogic={setAlgorithmLogic}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <p className="text-muted-foreground">
+                          Select a Python file from the repository to create your solver.
+                        </p>
+                      </div>
+                    )}
 
                     <Button
                       className="w-full"
