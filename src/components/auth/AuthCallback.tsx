@@ -15,10 +15,10 @@ export const AuthCallback = () => {
         const data = await response.json();
         
         if (data.authenticated && data.user) {
-          // Sign up new user in Supabase
+          // Sign up new user in Supabase - convert ID to string
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: data.user.email,
-            password: data.user.id, // Use GitHub user ID as password
+            password: String(data.user.id), // Convert ID to string
             options: {
               data: {
                 avatar_url: data.user.avatar_url,
@@ -32,10 +32,10 @@ export const AuthCallback = () => {
             throw signUpError;
           }
 
-          // Sign in user
+          // Sign in user - also use string ID
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: data.user.email,
-            password: data.user.id
+            password: String(data.user.id) // Convert ID to string
           });
 
           if (signInError) {
@@ -45,7 +45,7 @@ export const AuthCallback = () => {
           // Wait for the profile to be created by the trigger
           await new Promise(resolve => setTimeout(resolve, 1000));
 
-          navigate('/uploadalgos');
+          navigate('/qubots');
           toast.success('Successfully logged in!');
         } else {
           throw new Error('Authentication failed');
