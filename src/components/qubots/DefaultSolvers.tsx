@@ -39,7 +39,8 @@ export const DefaultSolvers = ({ onSelect }: DefaultSolversProps) => {
               </div>
             </div>
           </Card>
-        ))}
+        );
+      })}
     </div>
   );
 };
