@@ -5,10 +5,9 @@ import { QUBOtsList } from "@/components/qubots/QUBOtsList";
 import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Github } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const QUBOts = () => {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return (
@@ -20,12 +19,6 @@ const QUBOts = () => {
             <p className="text-muted-foreground">
               Please login with GitHub to create and manage your QUBOt solvers.
             </p>
-            <Button 
-              onClick={login}
-              className="bg-gradient-to-r from-blue-600 to-blue-800"
-            >
-              Login with GitHub
-            </Button>
           </Card>
         </div>
       </DashboardLayout>

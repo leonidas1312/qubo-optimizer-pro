@@ -5,18 +5,18 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 import { Tables } from "@/integrations/supabase/types";
 import { SolverSection } from "./sections/SolverSection";
 import { DatasetSection } from "./sections/DatasetSection";
 import { HardwareSection } from "./sections/HardwareSection";
-import { useSession } from '@supabase/auth-helpers-react';
-import { useQuery } from "@tanstack/react-query";
 
 type Dataset = Tables<"datasets">;
 type HardwareProvider = Tables<"hardware_providers">;
 
 export const CreateQUBOtForm = () => {
-  const session = useSession();
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedSolver, setSelectedSolver] = useState<{
@@ -52,13 +52,13 @@ export const CreateQUBOtForm = () => {
   });
 
   const handleCreateQubot = async () => {
-    if (!name || !selectedSolver) {
-      toast.error("Please fill in all required fields");
+    if (!user) {
+      toast.error("Please log in to create a QUBOt");
       return;
     }
 
-    if (!session?.user?.id) {
-      toast.error("Please log in to create a QUBOt");
+    if (!name || !selectedSolver) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -68,13 +68,10 @@ export const CreateQUBOtForm = () => {
         .insert({
           name,
           description,
-          creator_id: session.user.id,
+          creator_id: user.id,
           solver_type: selectedSolver.id,
           solver_parameters: selectedSolver.parameters,
-          is_public: true,
-          input_parameters: [],
-          cost_function: null,
-          algorithm_logic: null
+          is_public: true
         });
 
       if (error) throw error;
@@ -85,8 +82,8 @@ export const CreateQUBOtForm = () => {
       setSelectedSolver(null);
       setSelectedDataset(null);
       setSelectedHardware(null);
-    } catch (error: any) {
-      toast.error(`Failed to create QUBOt: ${error.message}`);
+    } catch (error) {
+      toast.error("Failed to create QUBOt");
       console.error(error);
     }
   };

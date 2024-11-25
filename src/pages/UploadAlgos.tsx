@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Github } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StepChooseFile } from '@/components/upload/steps/StepChooseFile';
 import { StepMarkCode } from '@/components/upload/steps/StepMarkCode';
 import { StepPreview } from '@/components/upload/steps/StepPreview';
 import { TransformationSteps } from '@/components/solver/TransformationSteps';
@@ -17,10 +18,71 @@ const UploadAlgos = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<{
+    owner: string;
+    name: string;
+    full_name: string;
+  } | null>(null);
+  const [fileStructure, setFileStructure] = useState<any[]>([]);
   const [inputParameters, setInputParameters] = useState<Selection | null>(null);
   const [costFunction, setCostFunction] = useState<Selection | null>(null);
   const [algorithmLogic, setAlgorithmLogic] = useState<Selection | null>(null);
-  const [activeStep, setActiveStep] = useState('mark-code');
+  const [activeStep, setActiveStep] = useState('choose-file');
+
+  const { data: repositories } = useQuery({
+    queryKey: ['repositories'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:8000/api/github/repos', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch repositories');
+      return response.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const handleFileSelect = async (path: string) => {
+    if (!selectedRepo) return;
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${selectedRepo.owner}/${selectedRepo.name}/contents/${path}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) throw new Error('Failed to fetch file content');
+      const data = await response.json();
+      const content = atob(data.content.replace(/\s/g, ''));
+      setCode(content);
+      setSelectedFileName(path);
+      toast.success('File loaded successfully');
+      setActiveStep('mark-code');
+    } catch (error) {
+      toast.error('Failed to load file');
+      console.error('Error fetching file content:', error);
+    }
+  };
+
+  const handleSelectRepository = async (repo: any) => {
+    try {
+      const [owner, repoName] = repo.full_name.split('/');
+      setSelectedRepo({ owner, name: repoName, full_name: repo.full_name });
+      
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${owner}/${repoName}/tree`,
+        { credentials: 'include' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch repository structure');
+      }
+      
+      const structure = await response.json();
+      setFileStructure(structure);
+      toast.success('Repository files loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load repository files');
+      console.error('Error fetching repository structure:', error);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -51,10 +113,26 @@ const UploadAlgos = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <Tabs value={activeStep} onValueChange={setActiveStep}>
-              <TabsList className="grid grid-cols-2">
-                <TabsTrigger value="mark-code">1. Mark Code</TabsTrigger>
-                <TabsTrigger value="preview">2. Preview</TabsTrigger>
+              <TabsList className="grid grid-cols-3">
+                <TabsTrigger value="choose-file">1. Choose File</TabsTrigger>
+                <TabsTrigger value="mark-code">2. Mark Code</TabsTrigger>
+                <TabsTrigger value="preview">3. Preview</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="choose-file">
+                <StepChooseFile
+                  name={name}
+                  setName={setName}
+                  description={description}
+                  setDescription={setDescription}
+                  repositories={repositories || []}
+                  selectedRepo={selectedRepo}
+                  setSelectedRepo={handleSelectRepository}
+                  fileStructure={fileStructure}
+                  setFileStructure={setFileStructure}
+                  onFileSelect={handleFileSelect}
+                />
+              </TabsContent>
 
               <TabsContent value="mark-code">
                 <StepMarkCode
@@ -73,6 +151,7 @@ const UploadAlgos = () => {
                   costFunction={costFunction}
                   algorithmLogic={algorithmLogic}
                   onCreateSolver={() => {
+                    // Handle solver creation
                     toast.success('QUBOt solver created successfully!');
                   }}
                 />
