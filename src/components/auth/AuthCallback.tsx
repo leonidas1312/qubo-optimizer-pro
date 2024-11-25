@@ -15,10 +15,13 @@ export const AuthCallback = () => {
         const data = await response.json();
         
         if (data.authenticated && data.user) {
-          // Sign up new user in Supabase - convert ID to string
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          // Generate a secure random password for the user
+          const password = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+
+          // Sign up new user in Supabase
+          const { error: signUpError } = await supabase.auth.signUp({
             email: data.user.email,
-            password: String(data.user.id), // Convert ID to string
+            password: password,
             options: {
               data: {
                 avatar_url: data.user.avatar_url,
@@ -28,18 +31,29 @@ export const AuthCallback = () => {
             }
           });
 
+          // If user already exists, that's fine - proceed to sign in
           if (signUpError && signUpError.message !== 'User already registered') {
             throw signUpError;
           }
 
-          // Sign in user - also use string ID
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          // Sign in user with email/password
+          const { error: signInError } = await supabase.auth.signInWithPassword({
             email: data.user.email,
-            password: String(data.user.id) // Convert ID to string
+            password: password
           });
 
           if (signInError) {
-            throw signInError;
+            // If sign in fails, try to sign in with OAuth
+            const { error: oAuthError } = await supabase.auth.signInWithOAuth({
+              provider: 'github',
+              options: {
+                redirectTo: window.location.origin
+              }
+            });
+
+            if (oAuthError) {
+              throw oAuthError;
+            }
           }
 
           // Wait for the profile to be created by the trigger
@@ -50,7 +64,7 @@ export const AuthCallback = () => {
         } else {
           throw new Error('Authentication failed');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Auth callback error:', error);
         toast.error('Authentication failed');
         navigate('/');
