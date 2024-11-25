@@ -14,6 +14,8 @@ import Hardware from "./pages/Hardware";
 import Playground from "./pages/Playground";
 import QUBOts from "./pages/QUBOts";
 import Datasets from "./pages/Datasets";
+import OptimizationLab from "./pages/OptimizationLab";
+import UploadSolver from "./pages/UploadSolver";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => {
                   <Route path="/leaderboard" element={<div>Leaderboard Coming Soon</div>} />
                   <Route path="/qubots" element={<QUBOts />} />
                   <Route path="/datasets" element={<Datasets />} />
+                  <Route path="/optimization-lab" element={<OptimizationLab />} />
+                  <Route path="/upload-solver" element={<UploadSolver />} />
                 </Routes>
                 <Toaster />
                 <Sonner />
