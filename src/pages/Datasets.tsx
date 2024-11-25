@@ -8,10 +8,22 @@ import { Database, FileJson, AlertCircle, Download } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type Dataset = Tables<"datasets">;
 
 const Datasets = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/');
+      toast.error("Please log in to view datasets");
+    }
+  }, [isAuthenticated, navigate]);
+
   const { data: datasets, isLoading, error } = useQuery({
     queryKey: ['datasets'],
     queryFn: async () => {
@@ -24,7 +36,8 @@ const Datasets = () => {
         throw error;
       }
       return data;
-    }
+    },
+    enabled: isAuthenticated, // Only run query if user is authenticated
   });
 
   const handleDownload = (dataset: Dataset) => {
@@ -49,6 +62,10 @@ const Datasets = () => {
     
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   };
+
+  if (!isAuthenticated) {
+    return null; // Don't render anything while redirecting
+  }
 
   if (error) {
     return (

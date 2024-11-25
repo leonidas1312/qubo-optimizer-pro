@@ -7,10 +7,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { Cpu, Server, HardDrive, AlertCircle } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type HardwareProvider = Tables<"hardware_providers">;
 
 const Hardware = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/');
+      toast.error("Please log in to view hardware providers");
+    }
+  }, [isAuthenticated, navigate]);
+
   const { data: providers, isLoading, error } = useQuery({
     queryKey: ['hardware-providers'],
     queryFn: async () => {
@@ -23,12 +35,17 @@ const Hardware = () => {
         throw error;
       }
       return data;
-    }
+    },
+    enabled: isAuthenticated, // Only run query if user is authenticated
   });
 
   const handleSelect = (provider: HardwareProvider) => {
     toast.success(`Selected ${provider.name} for computation`);
   };
+
+  if (!isAuthenticated) {
+    return null; // Don't render anything while redirecting
+  }
 
   if (error) {
     return (
