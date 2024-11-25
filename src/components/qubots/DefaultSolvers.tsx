@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { solverTemplates } from "@/utils/solverTemplates";
 import { toast } from "sonner";
 
@@ -9,9 +8,10 @@ interface DefaultSolversProps {
     name: string;
     parameters: Record<string, any>;
   }) => void;
+  selectedSolverId?: string;
 }
 
-export const DefaultSolvers = ({ onSelect }: DefaultSolversProps) => {
+export const DefaultSolvers = ({ onSelect, selectedSolverId }: DefaultSolversProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {solverTemplates.map((template) => {
@@ -19,7 +19,9 @@ export const DefaultSolvers = ({ onSelect }: DefaultSolversProps) => {
         return (
           <Card 
             key={template.id}
-            className="p-4 hover:bg-accent cursor-pointer transition-colors"
+            className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
+              selectedSolverId === template.id ? 'border-2 border-primary' : ''
+            }`}
             onClick={() => {
               onSelect({
                 id: template.id,
