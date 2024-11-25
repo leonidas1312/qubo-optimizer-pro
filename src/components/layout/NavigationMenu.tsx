@@ -49,6 +49,12 @@ export function CustomNavigationMenu() {
                       <span>Browse available QUBO solvers</span>
                     </div>
                   </ListItem>
+                  <ListItem to="/qubots" title="Create Your Own">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      <span>Create and manage QUBOts</span>
+                    </div>
+                  </ListItem>
                   <ListItem to="/hardware" title="Hardware">
                     <div className="flex items-center gap-2">
                       <Cpu className="h-4 w-4" />
@@ -78,12 +84,6 @@ export function CustomNavigationMenu() {
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4" />
                       <span>View top performing solvers and users</span>
-                    </div>
-                  </ListItem>
-                  <ListItem to="/qubots" title="QUBOts">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>Browse and create QUBOts</span>
                     </div>
                   </ListItem>
                 </ul>

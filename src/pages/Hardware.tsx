@@ -11,15 +11,17 @@ import { toast } from "sonner";
 type HardwareProvider = Tables<"hardware_providers">;
 
 const Hardware = () => {
-  const { data: providers, isLoading } = useQuery({
+  const { data: providers, isLoading, error } = useQuery({
     queryKey: ['hardware-providers'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('hardware_providers')
-        .select('*')
-        .eq('availability', true);
+        .select('*');
       
-      if (error) throw error;
+      if (error) {
+        toast.error("Failed to load hardware providers");
+        throw error;
+      }
       return data;
     }
   });
@@ -27,6 +29,19 @@ const Hardware = () => {
   const handleSelect = (provider: HardwareProvider) => {
     toast.success(`Selected ${provider.name} for computation`);
   };
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-8 px-4">
+          <Card className="p-8 text-center">
+            <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
+            <p className="mt-2 text-muted-foreground">Failed to load hardware providers</p>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -51,7 +66,7 @@ const Hardware = () => {
             </div>
           ) : providers && providers.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {providers.map((provider: HardwareProvider) => (
+              {providers.map((provider) => (
                 <Card 
                   key={provider.id} 
                   className="p-6 hover:border-primary/50 transition-colors duration-300 hover:shadow-lg"

@@ -12,15 +12,17 @@ import { formatDistanceToNow } from "date-fns";
 type Dataset = Tables<"datasets">;
 
 const Datasets = () => {
-  const { data: datasets, isLoading } = useQuery({
+  const { data: datasets, isLoading, error } = useQuery({
     queryKey: ['datasets'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('datasets')
-        .select('*, profiles(username)')
-        .eq('is_public', true);
+        .select('*, profiles(username)');
       
-      if (error) throw error;
+      if (error) {
+        toast.error("Failed to load datasets");
+        throw error;
+      }
       return data;
     }
   });
@@ -47,6 +49,19 @@ const Datasets = () => {
     
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   };
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-8 px-4">
+          <Card className="p-8 text-center">
+            <AlertCircle className="h-8 w-8 mx-auto text-destructive" />
+            <p className="mt-2 text-muted-foreground">Failed to load datasets</p>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
