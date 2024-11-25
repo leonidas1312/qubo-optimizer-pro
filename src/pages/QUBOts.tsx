@@ -99,21 +99,6 @@ const QUBOts = () => {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <DashboardLayout>
-        <div className="container mx-auto py-8 px-4">
-          <Card className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
-            <p className="text-muted-foreground">
-              Please log in to create and manage QUBOts
-            </p>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
       <div className="container mx-auto py-8 px-4 space-y-8">

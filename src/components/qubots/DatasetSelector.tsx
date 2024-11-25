@@ -9,27 +9,21 @@ interface DatasetSelectorProps {
 }
 
 export const DatasetSelector = ({ datasets, onSelect }: DatasetSelectorProps) => {
-  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
   if (!datasets) return null;
 
-  const filteredDatasets = datasets.filter((dataset) =>
-    dataset.name.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <Command className="rounded-lg border shadow-md w-full">
-      <CommandInput 
-        placeholder="Search datasets..." 
-        value={search}
-        onValueChange={setSearch}
-      />
+      <CommandInput placeholder="Search datasets..." />
       <CommandGroup heading="Available Datasets">
-        {filteredDatasets.map((dataset) => (
+        {datasets.map((dataset) => (
           <CommandItem
             key={dataset.id}
-            value={dataset.id}
-            onSelect={() => onSelect(dataset.id)}
+            onSelect={() => {
+              onSelect(dataset.id);
+              setOpen(false);
+            }}
             className="flex items-center"
           >
             <Database className="h-4 w-4 mr-2" />

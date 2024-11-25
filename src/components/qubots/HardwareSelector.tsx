@@ -9,27 +9,21 @@ interface HardwareSelectorProps {
 }
 
 export const HardwareSelector = ({ hardware, onSelect }: HardwareSelectorProps) => {
-  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
   if (!hardware) return null;
 
-  const filteredHardware = hardware.filter((hw) =>
-    hw.name.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <Command className="rounded-lg border shadow-md w-full">
-      <CommandInput 
-        placeholder="Search hardware..." 
-        value={search}
-        onValueChange={setSearch}
-      />
+      <CommandInput placeholder="Search hardware..." />
       <CommandGroup heading="Available Hardware">
-        {filteredHardware.map((hw) => (
+        {hardware.map((hw) => (
           <CommandItem
             key={hw.id}
-            value={hw.id}
-            onSelect={() => onSelect(hw.id)}
+            onSelect={() => {
+              onSelect(hw.id);
+              setOpen(false);
+            }}
             className="flex items-center"
           >
             {hw.provider_type === 'CPU' ? (
