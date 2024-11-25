@@ -37,6 +37,7 @@ export const CreateQUBOtForm = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.user, // Only run query if user is authenticated
   });
 
   const { data: hardwareProviders } = useQuery({
@@ -49,16 +50,17 @@ export const CreateQUBOtForm = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.user, // Only run query if user is authenticated
   });
 
   const handleCreateQubot = async () => {
-    if (!name || !selectedSolver) {
-      toast.error("Please fill in all required fields");
+    if (!session?.user?.id) {
+      toast.error("Please log in to create a QUBOt");
       return;
     }
 
-    if (!session?.user?.id) {
-      toast.error("Please log in to create a QUBOt");
+    if (!name || !selectedSolver) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
