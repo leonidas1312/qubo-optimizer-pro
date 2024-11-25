@@ -20,10 +20,7 @@ export const AuthCallback = () => {
           const { error: signInError } = await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
-              redirectTo: `${window.location.origin}/auth/callback`,
-              queryParams: {
-                access_token: data.user.access_token
-              }
+              redirectTo: `${window.location.origin}/auth/callback`
             }
           });
 
