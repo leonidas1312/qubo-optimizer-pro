@@ -18,7 +18,7 @@ export const AuthCallback = () => {
           // Sign up new user in Supabase
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email: data.user.email,
-            password: data.user.id, // Use GitHub user ID as password
+            password: String(data.user.id), // Convert GitHub ID to string
             options: {
               data: {
                 avatar_url: data.user.avatar_url,
@@ -35,7 +35,7 @@ export const AuthCallback = () => {
           // Sign in user
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: data.user.email,
-            password: data.user.id
+            password: String(data.user.id) // Convert GitHub ID to string
           });
 
           if (signInError) {
