@@ -11,12 +11,13 @@ import { Tables } from "@/integrations/supabase/types";
 import { SolverSection } from "./sections/SolverSection";
 import { DatasetSection } from "./sections/DatasetSection";
 import { HardwareSection } from "./sections/HardwareSection";
+import { useSession } from '@supabase/auth-helpers-react';
 
 type Dataset = Tables<"datasets">;
 type HardwareProvider = Tables<"hardware_providers">;
 
 export const CreateQUBOtForm = () => {
-  const { user } = useAuth();
+  const session = useSession();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedSolver, setSelectedSolver] = useState<{
@@ -52,7 +53,7 @@ export const CreateQUBOtForm = () => {
   });
 
   const handleCreateQubot = async () => {
-    if (!user) {
+    if (!session?.user) {
       toast.error("Please log in to create a QUBOt");
       return;
     }
@@ -68,7 +69,7 @@ export const CreateQUBOtForm = () => {
         .insert({
           name,
           description,
-          creator_id: user.id,
+          creator_id: session.user.id,
           solver_type: selectedSolver.id,
           solver_parameters: selectedSolver.parameters,
           is_public: true
@@ -82,8 +83,8 @@ export const CreateQUBOtForm = () => {
       setSelectedSolver(null);
       setSelectedDataset(null);
       setSelectedHardware(null);
-    } catch (error) {
-      toast.error("Failed to create QUBOt");
+    } catch (error: any) {
+      toast.error(`Failed to create QUBOt: ${error.message}`);
       console.error(error);
     }
   };
