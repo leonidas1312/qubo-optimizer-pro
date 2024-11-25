@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -9,27 +9,48 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const response = await fetch('http://localhost:8000/api/auth/status', {
+          credentials: 'include'
+        });
+        const data = await response.json();
         
-        if (error) throw error;
-        
-        if (session) {
-          toast.success('Successfully signed in!');
-          navigate('/');
-        } else {
-          // If no session, initiate GitHub OAuth
-          const { error: signInError } = await supabase.auth.signInWithOAuth({
-            provider: 'github',
+        if (data.authenticated && data.user) {
+          // Sign up new user in Supabase - convert ID to string
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: data.user.email,
+            password: String(data.user.id), // Convert ID to string
             options: {
-              redirectTo: `${window.location.origin}/auth/callback`
+              data: {
+                avatar_url: data.user.avatar_url,
+                github_username: data.user.login,
+                email: data.user.email,
+              }
             }
+          });
+
+          if (signUpError && signUpError.message !== 'User already registered') {
+            throw signUpError;
+          }
+
+          // Sign in user - also use string ID
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: data.user.email,
+            password: String(data.user.id) // Convert ID to string
           });
 
           if (signInError) {
             throw signInError;
           }
+
+          // Wait for the profile to be created by the trigger
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          navigate('/qubots');
+          toast.success('Successfully logged in!');
+        } else {
+          throw new Error('Authentication failed');
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Auth callback error:', error);
         toast.error('Authentication failed');
         navigate('/');
