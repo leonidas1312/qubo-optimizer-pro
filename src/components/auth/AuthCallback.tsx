@@ -9,46 +9,26 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/auth/status', {
-          credentials: 'include'
-        });
-        const data = await response.json();
+        // Get the code from the URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+
+        if (!accessToken) {
+          throw new Error('No access token found');
+        }
+
+        // Exchange the token for session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (data.authenticated && data.user) {
-          // Sign up new user in Supabase - convert ID to string
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email: data.user.email,
-            password: String(data.user.id), // Convert ID to string
-            options: {
-              data: {
-                avatar_url: data.user.avatar_url,
-                github_username: data.user.login,
-                email: data.user.email,
-              }
-            }
-          });
+        if (sessionError) {
+          throw sessionError;
+        }
 
-          if (signUpError && signUpError.message !== 'User already registered') {
-            throw signUpError;
-          }
-
-          // Sign in user - also use string ID
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: data.user.email,
-            password: String(data.user.id) // Convert ID to string
-          });
-
-          if (signInError) {
-            throw signInError;
-          }
-
-          // Wait for the profile to be created by the trigger
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
+        if (session) {
           navigate('/qubots');
           toast.success('Successfully logged in!');
         } else {
-          throw new Error('Authentication failed');
+          throw new Error('No session found');
         }
       } catch (error) {
         console.error('Auth callback error:', error);
