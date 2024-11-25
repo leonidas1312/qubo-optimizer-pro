@@ -10,6 +10,7 @@ import { SolverSection } from "./sections/SolverSection";
 import { DatasetSection } from "./sections/DatasetSection";
 import { HardwareSection } from "./sections/HardwareSection";
 import { useSession } from '@supabase/auth-helpers-react';
+import { useQuery } from "@tanstack/react-query";
 
 type Dataset = Tables<"datasets">;
 type HardwareProvider = Tables<"hardware_providers">;
@@ -70,7 +71,10 @@ export const CreateQUBOtForm = () => {
           creator_id: session.user.id,
           solver_type: selectedSolver.id,
           solver_parameters: selectedSolver.parameters,
-          is_public: true
+          is_public: true,
+          input_parameters: [],
+          cost_function: null,
+          algorithm_logic: null
         });
 
       if (error) throw error;
