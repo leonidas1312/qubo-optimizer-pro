@@ -11,6 +11,7 @@ import { DatasetSection } from "./sections/DatasetSection";
 import { HardwareSection } from "./sections/HardwareSection";
 import { useSession } from '@supabase/auth-helpers-react';
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 type Dataset = Tables<"datasets">;
 type HardwareProvider = Tables<"hardware_providers">;
@@ -27,7 +28,7 @@ export const CreateQUBOtForm = () => {
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
   const [selectedHardware, setSelectedHardware] = useState<HardwareProvider | null>(null);
 
-  const { data: datasets } = useQuery({
+  const { data: datasets, isLoading: datasetsLoading } = useQuery({
     queryKey: ['datasets'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -37,10 +38,10 @@ export const CreateQUBOtForm = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!session?.user, // Only run query if user is authenticated
+    enabled: !!session?.user,
   });
 
-  const { data: hardwareProviders } = useQuery({
+  const { data: hardwareProviders, isLoading: hardwareLoading } = useQuery({
     queryKey: ['hardware-providers'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -50,15 +51,10 @@ export const CreateQUBOtForm = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!session?.user, // Only run query if user is authenticated
+    enabled: !!session?.user,
   });
 
   const handleCreateQubot = async () => {
-    if (!session?.user?.id) {
-      toast.error("Please log in to create a QUBOt");
-      return;
-    }
-
     if (!name || !selectedSolver) {
       toast.error("Please fill in all required fields");
       return;
@@ -70,7 +66,7 @@ export const CreateQUBOtForm = () => {
         .insert({
           name,
           description,
-          creator_id: session.user.id,
+          creator_id: session?.user?.id,
           solver_type: selectedSolver.id,
           solver_parameters: selectedSolver.parameters,
           is_public: true,
@@ -92,6 +88,25 @@ export const CreateQUBOtForm = () => {
       console.error(error);
     }
   };
+
+  if (!session?.user) {
+    return (
+      <Card className="p-6 text-center">
+        <p className="text-muted-foreground">Please log in to create QUBOts</p>
+      </Card>
+    );
+  }
+
+  if (datasetsLoading || hardwareLoading) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center justify-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <p>Loading resources...</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">
