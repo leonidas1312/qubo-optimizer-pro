@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 type HardwareProvider = Tables<"hardware_providers">;
 
 const Hardware = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -32,12 +32,12 @@ const Hardware = () => {
         .select('*');
       
       if (error) {
-        toast.error("Failed to load hardware providers");
+        console.error('Error fetching hardware providers:', error);
         throw error;
       }
       return data;
     },
-    enabled: isAuthenticated, // Only run query if user is authenticated
+    enabled: !!user, // Only run query if user is authenticated
   });
 
   const handleSelect = (provider: HardwareProvider) => {

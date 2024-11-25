@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 type Dataset = Tables<"datasets">;
 
 const Datasets = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -33,12 +33,12 @@ const Datasets = () => {
         .select('*, profiles(username)');
       
       if (error) {
-        toast.error("Failed to load datasets");
+        console.error('Error fetching datasets:', error);
         throw error;
       }
       return data;
     },
-    enabled: isAuthenticated, // Only run query if user is authenticated
+    enabled: !!user, // Only run query if user is authenticated
   });
 
   const handleDownload = (dataset: Dataset) => {
