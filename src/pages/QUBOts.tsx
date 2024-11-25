@@ -9,7 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Plus, Code2, Database, Cpu } from "lucide-react";
+import { Plus } from "lucide-react";
+import { SolverSelector } from "@/components/qubots/SolverSelector";
+import { HardwareSelector } from "@/components/qubots/HardwareSelector";
+import { DatasetSelector } from "@/components/qubots/DatasetSelector";
 
 const QUBOts = () => {
   const { isAuthenticated, user } = useAuth();
@@ -26,20 +29,6 @@ const QUBOts = () => {
         .from('qubots')
         .select('*')
         .eq('is_public', true);
-      
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const { data: solvers } = useQuery({
-    queryKey: ['solvers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('qubots')
-        .select('*')
-        .eq('is_public', true)
-        .eq('solver_type', 'solver');
       
       if (error) throw error;
       return data;
@@ -90,7 +79,7 @@ const QUBOts = () => {
           name,
           description,
           creator_id: user?.id,
-          solver_id: selectedSolver,
+          solver_type: selectedSolver,
           dataset_id: selectedDataset,
           hardware_id: selectedHardware,
           is_public: true
@@ -149,63 +138,21 @@ const QUBOts = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Code2 className="h-5 w-5" />
-                      <h3 className="font-medium">Select Solver</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {solvers?.map((solver) => (
-                        <Button
-                          key={solver.id}
-                          variant={selectedSolver === solver.id ? "default" : "outline"}
-                          className="w-full justify-start"
-                          onClick={() => setSelectedSolver(solver.id)}
-                        >
-                          {solver.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </Card>
+                <div className="grid grid-cols-1 gap-6">
+                  <div className="space-y-2">
+                    <Label>Select Solver</Label>
+                    <SolverSelector onSelect={setSelectedSolver} />
+                  </div>
 
-                  <Card className="p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Database className="h-5 w-5" />
-                      <h3 className="font-medium">Select Dataset</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {datasets?.map((dataset) => (
-                        <Button
-                          key={dataset.id}
-                          variant={selectedDataset === dataset.id ? "default" : "outline"}
-                          className="w-full justify-start"
-                          onClick={() => setSelectedDataset(dataset.id)}
-                        >
-                          {dataset.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </Card>
+                  <div className="space-y-2">
+                    <Label>Select Dataset</Label>
+                    <DatasetSelector datasets={datasets} onSelect={setSelectedDataset} />
+                  </div>
 
-                  <Card className="p-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Cpu className="h-5 w-5" />
-                      <h3 className="font-medium">Select Hardware</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {hardware?.map((hw) => (
-                        <Button
-                          key={hw.id}
-                          variant={selectedHardware === hw.id ? "default" : "outline"}
-                          className="w-full justify-start"
-                          onClick={() => setSelectedHardware(hw.id)}
-                        >
-                          {hw.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </Card>
+                  <div className="space-y-2">
+                    <Label>Select Hardware</Label>
+                    <HardwareSelector hardware={hardware} onSelect={setSelectedHardware} />
+                  </div>
                 </div>
 
                 <Button onClick={handleCreateQubot} className="w-full">
