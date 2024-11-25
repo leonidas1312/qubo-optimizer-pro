@@ -34,19 +34,25 @@ interface SolverSelectorProps {
 }
 
 export const SolverSelector = ({ onSelect }: SolverSelectorProps) => {
-  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredSolvers = solvers.filter((solver) =>
+    solver.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <Command className="rounded-lg border shadow-md w-full">
-      <CommandInput placeholder="Search solvers..." />
+      <CommandInput 
+        placeholder="Search solvers..." 
+        value={search}
+        onValueChange={setSearch}
+      />
       <CommandGroup heading="Available Solvers">
-        {solvers.map((solver) => (
+        {filteredSolvers.map((solver) => (
           <CommandItem
             key={solver.id}
-            onSelect={() => {
-              onSelect(solver.id);
-              setOpen(false);
-            }}
+            value={solver.id}
+            onSelect={() => onSelect(solver.id)}
             className="flex items-center"
           >
             {solver.icon}
