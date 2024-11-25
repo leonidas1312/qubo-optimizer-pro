@@ -30,7 +30,7 @@ export const SolverChatInterface = ({ code }: SolverChatInterfaceProps) => {
       setMessages(prev => [...prev, newMessage]);
       setInput('');
 
-      const { data, error } = await supabase.functions.invoke('solver-chat', {
+      const { data, error } = await supabase.functions.invoke('gpt4all-chat', {
         body: { message: input, code }
       });
 
@@ -44,7 +44,7 @@ export const SolverChatInterface = ({ code }: SolverChatInterfaceProps) => {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
-      toast.error('Failed to get response');
+      toast.error('Failed to get response. Make sure the GPT4All API server is running on port 4891.');
     } finally {
       setIsLoading(false);
     }
