@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: 'https://qubot.vercel.app/auth/callback'
+        redirectTo: 'http://localhost:8080/auth/callback'
       }
     });
 
