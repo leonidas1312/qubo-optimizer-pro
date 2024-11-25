@@ -21,7 +21,7 @@ export const AuthCallback = () => {
           const { error: signInError } = await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
-              redirectTo: 'https://zddqnxesbhbvmdcyqpuw.supabase.co/auth/v1/callback'
+              redirectTo: `${window.location.origin}/auth/callback`
             }
           });
 
