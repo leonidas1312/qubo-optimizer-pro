@@ -9,32 +9,25 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get GitHub session data from our backend
-        const response = await fetch('http://localhost:8000/api/auth/status', {
-          credentials: 'include'
-        });
-        const data = await response.json();
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (data.authenticated && data.user) {
-          // Sign in with GitHub OAuth
+        if (error) throw error;
+        
+        if (session) {
+          toast.success('Successfully signed in!');
+          navigate('/');
+        } else {
+          // If no session, initiate GitHub OAuth
           const { error: signInError } = await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
-              redirectTo: `${window.location.origin}/auth/callback`
+              redirectTo: 'https://zddqnxesbhbvmdcyqpuw.supabase.co/auth/v1/callback'
             }
           });
 
           if (signInError) {
             throw signInError;
           }
-
-          // Wait briefly for the profile to be created by the trigger
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          toast.success('Successfully signed in!');
-          navigate('/');
-        } else {
-          throw new Error('Authentication failed');
         }
       } catch (error: any) {
         console.error('Auth callback error:', error);
