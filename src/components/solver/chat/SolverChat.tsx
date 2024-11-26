@@ -6,15 +6,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-interface Message {
-  role: "assistant" | "user";
-  content: string;
-  timestamp: Date;
-}
+import { ChatMessage } from "./types";
+import { ChatMessageList } from "./ChatMessageList";
+import { ChatInput } from "./ChatInput";
 
 export const SolverChat = () => {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content: "Hello! How can I assist you today?",
@@ -32,17 +29,15 @@ export const SolverChat = () => {
 
   const fetchAvailableModels = async () => {
     try {
-      const response = await fetch("http://localhost:4891/v1/models", {
+      const response = await fetch("http://localhost:8000/api/gpt4all/models", {
         method: 'GET'
       });
       if (!response.ok) throw new Error("Failed to fetch models");
       const result = await response.json();
       
-      // Handle the correct response structure
       const modelIds = result.data?.map((model: { id: string }) => model.id) || [];
       setAvailableModels(modelIds);
       
-      // Set default model if none selected
       if (!selectedModel && modelIds.length > 0) {
         setSelectedModel(modelIds[0]);
       }
@@ -52,22 +47,11 @@ export const SolverChat = () => {
     }
   };
 
-  const formatTimestamp = (date: Date) => {
-    if (isNaN(date.getTime())) return "";
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    
-    if (minutes < 1) return "Just now";
-    if (minutes === 1) return "1 minute ago";
-    return `${minutes} minutes ago`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       role: "user",
       content: input.trim(),
       timestamp: new Date(),
@@ -78,19 +62,7 @@ export const SolverChat = () => {
     setIsLoading(true);
 
     try {
-      // First, check if the API is available
-      const checkResponse = await fetch("http://localhost:4891/v1/models", {
-        method: "GET"
-      }).catch(() => null);
-
-      if (!checkResponse?.ok) {
-        throw new Error(
-          "GPT4All API is not available. Please make sure the server is running on port 4891. " +
-          "You can download GPT4All from https://gpt4all.io"
-        );
-      }
-
-      const response = await fetch("http://localhost:4891/v1/chat/completions", {
+      const response = await fetch("http://localhost:8000/api/gpt4all/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +82,7 @@ export const SolverChat = () => {
       }
 
       const data = await response.json();
-      const assistantMessage: Message = {
+      const assistantMessage: ChatMessage = {
         role: "assistant",
         content: data.choices[0].message.content,
         timestamp: new Date(),
@@ -199,4 +171,15 @@ export const SolverChat = () => {
       </form>
     </Card>
   );
+};
+
+const formatTimestamp = (date: Date) => {
+  if (isNaN(date.getTime())) return "";
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  
+  if (minutes < 1) return "Just now";
+  if (minutes === 1) return "1 minute ago";
+  return `${minutes} minutes ago`;
 };

@@ -27,13 +27,14 @@ GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"
 GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
 FRONTEND_URL = "http://localhost:8080"
 
-# Import and include the GitHub routes
+# Import and include all routes
 from backend.routes.github_routes import router as github_router
-app.include_router(github_router, prefix="/api/github")
-
-# Import and include the solver routes
 from backend.routes.solver_routes import router as solver_router
+from backend.routes.gpt4all_routes import router as gpt4all_router
+
+app.include_router(github_router, prefix="/api/github")
 app.include_router(solver_router, prefix="/api")
+app.include_router(gpt4all_router, prefix="/api/gpt4all")
 
 @app.get("/api/auth/github")
 async def github_login():
