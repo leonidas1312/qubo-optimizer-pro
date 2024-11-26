@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Message {
   role: "assistant" | "user";
@@ -22,6 +23,24 @@ export const SolverChat = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Phi-3 Mini Instruct");
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchAvailableModels();
+  }, []);
+
+  const fetchAvailableModels = async () => {
+    try {
+      const response = await fetch("http://localhost:4891/v1/models");
+      if (!response.ok) throw new Error("Failed to fetch models");
+      const data = await response.json();
+      setAvailableModels(data.map((model: any) => model.name));
+    } catch (error) {
+      console.error("Error fetching models:", error);
+      toast.error("Failed to fetch available models");
+    }
+  };
 
   const formatTimestamp = (date: Date) => {
     if (isNaN(date.getTime())) return "";
@@ -52,9 +71,6 @@ export const SolverChat = () => {
       // First, check if the API is available
       const checkResponse = await fetch("http://localhost:4891/v1/models", {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }).catch(() => null);
 
       if (!checkResponse?.ok) {
@@ -70,7 +86,7 @@ export const SolverChat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "Qwen 1.5B",
+          model: selectedModel,
           messages: messages
             .concat(userMessage)
             .map(({ role, content }) => ({ role, content })),
@@ -104,6 +120,21 @@ export const SolverChat = () => {
       <div className="flex items-center gap-2 p-4 border-b border-white/10">
         <h2 className="text-xl font-semibold">ChatGPT</h2>
         <span className="text-sm text-muted-foreground">Online</span>
+      </div>
+
+      <div className="p-4 border-b border-white/10">
+        <Select value={selectedModel} onValueChange={setSelectedModel}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a model" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableModels.map((model) => (
+              <SelectItem key={model} value={model}>
+                {model}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <ScrollArea className="flex-1 p-4">
