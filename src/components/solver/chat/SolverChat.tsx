@@ -25,12 +25,13 @@ export const SolverChat = () => {
 
   const fetchAvailableModels = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/gpt4all/models", {
-        method: 'GET'
-      });
-      if (!response.ok) throw new Error("Failed to fetch models");
-      const result = await response.json();
+      const response = await fetch("http://localhost:8000/api/gpt4all/models");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || "Failed to fetch models");
+      }
       
+      const result = await response.json();
       const modelIds = result.data?.map((model: { id: string }) => model.id) || [];
       setAvailableModels(modelIds);
       
@@ -39,7 +40,7 @@ export const SolverChat = () => {
       }
     } catch (error) {
       console.error("Error fetching models:", error);
-      toast.error("Failed to fetch available models");
+      toast.error(error instanceof Error ? error.message : "Failed to fetch available models");
     }
   };
 
@@ -74,7 +75,8 @@ export const SolverChat = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get response from the model");
+        const error = await response.json();
+        throw new Error(error.detail || "Failed to get response from the model");
       }
 
       const data = await response.json();
