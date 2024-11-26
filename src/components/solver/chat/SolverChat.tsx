@@ -49,10 +49,23 @@ export const SolverChat = () => {
     setIsLoading(true);
 
     try {
+      // First, check if the API is available
+      const checkResponse = await fetch("http://localhost:4093/v1/models", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).catch(() => null);
+
+      if (!checkResponse?.ok) {
+        throw new Error("GPT4All API is not available. Please make sure the server is running on port 4093.");
+      }
+
       const response = await fetch("http://localhost:4093/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           model: "Qwen 1.5B",
@@ -64,7 +77,9 @@ export const SolverChat = () => {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to get response");
+      if (!response.ok) {
+        throw new Error("Failed to get response from the model");
+      }
 
       const data = await response.json();
       const assistantMessage: Message = {
@@ -75,8 +90,8 @@ export const SolverChat = () => {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      toast.error("Failed to get response from the model");
       console.error("Error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to get response from the model");
     } finally {
       setIsLoading(false);
     }
