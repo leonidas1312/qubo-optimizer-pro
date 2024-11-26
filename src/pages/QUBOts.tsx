@@ -2,6 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateQUBOtForm } from "@/components/qubots/CreateQUBOtForm";
 import { QUBOtsList } from "@/components/qubots/QUBOtsList";
+import { SolverChat } from "@/components/solver/chat/SolverChat";
 import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Github } from "lucide-react";
@@ -36,13 +37,20 @@ const QUBOts = () => {
         </div>
 
         <Tabs defaultValue="create" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="create">Create QUBOt</TabsTrigger>
+            <TabsTrigger value="chat">AI Assistant</TabsTrigger>
             <TabsTrigger value="browse">Browse QUBOts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="create">
             <CreateQUBOtForm />
+          </TabsContent>
+
+          <TabsContent value="chat">
+            <div className="max-w-3xl mx-auto">
+              <SolverChat />
+            </div>
           </TabsContent>
 
           <TabsContent value="browse">

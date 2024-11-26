@@ -169,6 +169,59 @@ export type Database = {
           },
         ]
       }
+      solvers: {
+        Row: {
+          code_content: string
+          created_at: string
+          creator_id: string
+          description: string | null
+          file_path: string | null
+          id: string
+          is_public: boolean
+          name: string
+          repository_url: string | null
+          solver_parameters: Json
+          solver_type: string
+          updated_at: string
+        }
+        Insert: {
+          code_content: string
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          is_public?: boolean
+          name: string
+          repository_url?: string | null
+          solver_parameters?: Json
+          solver_type?: string
+          updated_at?: string
+        }
+        Update: {
+          code_content?: string
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          file_path?: string | null
+          id?: string
+          is_public?: boolean
+          name?: string
+          repository_url?: string | null
+          solver_parameters?: Json
+          solver_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solvers_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
