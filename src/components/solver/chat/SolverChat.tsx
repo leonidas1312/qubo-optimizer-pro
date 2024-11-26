@@ -53,13 +53,17 @@ export const SolverChat = () => {
     setIsLoading(true);
 
     try {
-      const apiMessages = messages
-        .filter(msg => msg.role === "user")
-        .concat(userMessage)
-        .map(({ role, content }) => ({
-          role: "user",
-          content
-        }));
+      // Format messages for the API - ensure alternating user/assistant pattern
+      const apiMessages = messages.map((msg, index) => ({
+        role: index % 2 === 0 ? "user" : "assistant",
+        content: msg.content
+      }));
+
+      // Add the new user message
+      apiMessages.push({
+        role: "user",
+        content: userMessage.content
+      });
 
       const response = await fetch("http://localhost:8000/api/gpt4all/chat/completions", {
         method: "POST",
