@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
-import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 import { ChatMessage } from "./types";
 import { ChatMessageList } from "./ChatMessageList";
 import { ChatInput } from "./ChatInput";
@@ -119,67 +115,13 @@ export const SolverChat = () => {
         </Select>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex flex-col ${
-                message.role === "assistant" ? "items-start" : "items-end"
-              }`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.role === "assistant"
-                    ? "bg-white/10"
-                    : "bg-blue-600"
-                }`}
-              >
-                <p className="text-sm">{message.content}</p>
-              </div>
-              <span className="text-xs text-muted-foreground mt-1">
-                {formatTimestamp(message.timestamp)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-
-      <form onSubmit={handleSubmit} className="p-4 border-t border-white/10">
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter your message"
-            className="min-h-[44px] bg-white/5"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-      </form>
+      <ChatMessageList messages={messages} />
+      <ChatInput 
+        input={input}
+        setInput={setInput}
+        handleSubmit={handleSubmit}
+        isLoading={isLoading}
+      />
     </Card>
   );
-};
-
-const formatTimestamp = (date: Date) => {
-  if (isNaN(date.getTime())) return "";
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const minutes = Math.floor(diff / 60000);
-  
-  if (minutes < 1) return "Just now";
-  if (minutes === 1) return "1 minute ago";
-  return `${minutes} minutes ago`;
 };
