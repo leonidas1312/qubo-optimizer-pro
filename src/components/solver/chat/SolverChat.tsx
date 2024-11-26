@@ -23,7 +23,7 @@ export const SolverChat = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("Phi-3 Mini Instruct");
+  const [selectedModel, setSelectedModel] = useState("Llama 3.2 3B Instruct");
   const [availableModels, setAvailableModels] = useState<string[]>([]);
 
   useEffect(() => {
@@ -36,12 +36,16 @@ export const SolverChat = () => {
         method: 'GET'
       });
       if (!response.ok) throw new Error("Failed to fetch models");
-      const data = await response.json();
-      // Handle the models data structure correctly
-      const modelNames = Array.isArray(data.models) 
-        ? data.models.map((model: { name: string }) => model.name)
-        : Object.keys(data.models || {});
-      setAvailableModels(modelNames);
+      const result = await response.json();
+      
+      // Handle the correct response structure
+      const modelIds = result.data?.map((model: { id: string }) => model.id) || [];
+      setAvailableModels(modelIds);
+      
+      // Set default model if none selected
+      if (!selectedModel && modelIds.length > 0) {
+        setSelectedModel(modelIds[0]);
+      }
     } catch (error) {
       console.error("Error fetching models:", error);
       toast.error("Failed to fetch available models");
