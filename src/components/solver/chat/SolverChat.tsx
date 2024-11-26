@@ -68,9 +68,12 @@ export const SolverChat = () => {
           model: selectedModel,
           messages: messages
             .concat(userMessage)
-            .map(({ role, content }) => ({ role, content })),
-          max_tokens: 1000,
+            .map(({ role, content }) => ({ 
+              role: role === "user" ? "user" : "assistant", 
+              content 
+            })),
           temperature: 0.28,
+          max_tokens: 1000,
         }),
       });
 
