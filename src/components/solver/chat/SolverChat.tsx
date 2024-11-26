@@ -50,7 +50,7 @@ export const SolverChat = () => {
 
     try {
       // First, check if the API is available
-      const checkResponse = await fetch("http://localhost:4093/v1/models", {
+      const checkResponse = await fetch("http://localhost:4891/v1/models", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -58,14 +58,13 @@ export const SolverChat = () => {
       }).catch(() => null);
 
       if (!checkResponse?.ok) {
-        throw new Error("GPT4All API is not available. Please make sure the server is running on port 4093.");
+        throw new Error("GPT4All API is not available. Please make sure the server is running on port 4891.");
       }
 
-      const response = await fetch("http://localhost:4093/v1/chat/completions", {
+      const response = await fetch("http://localhost:4891/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           model: "Qwen 1.5B",
