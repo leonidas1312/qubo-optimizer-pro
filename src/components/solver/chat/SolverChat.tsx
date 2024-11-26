@@ -32,7 +32,9 @@ export const SolverChat = () => {
 
   const fetchAvailableModels = async () => {
     try {
-      const response = await fetch("http://localhost:4891/v1/models");
+      const response = await fetch("http://localhost:4891/v1/models", {
+        method: 'GET'
+      });
       if (!response.ok) throw new Error("Failed to fetch models");
       const data = await response.json();
       setAvailableModels(data.map((model: any) => model.name));
@@ -70,7 +72,7 @@ export const SolverChat = () => {
     try {
       // First, check if the API is available
       const checkResponse = await fetch("http://localhost:4891/v1/models", {
-        method: "GET",
+        method: "GET"
       }).catch(() => null);
 
       if (!checkResponse?.ok) {
