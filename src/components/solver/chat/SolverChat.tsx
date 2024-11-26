@@ -16,7 +16,7 @@ export const SolverChat = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("Llama 3.2 3B Instruct");
+  const [selectedModel, setSelectedModel] = useState("");
   const [availableModels, setAvailableModels] = useState<string[]>([]);
 
   useEffect(() => {
@@ -68,9 +68,9 @@ export const SolverChat = () => {
           model: selectedModel,
           messages: messages
             .concat(userMessage)
-            .map(({ role, content }) => ({ 
-              role: role === "user" ? "user" : "assistant", 
-              content 
+            .map(({ role, content }) => ({
+              role: role === "user" ? "user" : "assistant",
+              content
             })),
           temperature: 0.28,
           max_tokens: 1000,
