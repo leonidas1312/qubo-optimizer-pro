@@ -7,42 +7,39 @@ interface StepsProps {
   }[];
   currentStep: number;
   className?: string;
-  value?: string;
-  children?: React.ReactNode;
 }
 
-interface StepsTriggerProps {
-  value: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-interface StepsContentProps {
-  value: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-export function Steps({ steps, currentStep, className, children }: StepsProps) {
+export function Steps({ steps, currentStep, className }: StepsProps) {
   return (
     <div className={cn("space-y-4", className)}>
-      {children}
-    </div>
-  );
-}
-
-export function StepsTrigger({ value, className, children }: StepsTriggerProps) {
-  return (
-    <div className={cn("cursor-pointer", className)}>
-      {children}
-    </div>
-  );
-}
-
-export function StepsContent({ value, className, children }: StepsContentProps) {
-  return (
-    <div className={cn("mt-4", className)}>
-      {children}
+      {steps.map((step, index) => (
+        <div
+          key={step.title}
+          className={cn(
+            "flex gap-4 items-start",
+            index < currentStep && "text-muted-foreground"
+          )}
+        >
+          <div
+            className={cn(
+              "h-8 w-8 rounded-full border-2 flex items-center justify-center",
+              index < currentStep
+                ? "border-primary bg-primary text-primary-foreground"
+                : index === currentStep
+                ? "border-primary"
+                : "border-muted"
+            )}
+          >
+            <span className="text-sm font-medium">{index + 1}</span>
+          </div>
+          <div className="space-y-1.5">
+            <h3 className="font-medium leading-none">{step.title}</h3>
+            {step.description && (
+              <p className="text-sm text-muted-foreground">{step.description}</p>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

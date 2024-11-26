@@ -38,7 +38,7 @@ export function CustomNavigationMenu() {
               <NavigationMenuTrigger>
                 <div className="flex items-center gap-2">
                   <Puzzle className="h-4 w-4" />
-                  Create QUBOt
+                  Optimization Lab
                 </div>
               </NavigationMenuTrigger>
               <NavigationMenuContent>
