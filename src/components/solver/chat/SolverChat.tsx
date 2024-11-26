@@ -53,7 +53,6 @@ export const SolverChat = () => {
     setIsLoading(true);
 
     try {
-      // Only send user messages to the API
       const apiMessages = messages
         .filter(msg => msg.role === "user")
         .concat(userMessage)
