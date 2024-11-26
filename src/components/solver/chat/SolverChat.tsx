@@ -37,7 +37,11 @@ export const SolverChat = () => {
       });
       if (!response.ok) throw new Error("Failed to fetch models");
       const data = await response.json();
-      setAvailableModels(data.map((model: any) => model.name));
+      // Handle the models data structure correctly
+      const modelNames = Array.isArray(data.models) 
+        ? data.models.map((model: { name: string }) => model.name)
+        : Object.keys(data.models || {});
+      setAvailableModels(modelNames);
     } catch (error) {
       console.error("Error fetching models:", error);
       toast.error("Failed to fetch available models");
