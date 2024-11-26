@@ -7,13 +7,7 @@ import { ChatMessageList } from "./ChatMessageList";
 import { ChatInput } from "./ChatInput";
 
 export const SolverChat = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      content: "Hello! How can I assist you today?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("");
@@ -59,6 +53,15 @@ export const SolverChat = () => {
     setIsLoading(true);
 
     try {
+      // Only send user messages to the API
+      const apiMessages = messages
+        .filter(msg => msg.role === "user")
+        .concat(userMessage)
+        .map(({ role, content }) => ({
+          role: "user",
+          content
+        }));
+
       const response = await fetch("http://localhost:8000/api/gpt4all/chat/completions", {
         method: "POST",
         headers: {
@@ -66,12 +69,7 @@ export const SolverChat = () => {
         },
         body: JSON.stringify({
           model: selectedModel,
-          messages: messages
-            .concat(userMessage)
-            .map(({ role, content }) => ({
-              role: role === "user" ? "user" : "assistant",
-              content
-            })),
+          messages: apiMessages,
           temperature: 0.28,
           max_tokens: 1000,
         }),
