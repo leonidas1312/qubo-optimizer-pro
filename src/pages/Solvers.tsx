@@ -1,9 +1,13 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Star, Cpu, Target, Dna } from "lucide-react";
+import { Play, Star, Cpu, Target, Dna, Upload, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SolverChat } from "@/components/solver/chat/SolverChat";
+import { DefaultSolvers } from "@/components/qubots/DefaultSolvers";
+import { CreateQUBOtForm } from "@/components/qubots/CreateQUBOtForm";
 
 const templates = [
   {
@@ -62,53 +66,74 @@ const Solvers = () => {
 
   return (
     <DashboardLayout>
-      <div className="container space-y-12 py-8">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-bold text-center">Solver Templates</h2>
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto">
-            Get started with our pre-built solver templates. Each template includes optimized implementations
-            of popular algorithms for solving QUBO problems.
-          </p>
-        </div>
+      <div className="container max-w-6xl mx-auto py-8 px-4">
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold">Create or Use a Solver</h2>
+            <p className="text-muted-foreground">
+              Choose from our pre-built solver templates or create your own custom solver.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-          {templates.map((template) => (
-            <Card 
-              key={template.id} 
-              className="p-6 bg-black/50 backdrop-blur-sm border-white/10 hover:border-white/20 transition-all duration-300"
-            >
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    {template.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold">{template.name}</h3>
-                    <p className="text-sm text-muted-foreground">{template.description}</p>
-                  </div>
-                </div>
+          <Tabs defaultValue="templates" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="templates">Use Template</TabsTrigger>
+              <TabsTrigger value="custom">Create Custom</TabsTrigger>
+            </TabsList>
 
-                <div className="space-y-2">
-                  <h4 className="font-medium">Parameters:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                    {Object.entries(template.parameters).map(([key, value]) => (
-                      <li key={key}>
-                        {key}: <span className="text-primary">{value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <TabsContent value="templates">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {templates.map((template) => (
+                  <Card 
+                    key={template.id} 
+                    className="p-6 bg-black/50 backdrop-blur-sm border-white/10 hover:border-white/20 transition-all duration-300"
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          {template.icon}
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold">{template.name}</h3>
+                          <p className="text-sm text-muted-foreground">{template.description}</p>
+                        </div>
+                      </div>
 
-                <Button 
-                  onClick={() => handleUseSolver(template)}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-800"
-                >
-                  <Play className="mr-2 h-4 w-4" />
-                  Use Solver
-                </Button>
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Parameters:</h4>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                          {Object.entries(template.parameters).map(([key, value]) => (
+                            <li key={key}>
+                              {key}: <span className="text-primary">{value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <Button 
+                        onClick={() => handleUseSolver(template)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-800"
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        Use Solver
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
               </div>
-            </Card>
-          ))}
+            </TabsContent>
+
+            <TabsContent value="custom">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <CreateQUBOtForm />
+                </div>
+                <div>
+                  <SolverChat />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </DashboardLayout>

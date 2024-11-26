@@ -43,16 +43,10 @@ export function CustomNavigationMenu() {
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
-                  <ListItem to="/solvers" title="Solvers">
+                  <ListItem to="/solvers" title="Create Solver">
                     <div className="flex items-center gap-2">
                       <Beaker className="h-4 w-4" />
-                      <span>Browse available QUBO solvers</span>
-                    </div>
-                  </ListItem>
-                  <ListItem to="/qubots" title="Create Your Own">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>Create and manage QUBOts</span>
+                      <span>Create or use existing QUBO solvers</span>
                     </div>
                   </ListItem>
                   <ListItem to="/hardware" title="Hardware">
@@ -80,6 +74,12 @@ export function CustomNavigationMenu() {
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
+                  <ListItem to="/qubots" title="Browse QUBOts">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      <span>Browse and use community QUBOts</span>
+                    </div>
+                  </ListItem>
                   <ListItem to="/leaderboard" title="Leaderboard">
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4" />
