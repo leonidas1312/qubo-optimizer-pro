@@ -58,7 +58,10 @@ export const SolverChat = () => {
       }).catch(() => null);
 
       if (!checkResponse?.ok) {
-        throw new Error("GPT4All API is not available. Please make sure the server is running on port 4891.");
+        throw new Error(
+          "GPT4All API is not available. Please make sure the server is running on port 4891. " +
+          "You can download GPT4All from https://gpt4all.io"
+        );
       }
 
       const response = await fetch("http://localhost:4891/v1/chat/completions", {
