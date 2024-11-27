@@ -43,3 +43,36 @@ export function Steps({ steps, currentStep, className }: StepsProps) {
     </div>
   );
 }
+
+interface StepsContentProps {
+  step: number;
+  currentStep: number;
+  children: React.ReactNode;
+}
+
+export function StepsContent({ step, currentStep, children }: StepsContentProps) {
+  if (step !== currentStep) return null;
+  return <div className="mt-4">{children}</div>;
+}
+
+interface StepsTriggerProps {
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+export function StepsTrigger({ onClick, children, disabled }: StepsTriggerProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "px-4 py-2 text-sm font-medium rounded-md",
+        "bg-primary text-primary-foreground hover:bg-primary/90",
+        "disabled:opacity-50 disabled:cursor-not-allowed"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
