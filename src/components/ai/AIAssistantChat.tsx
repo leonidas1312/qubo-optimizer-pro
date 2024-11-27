@@ -37,21 +37,33 @@ export const AIAssistantChat = () => {
         throw new Error('Not authenticated');
       }
 
-      const response = await supabase.functions.invoke('ai-assistant', {
+      // Get the function URL from Supabase
+      const { data: { url } } = await supabase.functions.invoke('ai-assistant', {
         body: {
           messages: [...messages, userMessage],
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
-        responseType: 'stream',
       });
 
-      if (!response.data) {
+      // Make a direct fetch request to handle streaming
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+        }),
+      });
+
+      if (!response.body) {
         throw new Error('Invalid response from AI service');
       }
 
-      const reader = response.data.getReader();
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantMessage = "";
 
