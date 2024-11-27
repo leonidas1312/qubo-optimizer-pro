@@ -18,17 +18,16 @@ export const Sidebar = React.forwardRef<
 })
 Sidebar.displayName = "Sidebar"
 
-export const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
-  return (
-    <Button ref={ref} className={cn("sidebar-trigger", className)} onClick={onClick} {...props}>
-      {props.children}
-    </Button>
-  )
-})
-SidebarTrigger.displayName = "SidebarTrigger"
+export const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn("sidebar-header", className)} {...props}>
+        {props.children}
+      </div>
+    )
+  }
+)
+SidebarHeader.displayName = "SidebarHeader"
 
 export const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
@@ -41,16 +40,49 @@ export const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentPr
 )
 SidebarContent.displayName = "SidebarContent"
 
-export const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+export const SidebarFooter = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("sidebar-header", className)} {...props}>
+      <div ref={ref} className={cn("sidebar-footer", className)} {...props}>
         {props.children}
       </div>
     )
   }
 )
-SidebarHeader.displayName = "SidebarHeader"
+SidebarFooter.displayName = "SidebarFooter"
+
+export const SidebarRail = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn("sidebar-rail", className)} {...props}>
+        {props.children}
+      </div>
+    )
+  }
+)
+SidebarRail.displayName = "SidebarRail"
+
+export const SidebarGroup = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn("sidebar-group", className)} {...props}>
+        {props.children}
+      </div>
+    )
+  }
+)
+SidebarGroup.displayName = "SidebarGroup"
+
+export const SidebarGroupLabel = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div ref={ref} className={cn("sidebar-group-label", className)} {...props}>
+        {props.children}
+      </div>
+    )
+  }
+)
+SidebarGroupLabel.displayName = "SidebarGroupLabel"
 
 export const SidebarMenu = React.forwardRef<HTMLUListElement, React.ComponentProps<"ul">>(
   ({ className, ...props }, ref) => {
@@ -76,12 +108,13 @@ SidebarMenuItem.displayName = "SidebarMenuItem"
 
 export const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<"button"> & {
+  React.ComponentProps<typeof Button> & {
     asChild?: boolean
     isActive?: boolean
     tooltip?: string | React.ComponentProps<"div">
+    size?: "default" | "sm" | "lg"
   }
->(({ asChild = false, isActive = false, className, ...props }, ref) => {
+>(({ asChild = false, isActive = false, className, size = "default", ...props }, ref) => {
   return (
     <Button ref={ref} className={cn("sidebar-menu-button", className)} {...props}>
       {props.children}
@@ -100,6 +133,17 @@ export const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.Component
   }
 )
 SidebarMenuSub.displayName = "SidebarMenuSub"
+
+export const SidebarMenuSubItem = React.forwardRef<HTMLLIElement, React.ComponentProps<"li">>(
+  ({ className, ...props }, ref) => {
+    return (
+      <li ref={ref} className={cn("sidebar-menu-sub-item", className)} {...props}>
+        {props.children}
+      </li>
+    )
+  }
+)
+SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
 
 export const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
