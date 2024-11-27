@@ -37,34 +37,62 @@ export const AIAssistantChat = () => {
         throw new Error('Not authenticated');
       }
 
-      const { data, error } = await supabase.functions.invoke('ai-assistant', {
+      const response = await supabase.functions.invoke('ai-assistant', {
         body: {
           messages: [...messages, userMessage],
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
+        responseType: 'stream',
       });
 
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
-      }
-
-      if (!data?.choices?.[0]?.message) {
-        console.error('Invalid response format:', data);
+      if (!response.data) {
         throw new Error('Invalid response from AI service');
       }
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: data.choices[0].message.content,
-      };
+      const reader = response.data.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessage = "";
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      // Add an initial assistant message that we'll update
+      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(5);
+            if (data === '[DONE]') continue;
+            
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices[0]?.delta?.content || '';
+              assistantMessage += content;
+              
+              // Update the last message with the accumulated content
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].content = assistantMessage;
+                return newMessages;
+              });
+            } catch (e) {
+              console.error('Error parsing chunk:', e);
+            }
+          }
+        }
+      }
+
     } catch (error) {
       console.error('Error:', error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
+      // Remove the last assistant message if there was an error
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -15,7 +14,6 @@ serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
@@ -35,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -45,28 +43,20 @@ serve(async (req) => {
           },
           ...messages
         ],
-        temperature: 0.7,
-        max_tokens: 1000,
+        stream: true,
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('OpenAI API error:', error);
-      throw new Error(error.error?.message || 'Failed to get AI response');
-    }
-
-    const data = await response.json();
-    console.log('OpenAI API response:', data);
-
-    if (!data.choices?.[0]?.message) {
-      console.error('Invalid response format:', data);
-      throw new Error('Invalid response format from OpenAI API');
-    }
-
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    // Return the stream directly to the client
+    return new Response(response.body, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
     });
+
   } catch (error) {
     console.error('Error in AI assistant function:', error);
     return new Response(
