@@ -10,6 +10,7 @@ import { Message, Repository } from "./types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -54,23 +55,15 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const response = await fetch("http://localhost:8000/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "gpt4all-j",
-          messages: [...messages, userMessage],
-          temperature: 0.28,
-          max_tokens: 1000
-        }),
+      const { data: response, error } = await supabase.functions.invoke('chat-completion', {
+        body: { messages: [...messages, userMessage] }
       });
 
-      if (!response.ok) throw new Error("Failed to get AI response");
+      if (error) throw error;
 
-      const data = await response.json();
       const assistantMessage = {
         role: "assistant" as const,
-        content: data.choices[0].message.content
+        content: response.choices[0].message.content
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
