@@ -4,8 +4,13 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessageList } from "./ChatMessageList";
 import { useState } from "react";
 import { ChatMessage } from "./types";
+import { cn } from "@/lib/utils";
 
-export const AIChat = () => {
+interface AIChatProps {
+  className?: string;
+}
+
+export const AIChat = ({ className }: AIChatProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,12 +45,12 @@ export const AIChat = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-black/30 rounded-lg border border-white/10">
+    <div className={cn("flex flex-col h-full bg-black/30 backdrop-blur-sm border-r border-white/10", className)}>
       <div className="p-4 border-b border-white/10 flex items-center gap-2">
         <div className="h-2 w-2 rounded-full bg-green-500"></div>
         <h3 className="text-sm font-medium text-white/80">AI Assistant</h3>
       </div>
-      <div className="flex-1 flex flex-col min-h-[600px]">
+      <div className="flex-1 flex flex-col">
         <ChatMessageList messages={messages} />
         <ChatInput
           input={input}

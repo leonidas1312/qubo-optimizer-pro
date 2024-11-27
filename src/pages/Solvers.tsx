@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { DatasetSelector } from "@/components/solver/DatasetSelector";
 import { HardwareSelector } from "@/components/solver/HardwareSelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,7 @@ const Solvers = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState("");
   const [createMode, setCreateMode] = useState<"ai" | "existing">("existing");
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const { data: repositories } = useQuery({
     queryKey: ['repositories'],
@@ -77,7 +78,38 @@ const Solvers = () => {
     }
   ];
 
+  const handleExitFullScreen = () => {
+    setIsFullScreen(false);
+    setCreateMode("existing");
+  };
+
   const renderStep1Content = () => {
+    if (createMode === "ai") {
+      if (!isFullScreen) {
+        setIsFullScreen(true);
+      }
+      return (
+        <div className="fixed inset-0 bg-background z-50 animate-fade-in">
+          <div className="absolute top-4 right-4 z-50">
+            <Button variant="ghost" size="icon" onClick={handleExitFullScreen}>
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
+          <div className="flex h-screen">
+            <RepositorySidebar 
+              files={repositories || []} 
+              onFileSelect={setSelectedFile} 
+              className="w-80 border-r border-white/10"
+            />
+            <div className="flex-1 flex">
+              <AIChat className="flex-1" />
+              <CodePreview fileContent={fileContent} className="w-[600px]" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         <Select value={createMode} onValueChange={(value: "ai" | "existing") => setCreateMode(value)}>
@@ -90,35 +122,31 @@ const Solvers = () => {
           </SelectContent>
         </Select>
 
-        {createMode === "existing" ? (
-          <Select
-            value={selectedSolver?.id}
-            onValueChange={(value) => {
-              const solver = availableSolvers?.find((s) => s.id === value);
-              setSelectedSolver(solver);
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a solver" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSolvers?.map((solver) => (
-                <SelectItem key={solver.id} value={solver.id}>
-                  {solver.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <div className="flex h-[calc(100vh-300px)]">
-            <RepositorySidebar files={repositories || []} onFileSelect={setSelectedFile} />
-            <AIChat />
-            <CodePreview fileContent={fileContent} />
-          </div>
-        )}
+        <Select
+          value={selectedSolver?.id}
+          onValueChange={(value) => {
+            const solver = availableSolvers?.find((s) => s.id === value);
+            setSelectedSolver(solver);
+          }}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a solver" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableSolvers?.map((solver) => (
+              <SelectItem key={solver.id} value={solver.id}>
+                {solver.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     );
   };
+
+  if (isFullScreen) {
+    return renderStep1Content();
+  }
 
   return (
     <DashboardLayout>
