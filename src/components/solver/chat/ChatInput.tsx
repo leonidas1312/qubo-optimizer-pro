@@ -11,13 +11,13 @@ interface ChatInputProps {
 
 export const ChatInput = ({ input, setInput, handleSubmit, isLoading }: ChatInputProps) => {
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t border-white/10">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit} className="p-6 border-t border-white/10">
+      <div className="flex gap-3">
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter your message"
-          className="min-h-[44px] bg-white/5"
+          placeholder="Ask me anything about the code..."
+          className="min-h-[60px] bg-white/5 border-white/10 resize-none text-white/90"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -29,9 +29,9 @@ export const ChatInput = ({ input, setInput, handleSubmit, isLoading }: ChatInpu
           type="submit"
           size="icon"
           disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-blue-600 hover:bg-blue-700 h-[60px] w-[60px]"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-5 w-5" />
         </Button>
       </div>
     </form>
