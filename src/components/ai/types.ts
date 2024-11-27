@@ -4,8 +4,12 @@ export interface Message {
 }
 
 export interface Repository {
-  owner: string;
+  id: number;
   name: string;
+  full_name: string;
+  owner: {
+    login: string;
+  };
 }
 
 export interface ChatHeaderProps {

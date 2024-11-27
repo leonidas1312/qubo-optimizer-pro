@@ -50,7 +50,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setMessages((prev) => [...prev, userMessage]);
 
     setIsLoading(true);
-    // Simulate file analysis and modification for demo
     setAnalyzingFile(selectedFile);
     setModifyingFile(selectedFile);
 
