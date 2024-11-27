@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
+import { ExamplePrompts } from "./chat/ExamplePrompts";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -187,6 +188,9 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           </div>
 
           <ScrollArea className="flex-1 px-4">
+            {messages.length === 0 && (
+              <ExamplePrompts onSelectPrompt={(prompt) => handleSendMessage(prompt)} />
+            )}
             {messages.map((message, index) => (
               <ChatMessage key={index} message={message} />
             ))}
