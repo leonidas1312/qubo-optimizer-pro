@@ -33,7 +33,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
   return (
     <SidebarProvider>
-      <Sidebar className="h-screen w-64 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/75 border-r border-white/10">
+      <Sidebar className="h-screen w-64 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75 border-r border-white/10">
         <SidebarHeader className="px-4 py-6">
           <SidebarMenu>
             <SidebarMenuItem>
@@ -124,8 +124,8 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
               ) : (
                 <Button 
                   onClick={login}
-                  variant="ghost" 
-                  className="w-full justify-start hover:bg-white/5"
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-white/5 border border-white text-white hover:text-white hover:border-white/80"
                 >
                   Login with GitHub
                 </Button>
@@ -135,5 +135,5 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
         </SidebarFooter>
       </Sidebar>
     </SidebarProvider>
-  );
-};
+  )
+}

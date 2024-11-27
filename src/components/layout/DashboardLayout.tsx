@@ -1,7 +1,7 @@
 import { ReactNode, useState } from "react"
 import { NewSidebar } from "@/components/layout/NewSidebar"
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { ToggleLeft, ToggleRight } from "lucide-react"
 
 interface DashboardLayoutProps {
   children: ReactNode
@@ -23,7 +23,11 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="fixed top-4 left-4 z-50 hover:bg-white/5"
         >
-          <Menu className="h-4 w-4" />
+          {isSidebarOpen ? (
+            <ToggleLeft className="h-6 w-6 text-white" />
+          ) : (
+            <ToggleRight className="h-6 w-6 text-white" />
+          )}
         </Button>
         {children}
       </main>
