@@ -9,6 +9,7 @@ import { ChevronsUpDown, Code, FileCode, Loader2 } from "lucide-react";
 import { Message, Repository } from "./types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
+import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -25,7 +26,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [analyzingFile, setAnalyzingFile] = useState<string | null>(null);
   const [modifyingFile, setModifyingFile] = useState<string | null>(null);
 
-  // Fetch repositories when component mounts
   useEffect(() => {
     const fetchRepositories = async () => {
       try {
@@ -115,6 +115,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Analyzing file: {analyzingFile}
                   </p>
+                ) : selectedFile ? (
+                  <CodeEditor
+                    value={fileContent}
+                    onChange={() => {}}
+                    language="javascript"
+                    className="h-[200px] border-none"
+                  />
                 ) : (
                   <>
                     <p>Analyzing code structure and dependencies...</p>
@@ -154,6 +161,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Modifying file: {modifyingFile}
                   </p>
+                ) : selectedFile ? (
+                  <CodeEditor
+                    value={fileContent}
+                    onChange={() => {}}
+                    language="javascript"
+                    className="h-[200px] border-none"
+                  />
                 ) : (
                   <>
                     <p>Planning code modifications...</p>
