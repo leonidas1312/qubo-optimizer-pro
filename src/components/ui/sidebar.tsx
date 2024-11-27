@@ -197,18 +197,6 @@ const SidebarRail = React.forwardRef<
 ))
 SidebarRail.displayName = "SidebarRail"
 
-const SidebarInset = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex-1", className)}
-    {...props}
-  />
-))
-SidebarInset.displayName = "SidebarInset"
-
 export {
   Sidebar,
   SidebarHeader,
@@ -224,5 +212,4 @@ export {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarRail,
-  SidebarInset,
 }

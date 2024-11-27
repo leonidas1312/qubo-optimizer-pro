@@ -4,7 +4,6 @@ import * as React from "react"
 import { useAuth } from "@/context/AuthContext"
 import { useNavigate } from "react-router-dom"
 import {
-  AudioWaveform,
   BadgeCheck,
   Bell,
   BookOpen,
@@ -174,7 +173,7 @@ export function NewSidebar() {
                       <SidebarMenuSub>
                         {item.items?.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
+                            <SidebarMenuSubButton>
                               <a href={subItem.url}>
                                 <span>{subItem.title}</span>
                               </a>
@@ -194,7 +193,7 @@ export function NewSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger>
                     <SidebarMenuButton
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
