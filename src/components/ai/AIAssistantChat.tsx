@@ -41,6 +41,11 @@ export const AIAssistantChat = () => {
 
       if (error) throw error;
 
+      // Validate the response structure
+      if (!data?.choices?.[0]?.message?.content) {
+        throw new Error("Invalid response format from AI service");
+      }
+
       const assistantMessage: Message = {
         role: "assistant",
         content: data.choices[0].message.content,
