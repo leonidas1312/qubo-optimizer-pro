@@ -9,9 +9,14 @@ export const Sidebar = React.forwardRef<
     variant?: "sidebar" | "floating" | "inset"
     collapsible?: "offcanvas" | "icon" | "none"
   }
->(({ side = "left", variant = "sidebar", className, children, ...props }, ref) => {
+>(({ side = "left", variant = "sidebar", collapsible = "none", className, children, ...props }, ref) => {
   return (
-    <div ref={ref} className={cn("relative transition-all", className)} {...props}>
+    <div 
+      ref={ref} 
+      className={cn("relative transition-all", className)} 
+      data-collapsible={collapsible}
+      {...props}
+    >
       {children}
     </div>
   )
@@ -134,6 +139,24 @@ export const SidebarMenuButton = React.forwardRef<
   )
 })
 SidebarMenuButton.displayName = "SidebarMenuButton"
+
+export const SidebarMenuAction = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button> & {
+    showOnHover?: boolean
+  }
+>(({ showOnHover, className, ...props }, ref) => {
+  return (
+    <Button
+      ref={ref}
+      className={cn("sidebar-menu-action", showOnHover && "opacity-0 group-hover:opacity-100", className)}
+      {...props}
+    >
+      {props.children}
+    </Button>
+  )
+})
+SidebarMenuAction.displayName = "SidebarMenuAction"
 
 export const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<"ul">>(
   ({ className, ...props }, ref) => {
