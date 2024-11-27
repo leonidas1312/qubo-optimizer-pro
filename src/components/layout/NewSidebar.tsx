@@ -1,12 +1,7 @@
 import * as React from "react"
 import { useAuth } from "@/context/AuthContext"
-import { Code2, LogOut, ChevronRight, ChevronsUpDown } from "lucide-react"
+import { Code2, LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 import { navigationData } from "@/config/navigation"
 
@@ -40,8 +31,8 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
   return (
     <SidebarProvider>
-      <Sidebar className="bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
-        <SidebarHeader>
+      <Sidebar className="h-screen w-64 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+        <SidebarHeader className="px-4 py-6">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -60,38 +51,18 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
               {navigationData.navMain.map((item) => (
-                <Collapsible
-                  key={item.title}
-                  defaultOpen={item.isActive}
-                  className="group/collapsible"
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger>
-                      <SidebarMenuButton tooltip={item.title}>
-                        {item.icon && <item.icon className="h-4 w-4" />}
-                        <span>{item.title}</span>
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton onClick={() => window.location.href = subItem.url}>
-                              <span>{subItem.title}</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton onClick={() => window.location.href = item.url}>
+                    {item.icon && <item.icon className="h-4 w-4" />}
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter>
+        <SidebarFooter className="border-t border-gray-800 p-4">
           <SidebarMenu>
             <SidebarMenuItem>
               {user ? (
@@ -112,7 +83,6 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
                           {user.email}
                         </span>
                       </div>
-                      <ChevronsUpDown className="ml-auto size-4" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -157,7 +127,6 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
-        <SidebarRail />
       </Sidebar>
     </SidebarProvider>
   )
