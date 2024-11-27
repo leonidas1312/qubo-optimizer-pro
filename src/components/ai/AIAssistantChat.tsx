@@ -22,28 +22,31 @@ export const AIAssistantChat = () => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const newMessage: Message = {
+    const userMessage: Message = {
       role: "user",
       content: input.trim(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
-          messages: [...messages, newMessage],
+          messages: [...messages, userMessage],
           userId: user?.id,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
-      // Validate the response structure
-      if (!data?.choices?.[0]?.message?.content) {
-        throw new Error("Invalid response format from AI service");
+      if (!data?.choices?.[0]?.message) {
+        console.error('Invalid response format:', data);
+        throw new Error('Invalid response from AI service');
       }
 
       const assistantMessage: Message = {
@@ -54,7 +57,7 @@ export const AIAssistantChat = () => {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error:', error);
-      toast.error("Failed to get AI response. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to get AI response");
     } finally {
       setIsLoading(false);
     }

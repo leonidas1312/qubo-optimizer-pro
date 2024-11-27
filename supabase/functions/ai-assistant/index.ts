@@ -3,8 +3,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,8 +17,7 @@ serve(async (req) => {
   try {
     const { messages, userId } = await req.json();
 
-    // Initialize Supabase client
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+    console.log('Received request with messages:', messages);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -29,7 +26,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -43,8 +40,14 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('OpenAI API error:', error);
+      throw new Error(error.error?.message || 'Failed to get AI response');
+    }
+
     const data = await response.json();
-    console.log('OpenAI Response:', data);
+    console.log('OpenAI API response:', data);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
