@@ -2,18 +2,23 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
 import { AIAssistantSidebar } from "@/components/ai/AIAssistantSidebar";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+interface Repository {
+  owner: string;
+  name: string;
+}
 
 const AIAssistant = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string>("");
+  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
 
-  const handleFileSelect = async (path: string) => {
+  const handleFileSelect = async (path: string, repo: Repository) => {
     try {
+      setSelectedRepo(repo);
       const response = await fetch(
-        `http://localhost:8000/api/github/repos/${selectedRepo?.owner}/${selectedRepo?.name}/contents/${path}`,
+        `http://localhost:8000/api/github/repos/${repo.owner}/${repo.name}/contents/${path}`,
         { credentials: 'include' }
       );
       
