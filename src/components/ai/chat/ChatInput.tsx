@@ -27,21 +27,28 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <Textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        className="min-h-[60px]"
-      />
-      <Button type="submit" size="icon" disabled={isLoading}>
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Send className="h-4 w-4" />
-        )}
-      </Button>
+    <form onSubmit={handleSubmit} className="sticky bottom-0 bg-background p-4 border-t">
+      <div className="relative">
+        <Textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className="min-h-[60px] pr-12"
+        />
+        <Button 
+          type="submit" 
+          size="icon" 
+          disabled={isLoading}
+          className="absolute right-2 bottom-2"
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
     </form>
   );
 };

@@ -82,21 +82,22 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     <div className="flex flex-col h-full bg-background">
       <ChatHeader selectedFile={selectedFile} />
       
-      <div className="flex-1 p-4 space-y-4">
-        <div className="space-y-4">
-          <div className="p-4 border rounded-lg">
-            <h3 className="text-sm font-medium mb-2">Select Repository</h3>
-            <RepositoryCombobox
-              repositories={repositories}
-              onSelectRepository={onSelectRepository}
-            />
-          </div>
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full flex flex-col">
+          <div className="p-4 space-y-4">
+            <div className="p-4 border rounded-lg">
+              <h3 className="text-sm font-medium mb-2">Select Repository</h3>
+              <RepositoryCombobox
+                repositories={repositories}
+                onSelectRepository={onSelectRepository}
+              />
+            </div>
 
-          <Collapsible
-            open={isAnalyzerOpen}
-            onOpenChange={setIsAnalyzerOpen}
-            className="w-full space-y-2"
-          >
+            <Collapsible
+              open={isAnalyzerOpen}
+              onOpenChange={setIsAnalyzerOpen}
+              className="w-full space-y-2"
+            >
             <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
               <div className="flex items-center space-x-2">
                 {analyzingFile ? (
@@ -136,13 +137,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 )}
               </div>
             </CollapsibleContent>
-          </Collapsible>
+            </Collapsible>
 
-          <Collapsible
-            open={isModifierOpen}
-            onOpenChange={setIsModifierOpen}
-            className="w-full space-y-2"
-          >
+            <Collapsible
+              open={isModifierOpen}
+              onOpenChange={setIsModifierOpen}
+              className="w-full space-y-2"
+            >
             <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
               <div className="flex items-center space-x-2">
                 {modifyingFile ? (
@@ -182,22 +183,21 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 )}
               </div>
             </CollapsibleContent>
-          </Collapsible>
+            </Collapsible>
+          </div>
+
+          <ScrollArea className="flex-1 px-4">
+            {messages.map((message, index) => (
+              <ChatMessage key={index} message={message} />
+            ))}
+          </ScrollArea>
+
+          <ChatInput
+            onSend={handleSendMessage}
+            isLoading={isLoading}
+            placeholder="Enter a GitHub repository and file path (e.g., 'owner/repo/path/to/file.py') or ask for help..."
+          />
         </div>
-
-        <ScrollArea className="flex-1 h-[400px] pr-4">
-          {messages.map((message, index) => (
-            <ChatMessage key={index} message={message} />
-          ))}
-        </ScrollArea>
-      </div>
-
-      <div className="p-4 border-t">
-        <ChatInput
-          onSend={handleSendMessage}
-          isLoading={isLoading}
-          placeholder="Enter a GitHub repository and file path (e.g., 'owner/repo/path/to/file.py') or ask for help..."
-        />
       </div>
     </div>
   );
