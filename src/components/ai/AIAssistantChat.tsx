@@ -6,6 +6,7 @@ import { Send, Bot, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Message {
   role: "assistant" | "user";
@@ -21,6 +22,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [activeRole, setActiveRole] = useState<'analyzer' | 'modifier' | 'communicator'>('communicator');
   const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,6 +48,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         body: {
           messages: [...messages, userMessage],
           fileContent: fileContent,
+          role: activeRole,
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -61,6 +64,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         body: JSON.stringify({
           messages: [...messages, userMessage],
           fileContent: fileContent,
+          role: activeRole,
         }),
       });
 
@@ -128,6 +132,16 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         </p>
       </div>
 
+      <div className="p-4 border-b border-white/10">
+        <Tabs value={activeRole} onValueChange={(value: any) => setActiveRole(value)}>
+          <TabsList className="grid grid-cols-3">
+            <TabsTrigger value="analyzer">Code Analyzer</TabsTrigger>
+            <TabsTrigger value="modifier">Code Modifier</TabsTrigger>
+            <TabsTrigger value="communicator">Communicator</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message, index) => (
@@ -166,9 +180,12 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={selectedFile 
-              ? "Ask me anything about this file..." 
-              : "Ask me anything about creating QUBOts..."
+            placeholder={
+              activeRole === 'analyzer' 
+                ? "Ask me to analyze your code..."
+                : activeRole === 'modifier'
+                ? "Ask me to suggest code modifications..."
+                : "Ask me anything about creating QUBOts..."
             }
             className="min-h-[60px] bg-white/5 border-white/10 resize-none"
             onKeyDown={(e) => {
