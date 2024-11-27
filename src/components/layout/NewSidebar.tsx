@@ -2,6 +2,7 @@ import * as React from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Code2, LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useNavigate } from "react-router-dom"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ import { navigationData } from "@/config/navigation"
 
 export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
   const { user, login, logout } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <SidebarProvider>
@@ -38,6 +40,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
               <SidebarMenuButton
                 size="lg"
                 className="data-[state=open]:bg-white/5 data-[state=open]:text-white"
+                onClick={() => navigate('/')}
               >
                 <Code2 className="h-6 w-6" />
                 <span className="font-bold text-xl">QUBOt</span>
@@ -53,7 +56,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
               {navigationData.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
-                    onClick={() => window.location.href = item.url}
+                    onClick={() => navigate(item.url)}
                     className="hover:bg-white/5"
                   >
                     {item.icon && <item.icon className="h-4 w-4" />}
@@ -132,5 +135,5 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
         </SidebarFooter>
       </Sidebar>
     </SidebarProvider>
-  )
-}
+  );
+};

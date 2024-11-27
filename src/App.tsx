@@ -14,6 +14,9 @@ import Hardware from "./pages/Hardware";
 import Playground from "./pages/Playground";
 import QUBOts from "./pages/QUBOts";
 import Datasets from "./pages/Datasets";
+import Jobs from "./pages/Jobs";
+import Billing from "./pages/Billing";
+import Documentation from "./pages/Documentation";
 
 const queryClient = new QueryClient();
 
@@ -31,9 +34,11 @@ const App = () => {
                   <Route path="/solvers" element={<Solvers />} />
                   <Route path="/hardware" element={<Hardware />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/leaderboard" element={<div>Leaderboard Coming Soon</div>} />
                   <Route path="/qubots" element={<QUBOts />} />
                   <Route path="/datasets" element={<Datasets />} />
+                  <Route path="/jobs" element={<Jobs />} />
+                  <Route path="/billing" element={<Billing />} />
+                  <Route path="/docs" element={<Documentation />} />
                 </Routes>
                 <Toaster />
                 <Sonner />
