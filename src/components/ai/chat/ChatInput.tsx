@@ -67,8 +67,8 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={cn(
-            "min-h-[60px] pr-24 transition-all duration-300",
-            isCommand && "border-2 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)] animate-pulse"
+            "min-h-[60px] pr-24 transition-all duration-500",
+            isCommand && "border border-green-500/30 shadow-[0_0_8px_rgba(34,197,94,0.2)]"
           )}
         />
         <div className="absolute right-2 bottom-2 flex gap-2">
@@ -95,8 +95,8 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
             size="icon"
             disabled={isLoading}
             className={cn(
-              "h-8 w-8",
-              isCommand && "bg-green-500 hover:bg-green-600"
+              "h-8 w-8 transition-colors duration-300",
+              isCommand ? "bg-green-600 hover:bg-green-700" : ""
             )}
           >
             {isLoading ? (
