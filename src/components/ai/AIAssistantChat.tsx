@@ -12,7 +12,12 @@ interface Message {
   content: string;
 }
 
-export const AIAssistantChat = () => {
+interface AIAssistantChatProps {
+  selectedFile?: string | null;
+  fileContent?: string;
+}
+
+export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +46,7 @@ export const AIAssistantChat = () => {
       const { data: { url } } = await supabase.functions.invoke('ai-assistant', {
         body: {
           messages: [...messages, userMessage],
+          fileContent: fileContent,
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -56,6 +62,7 @@ export const AIAssistantChat = () => {
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
+          fileContent: fileContent,
         }),
       });
 
@@ -115,7 +122,10 @@ export const AIAssistantChat = () => {
       <div className="p-4 border-b border-white/10">
         <h2 className="text-xl font-semibold">AI Assistant</h2>
         <p className="text-sm text-muted-foreground">
-          I'll help you create and optimize your QUBOts
+          {selectedFile 
+            ? `Discussing: ${selectedFile}`
+            : "I'll help you create and optimize your QUBOts"
+          }
         </p>
       </div>
 
@@ -157,7 +167,10 @@ export const AIAssistantChat = () => {
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything about creating QUBOts..."
+            placeholder={selectedFile 
+              ? "Ask me anything about this file..." 
+              : "Ask me anything about creating QUBOts..."
+            }
             className="min-h-[60px] bg-white/5 border-white/10 resize-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

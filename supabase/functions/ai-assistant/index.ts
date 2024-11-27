@@ -19,12 +19,16 @@ serve(async (req) => {
       throw new Error('Missing authorization header');
     }
 
-    const { messages } = await req.json();
+    const { messages, fileContent } = await req.json();
     console.log('Processing request with messages:', messages);
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
     }
+
+    const systemMessage = fileContent 
+      ? `You are an AI assistant specialized in helping users understand and modify code. Here is the current file content:\n\n${fileContent}\n\nHelp users understand and modify this code. Be concise and clear in your explanations.`
+      : `You are an AI assistant specialized in helping users create QUBOts (Quantum-inspired optimization solvers). Help users connect optimization algorithms with datasets and hardware configurations. Be concise and clear in your explanations.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -37,9 +41,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an AI assistant specialized in helping users create QUBOts (Quantum-inspired optimization solvers). 
-            Help users connect optimization algorithms with datasets and hardware configurations. 
-            Be concise and clear in your explanations.`
+            content: systemMessage
           },
           ...messages
         ],
@@ -47,7 +49,6 @@ serve(async (req) => {
       }),
     });
 
-    // Return the stream directly to the client
     return new Response(response.body, {
       headers: {
         ...corsHeaders,
