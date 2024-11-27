@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useAuth } from "@/context/AuthContext"
-import { Code2, LogOut } from "lucide-react"
+import { Code2, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useNavigate } from "react-router-dom"
 import {
@@ -26,6 +26,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { navigationData } from "@/config/navigation"
+import { cn } from "@/lib/utils"
 
 export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
   const { user, login, logout } = useAuth()
@@ -33,23 +34,43 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
   return (
     <SidebarProvider>
-      <Sidebar className="h-screen w-64 bg-neutral-900/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/75 border-r border-white/10">
+      <Sidebar className={cn(
+        "h-screen bg-neutral-900/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/75 border-r border-white/10 transition-all duration-300",
+        isOpen ? "w-64" : "w-0"
+      )}>
         <SidebarHeader className="px-4 py-6">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-white/5 data-[state=open]:text-white"
-                onClick={() => navigate('/')}
-              >
-                <Code2 className="h-6 w-6" />
-                <span className="font-bold text-xl">QUBOt</span>
-              </SidebarMenuButton>
+              <div className="flex items-center justify-between w-full">
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-white/5 data-[state=open]:text-white"
+                  onClick={() => navigate('/')}
+                >
+                  <Code2 className="h-6 w-6" />
+                  <span className="font-bold text-xl">QUBOt</span>
+                </SidebarMenuButton>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onToggle}
+                  className="ml-2"
+                >
+                  {isOpen ? (
+                    <ChevronLeft className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className={cn(
+          "transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0"
+        )}>
           <SidebarGroup>
             <SidebarGroupLabel className="text-white/60">Platform</SidebarGroupLabel>
             <SidebarMenu>
@@ -68,7 +89,10 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="border-t border-white/10 p-4">
+        <SidebarFooter className={cn(
+          "border-t border-white/10 p-4 transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0"
+        )}>
           <SidebarMenu>
             <SidebarMenuItem>
               {user ? (
