@@ -16,7 +16,11 @@ export const AuthCallback = () => {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
 
-          navigate('/');
+          // Get the stored path and remove it from localStorage
+          const preAuthPath = localStorage.getItem('preAuthPath') || '/';
+          localStorage.removeItem('preAuthPath');
+
+          navigate(preAuthPath);
           toast.success('Successfully logged in!');
         }
       } catch (error) {
