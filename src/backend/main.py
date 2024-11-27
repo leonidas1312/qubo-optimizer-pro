@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 import requests
 from fastapi.responses import RedirectResponse
+import urllib.parse
 
 app = FastAPI()
 
@@ -38,9 +39,14 @@ app.include_router(gpt4all_router, prefix="/api/gpt4all")
 
 @app.get("/api/auth/github")
 async def github_login():
-    return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=read:user,user:email repo"
-    )
+    params = {
+        'client_id': GITHUB_CLIENT_ID,
+        'redirect_uri': GITHUB_REDIRECT_URI,
+        'scope': 'read:user user:email repo',
+        'response_type': 'code'
+    }
+    url = f"https://github.com/login/oauth/authorize?{urllib.parse.urlencode(params)}"
+    return RedirectResponse(url=url)
 
 @app.get("/api/auth/github/callback")
 async def github_callback(request: Request, code: str):
