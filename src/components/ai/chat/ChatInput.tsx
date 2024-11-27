@@ -14,11 +14,24 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
     setInput("");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        // Allow new line with Shift+Enter
+        return;
+      }
+      // Send message with just Enter
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <Textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="min-h-[60px]"
       />
