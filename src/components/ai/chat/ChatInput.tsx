@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Send, MoreVertical } from "lucide-react";
+import { Loader2, Send, MoreVertical, Terminal } from "lucide-react";
 import { ChatInputProps } from "../types";
 import {
   DropdownMenu,
@@ -115,6 +115,15 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
           </div>
         )}
         <div className="absolute right-2 bottom-2 flex gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setShowCommandMenu(!showCommandMenu)}
+          >
+            <Terminal className="h-4 w-4" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
