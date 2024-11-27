@@ -6,18 +6,40 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { ChevronsUpDown, Code, FileCode } from "lucide-react";
-import { Message } from "./types";
+import { Message, Repository } from "./types";
+import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
+import { toast } from "sonner";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
   fileContent: string;
+  onSelectRepository: (repo: Repository) => void;
 }
 
-export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatProps) => {
+export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzerOpen, setIsAnalyzerOpen] = useState(false);
   const [isModifierOpen, setIsModifierOpen] = useState(false);
+  const [repositories, setRepositories] = useState<any[]>([]);
+
+  // Fetch repositories when component mounts
+  useState(() => {
+    const fetchRepositories = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/github/repos", {
+          credentials: 'include'
+        });
+        if (!response.ok) throw new Error("Failed to fetch repositories");
+        const data = await response.json();
+        setRepositories(data);
+      } catch (error) {
+        toast.error("Error fetching repositories");
+        console.error("Error fetching repositories:", error);
+      }
+    };
+    fetchRepositories();
+  }, []);
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
@@ -50,6 +72,14 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
       
       <div className="flex-1 p-4 space-y-4">
         <div className="space-y-4">
+          <div className="p-4 border rounded-lg">
+            <h3 className="text-sm font-medium mb-2">Select Repository</h3>
+            <RepositoryCombobox
+              repositories={repositories}
+              onSelectRepository={onSelectRepository}
+            />
+          </div>
+
           <Collapsible
             open={isAnalyzerOpen}
             onOpenChange={setIsAnalyzerOpen}
