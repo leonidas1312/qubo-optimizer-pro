@@ -18,6 +18,18 @@ export const Sidebar = React.forwardRef<
 })
 Sidebar.displayName = "Sidebar"
 
+export const SidebarTrigger = React.forwardRef<
+  React.ElementRef<typeof Button>,
+  React.ComponentProps<typeof Button>
+>(({ className, onClick, ...props }, ref) => {
+  return (
+    <Button ref={ref} className={cn("sidebar-trigger", className)} onClick={onClick} {...props}>
+      {props.children}
+    </Button>
+  )
+})
+SidebarTrigger.displayName = "SidebarTrigger"
+
 export const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
     return (
