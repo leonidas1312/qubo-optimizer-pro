@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactNode, CSSProperties } from "react"
 
 export type SidebarContextType = {
   state: "expanded" | "collapsed"
@@ -15,6 +15,8 @@ export interface SidebarProviderProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   children: ReactNode
+  className?: string
+  style?: CSSProperties
 }
 
 export interface SidebarProps {
