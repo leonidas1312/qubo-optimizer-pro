@@ -33,7 +33,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
   return (
     <SidebarProvider>
-      <Sidebar className="h-screen w-64 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75 border-r border-white/10">
+      <Sidebar className="h-screen w-64 bg-neutral-900/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/75 border-r border-white/10">
         <SidebarHeader className="px-4 py-6">
           <SidebarMenu>
             <SidebarMenuItem>
