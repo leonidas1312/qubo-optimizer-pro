@@ -3,7 +3,7 @@ import { TooltipProvider } from "@radix-ui/react-tooltip"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { SidebarContext } from "./sidebar-context"
-import { SidebarProviderProps } from "./types"
+import { SidebarProviderProps, SidebarContextType } from "./types"
 
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
@@ -32,9 +32,9 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
       return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
     }, [isMobile, setOpen])
 
-    const state = open ? "expanded" : "collapsed" as const
+    const state = (open ? "expanded" : "collapsed") as const
 
-    const contextValue = React.useMemo(
+    const contextValue: SidebarContextType = React.useMemo(
       () => ({
         state,
         open,
