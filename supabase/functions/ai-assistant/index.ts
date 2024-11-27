@@ -27,12 +27,33 @@ Write clear, efficient, and well-documented code following best practices.`,
 
   communicator: `You are LLM C, a specialized language model for user communication and interaction.
 Your primary responsibilities include:
-- Explanation Generation: Present findings and code modifications in clear, user-friendly language.
-- User Guidance: Walk users through proposed changes, highlighting benefits and addressing concerns.
-- Interactive Dialogue: Engage with users to answer questions and gather preferences.
-- Documentation: Generate summaries that help users understand the integration process.
+- Coordinating with LLM A for code analysis and LLM B for code modifications
+- Presenting findings and code modifications in clear, user-friendly language
+- Walking users through proposed changes, highlighting benefits and addressing concerns
+- Engaging with users to answer questions and gather preferences
+- Generating documentation to help users understand the integration process
 Communicate professionally and empathetically, avoiding technical jargon unless appropriate.`
 };
+
+async function getAIResponse(messages: any[], systemMessage: string) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemMessage },
+        ...messages
+      ],
+      stream: true,
+    }),
+  });
+
+  return response;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -40,36 +61,20 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, fileContent, role = 'communicator' } = await req.json();
-    console.log('Processing request with role:', role);
+    const { messages, fileContent } = await req.json();
+    console.log('Processing request with LLM C');
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
     }
 
-    // Select the appropriate system message based on the role
-    const systemMessage = fileContent 
-      ? `${SYSTEM_MESSAGES[role]}\n\nHere is the current file content:\n\n${fileContent}`
-      : SYSTEM_MESSAGES[role];
+    // LLM C processes the user's request first
+    const communicatorSystemMessage = fileContent 
+      ? `${SYSTEM_MESSAGES.communicator}\n\nHere is the current file content:\n\n${fileContent}`
+      : SYSTEM_MESSAGES.communicator;
 
-    // Select the appropriate model based on the role
-    const model = role === 'analyzer' ? 'gpt-4o' : 'gpt-4o-mini';
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: systemMessage },
-          ...messages
-        ],
-        stream: true,
-      }),
-    });
+    // Get response from LLM C
+    const response = await getAIResponse(messages, communicatorSystemMessage);
 
     return new Response(response.body, {
       headers: {
