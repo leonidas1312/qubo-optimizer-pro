@@ -7,9 +7,14 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface Repository {
+  owner: string;
+  name: string;
+}
+
 interface RepositorySidebarProps {
   files: any[];
-  onFileSelect: (path: string) => void;
+  onFileSelect: (path: string, repo?: Repository) => void;
   className?: string;
   selectedFile: string | null;
 }
@@ -43,7 +48,7 @@ export const RepositorySidebar = ({ files, onFileSelect, className, selectedFile
   };
 
   const handleFileSelect = async (path: string) => {
-    onFileSelect(path);
+    onFileSelect(path, selectedRepo);
     setIsCollapsed(true);
   };
 
