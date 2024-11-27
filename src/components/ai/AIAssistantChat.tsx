@@ -54,18 +54,30 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const response = await fetch("/api/ai-assistant", {
+      const response = await fetch("http://localhost:8000/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({
+          model: "gpt4all-j",
+          messages: [...messages, userMessage],
+          temperature: 0.28,
+          max_tokens: 1000
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to get AI response");
 
       const data = await response.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
+      const assistantMessage = {
+        role: "assistant" as const,
+        content: data.choices[0].message.content
+      };
+      
+      setMessages((prev) => [...prev, assistantMessage]);
+      toast.success("Response received successfully");
     } catch (error) {
       console.error("Error:", error);
+      toast.error("Failed to get AI response");
     } finally {
       setIsLoading(false);
       setAnalyzingFile(null);
