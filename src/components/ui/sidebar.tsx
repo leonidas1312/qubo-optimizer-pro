@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const sidebarVariants = cva(
@@ -25,16 +24,18 @@ const sidebarVariants = cva(
   }
 )
 
-const Sidebar = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof sidebarVariants>
->(({ className, variant, size, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(sidebarVariants({ variant, size }), className)}
-    {...props}
-  />
-))
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof sidebarVariants> {}
+
+const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
+  ({ className, variant, size, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(sidebarVariants({ variant, size }), className)}
+      {...props}
+    />
+  )
+)
 Sidebar.displayName = "Sidebar"
 
 const SidebarHeader = React.forwardRef<

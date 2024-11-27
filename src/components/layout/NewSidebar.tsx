@@ -12,20 +12,9 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Command,
-  CreditCard,
-  Folder,
-  Forward,
   Frame,
-  GalleryVerticalEnd,
   LogOut,
-  Map,
-  MoreHorizontal,
-  PieChart,
-  Plus,
-  Settings2,
-  Sparkles,
   SquareTerminal,
-  Trash2,
 } from "lucide-react"
 
 import {
@@ -33,14 +22,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import {
   Collapsible,
   CollapsibleContent,
@@ -53,10 +34,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -64,9 +43,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarInset,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -74,10 +51,8 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-// Navigation data
 const navMain = [
   {
     title: "Playground",
@@ -153,7 +128,7 @@ export function NewSidebar() {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon">
+      <Sidebar className="h-screen">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
