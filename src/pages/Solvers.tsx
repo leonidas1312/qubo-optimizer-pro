@@ -23,6 +23,7 @@ const Solvers = () => {
   const [fileContent, setFileContent] = useState("");
   const [createMode, setCreateMode] = useState<"ai" | "existing">("existing");
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [selectedRepo, setSelectedRepo] = useState<any>(null);
 
   const { data: repositories } = useQuery({
     queryKey: ['repositories'],
@@ -83,6 +84,11 @@ const Solvers = () => {
     setCreateMode("existing");
   };
 
+  const handleFileSelect = async (path: string) => {
+    setSelectedFile(path);
+    // Add any additional file selection logic here
+  };
+
   const renderStep1Content = () => {
     if (createMode === "ai") {
       if (!isFullScreen) {
@@ -98,12 +104,18 @@ const Solvers = () => {
           <div className="flex h-screen">
             <RepositorySidebar 
               files={repositories || []} 
-              onFileSelect={setSelectedFile} 
-              className="w-80 border-r border-white/10"
+              onFileSelect={handleFileSelect}
+              selectedFile={selectedFile}
+              className="border-r border-white/10"
             />
             <div className="flex-1 flex">
               <AIChat className="flex-1" />
-              <CodePreview fileContent={fileContent} className="w-[600px]" />
+              <CodePreview 
+                fileContent={fileContent} 
+                className="w-[600px]"
+                selectedFile={selectedFile}
+                selectedRepo={selectedRepo}
+              />
             </div>
           </div>
         </div>
