@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
@@ -21,12 +21,12 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzerOpen, setIsAnalyzerOpen] = useState(false);
   const [isModifierOpen, setIsModifierOpen] = useState(false);
-  const [repositories, setRepositories] = useState<any[]>([]);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [analyzingFile, setAnalyzingFile] = useState<string | null>(null);
   const [modifyingFile, setModifyingFile] = useState<string | null>(null);
 
   // Fetch repositories when component mounts
-  useState(() => {
+  useEffect(() => {
     const fetchRepositories = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/github/repos", {

@@ -101,12 +101,6 @@ const Solvers = () => {
             </Button>
           </div>
           <div className="flex h-screen">
-            <RepositorySidebar 
-              files={repositories || []} 
-              onFileSelect={handleFileSelect}
-              selectedFile={selectedFile}
-              className="border-r border-white/10"
-            />
             <div className="flex-1 flex">
               <AIChat className="flex-1" />
               <CodePreview 
