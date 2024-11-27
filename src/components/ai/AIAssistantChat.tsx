@@ -42,7 +42,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         throw new Error('Not authenticated');
       }
 
-      // Get the function URL from Supabase
       const { data: { url } } = await supabase.functions.invoke('ai-assistant', {
         body: {
           messages: [...messages, userMessage],
@@ -53,7 +52,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         },
       });
 
-      // Make a direct fetch request to handle streaming
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -74,7 +72,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
       const decoder = new TextDecoder();
       let assistantMessage = "";
 
-      // Add an initial assistant message that we'll update
       setMessages(prev => [...prev, { role: "assistant", content: "" }]);
 
       while (true) {
@@ -86,7 +83,9 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
         
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = line.slice(5);
+            const data = line.slice(5).trim();
+            
+            // Skip the [DONE] message
             if (data === '[DONE]') continue;
             
             try {
@@ -94,14 +93,15 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
               const content = parsed.choices[0]?.delta?.content || '';
               assistantMessage += content;
               
-              // Update the last message with the accumulated content
               setMessages(prev => {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1].content = assistantMessage;
                 return newMessages;
               });
             } catch (e) {
-              console.error('Error parsing chunk:', e);
+              // Skip any parsing errors for non-JSON lines
+              console.debug('Skipping unparseable line:', data);
+              continue;
             }
           }
         }
@@ -110,7 +110,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatPr
     } catch (error) {
       console.error('Error:', error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
-      // Remove the last assistant message if there was an error
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
