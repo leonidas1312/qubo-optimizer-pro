@@ -1,6 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
-import { AIAssistantSidebar } from "@/components/ai/AIAssistantSidebar";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Repository } from "@/components/ai/types";
@@ -58,23 +57,8 @@ const AIAssistant = () => {
   return (
     <DashboardLayout>
       <div className="flex h-[calc(100vh-4rem)] relative">
-        <AIAssistantSidebar 
-          onFileSelect={handleFileSelect}
-          isCollapsed={isSidebarCollapsed}
-          fileStructure={fileStructure}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-0 top-4 z-50"
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        >
-          {isSidebarCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+
+        
         <div className="flex-1">
           <AIAssistantChat 
             selectedFile={selectedFile} 

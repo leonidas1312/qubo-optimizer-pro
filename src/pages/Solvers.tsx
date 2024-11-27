@@ -10,7 +10,6 @@ import { ArrowRight, X } from "lucide-react";
 import { DatasetSelector } from "@/components/solver/DatasetSelector";
 import { HardwareSelector } from "@/components/solver/HardwareSelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RepositorySidebar } from "@/components/solver/sidebar/RepositorySidebar";
 import { AIChat } from "@/components/solver/chat/AIChat";
 import { CodePreview } from "@/components/solver/preview/CodePreview";
 
