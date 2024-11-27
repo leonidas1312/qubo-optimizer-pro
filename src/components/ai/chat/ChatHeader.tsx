@@ -1,17 +1,14 @@
-interface ChatHeaderProps {
-  selectedFile: string | null;
-}
+import { ChatHeaderProps } from "../types";
 
 export const ChatHeader = ({ selectedFile }: ChatHeaderProps) => {
   return (
-    <div className="p-4 border-b border-white/10">
-      <h2 className="text-xl font-semibold">AI Assistant</h2>
-      <p className="text-sm text-muted-foreground">
-        {selectedFile 
-          ? `Discussing: ${selectedFile}`
-          : "I'll help you create and optimize your QUBOts"
-        }
-      </p>
+    <div className="border-b p-4">
+      <h2 className="text-lg font-semibold">AI Assistant</h2>
+      {selectedFile && (
+        <p className="text-sm text-muted-foreground mt-1">
+          Current file: {selectedFile}
+        </p>
+      )}
     </div>
   );
 };

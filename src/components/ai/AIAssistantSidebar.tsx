@@ -1,8 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-
-interface AIAssistantSidebarProps {
-  onFileSelect: (path: string, repo: Repository) => void;
-}
+import { AIAssistantSidebarProps } from "./types";
 
 export const AIAssistantSidebar = () => {
   return (

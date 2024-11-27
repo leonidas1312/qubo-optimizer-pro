@@ -1,13 +1,5 @@
 import { Bot, User } from "lucide-react";
-
-interface Message {
-  role: "assistant" | "user";
-  content: string;
-}
-
-interface ChatMessageProps {
-  message: Message;
-}
+import { ChatMessageProps } from "../types";
 
 export const ChatMessage = ({ message }: ChatMessageProps) => {
   return (

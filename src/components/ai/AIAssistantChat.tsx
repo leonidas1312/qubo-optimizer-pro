@@ -5,15 +5,15 @@ import { ChatHeader } from "./chat/ChatHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, Code, FileCode, MessageSquare } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronsUpDown, Code, FileCode } from "lucide-react";
+import { Message } from "./types";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
+interface AIAssistantChatProps {
+  selectedFile: string | null;
+  fileContent: string;
 }
 
-export const AIAssistantChat = () => {
+export const AIAssistantChat = ({ selectedFile, fileContent }: AIAssistantChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAnalyzerOpen, setIsAnalyzerOpen] = useState(false);
@@ -22,7 +22,7 @@ export const AIAssistantChat = () => {
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
-    const userMessage = { role: "user", content };
+    const userMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, userMessage]);
 
     setIsLoading(true);
@@ -46,7 +46,7 @@ export const AIAssistantChat = () => {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <ChatHeader />
+      <ChatHeader selectedFile={selectedFile} />
       
       <div className="flex-1 p-4 space-y-4">
         <div className="space-y-4">
@@ -105,11 +105,7 @@ export const AIAssistantChat = () => {
 
         <ScrollArea className="flex-1 h-[400px] pr-4">
           {messages.map((message, index) => (
-            <ChatMessage
-              key={index}
-              role={message.role}
-              content={message.content}
-            />
+            <ChatMessage key={index} message={message} />
           ))}
         </ScrollArea>
       </div>
