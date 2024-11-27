@@ -24,7 +24,7 @@ app.add_middleware(
 
 GITHUB_CLIENT_ID = "Ov23lik0nLhm747FIJLk"
 GITHUB_CLIENT_SECRET = "d329548607d310f4260a2a8c7b9d27eef763f77b"
-GITHUB_REDIRECT_URI = "http://localhost:8000/api/auth/github/callback"
+GITHUB_REDIRECT_URI = "http://localhost:8080/auth/callback"
 FRONTEND_URL = "http://localhost:8080"
 
 # Import and include all routes
