@@ -9,46 +9,15 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/auth/status', {
-          credentials: 'include'
-        });
-        const data = await response.json();
-        
-        if (data.authenticated && data.user) {
-          // Sign up new user in Supabase
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email: data.user.email,
-            password: String(data.user.id), // Convert GitHub ID to string
-            options: {
-              data: {
-                avatar_url: data.user.avatar_url,
-                github_username: data.user.login,
-                email: data.user.email,
-              }
-            }
-          });
+        const { searchParams } = new URL(window.location.href);
+        const code = searchParams.get('code');
 
-          if (signUpError && signUpError.message !== 'User already registered') {
-            throw signUpError;
-          }
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
 
-          // Sign in user
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: data.user.email,
-            password: String(data.user.id) // Convert GitHub ID to string
-          });
-
-          if (signInError) {
-            throw signInError;
-          }
-
-          // Wait for the profile to be created by the trigger
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          navigate('/uploadalgos');
+          navigate('/');
           toast.success('Successfully logged in!');
-        } else {
-          throw new Error('Authentication failed');
         }
       } catch (error) {
         console.error('Auth callback error:', error);
