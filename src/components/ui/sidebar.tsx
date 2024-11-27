@@ -5,11 +5,11 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const sidebarVariants = cva(
-  "flex flex-col gap-4 p-4",
+  "flex flex-col gap-4 p-4 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75",
   {
     variants: {
       variant: {
-        default: "bg-background",
+        default: "border-r border-gray-800",
         transparent: "bg-transparent",
       },
       size: {
