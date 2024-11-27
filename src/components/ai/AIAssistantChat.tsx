@@ -5,7 +5,7 @@ import { ChatHeader } from "./chat/ChatHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, Code, FileCode } from "lucide-react";
+import { ChevronsUpDown, Code, FileCode, Loader2 } from "lucide-react";
 import { Message, Repository } from "./types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [isAnalyzerOpen, setIsAnalyzerOpen] = useState(false);
   const [isModifierOpen, setIsModifierOpen] = useState(false);
   const [repositories, setRepositories] = useState<any[]>([]);
+  const [analyzingFile, setAnalyzingFile] = useState<string | null>(null);
+  const [modifyingFile, setModifyingFile] = useState<string | null>(null);
 
   // Fetch repositories when component mounts
   useState(() => {
@@ -48,6 +50,10 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setMessages((prev) => [...prev, userMessage]);
 
     setIsLoading(true);
+    // Simulate file analysis and modification for demo
+    setAnalyzingFile(selectedFile);
+    setModifyingFile(selectedFile);
+
     try {
       const response = await fetch("/api/ai-assistant", {
         method: "POST",
@@ -63,6 +69,8 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
+      setAnalyzingFile(null);
+      setModifyingFile(null);
     }
   };
 
@@ -87,7 +95,11 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           >
             <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
               <div className="flex items-center space-x-2">
-                <Code className="h-5 w-5 text-blue-500" />
+                {analyzingFile ? (
+                  <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                ) : (
+                  <Code className="h-5 w-5 text-blue-500" />
+                )}
                 <h4 className="text-sm font-semibold">Code Analyzer (LLM A)</h4>
               </div>
               <CollapsibleTrigger asChild>
@@ -99,9 +111,18 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             </div>
             <CollapsibleContent className="space-y-2">
               <div className="rounded-md border px-4 py-3 text-sm space-y-2">
-                <p>Analyzing code structure and dependencies...</p>
-                <p>Identifying key components and interactions...</p>
-                <p>Generating code insights for modification...</p>
+                {analyzingFile ? (
+                  <p className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Analyzing file: {analyzingFile}
+                  </p>
+                ) : (
+                  <>
+                    <p>Analyzing code structure and dependencies...</p>
+                    <p>Identifying key components and interactions...</p>
+                    <p>Generating code insights for modification...</p>
+                  </>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
@@ -113,7 +134,11 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           >
             <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
               <div className="flex items-center space-x-2">
-                <FileCode className="h-5 w-5 text-green-500" />
+                {modifyingFile ? (
+                  <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
+                ) : (
+                  <FileCode className="h-5 w-5 text-green-500" />
+                )}
                 <h4 className="text-sm font-semibold">Code Modifier (LLM B)</h4>
               </div>
               <CollapsibleTrigger asChild>
@@ -125,9 +150,18 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             </div>
             <CollapsibleContent className="space-y-2">
               <div className="rounded-md border px-4 py-3 text-sm space-y-2">
-                <p>Planning code modifications...</p>
-                <p>Implementing platform integrations...</p>
-                <p>Validating changes and maintaining functionality...</p>
+                {modifyingFile ? (
+                  <p className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Modifying file: {modifyingFile}
+                  </p>
+                ) : (
+                  <>
+                    <p>Planning code modifications...</p>
+                    <p>Implementing platform integrations...</p>
+                    <p>Validating changes and maintaining functionality...</p>
+                  </>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
