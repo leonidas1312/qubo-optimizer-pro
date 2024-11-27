@@ -17,6 +17,12 @@ import {
 export const navigationData = {
   navMain: [
     {
+      title: "AI Assistant",
+      url: "/ai-assistant",
+      icon: Bot,
+      description: "Create QUBOts with AI help",
+    },
+    {
       title: "Solvers",
       url: "/solvers",
       icon: Code2,

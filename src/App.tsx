@@ -17,6 +17,7 @@ import Datasets from "./pages/Datasets";
 import Jobs from "./pages/Jobs";
 import Billing from "./pages/Billing";
 import Documentation from "./pages/Documentation";
+import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => {
                   <Route path="/jobs" element={<Jobs />} />
                   <Route path="/billing" element={<Billing />} />
                   <Route path="/docs" element={<Documentation />} />
+                  <Route path="/ai-assistant" element={<AIAssistant />} />
                 </Routes>
                 <Toaster />
                 <Sonner />
