@@ -3,11 +3,7 @@ import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
 import { AIAssistantSidebar } from "@/components/ai/AIAssistantSidebar";
 import { useState } from "react";
 import { toast } from "sonner";
-
-interface Repository {
-  owner: string;
-  name: string;
-}
+import { Repository } from "@/components/ai/types";
 
 const AIAssistant = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
