@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Send, MoreVertical } from "lucide-react";
@@ -10,9 +10,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) => {
   const [input, setInput] = useState("");
+  const [isCommand, setIsCommand] = useState(false);
+
+  const COMMANDS = [
+    "/add_solver",
+    "/add_dataset",
+    "/add_hardware",
+    "/save_solver",
+    "/save_dataset",
+    "/run"
+  ];
+
+  useEffect(() => {
+    const isValidCommand = COMMANDS.some(cmd => input.trim().startsWith(cmd));
+    setIsCommand(isValidCommand);
+  }, [input]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,15 +48,12 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
     switch (action) {
       case 'playground':
         toast.info("Moving to playground...");
-        // TODO: Implement playground navigation
         break;
       case 'save-solver':
         toast.info("Saving as solver...");
-        // TODO: Implement solver saving
         break;
       case 'save-dataset':
         toast.info("Saving as dataset...");
-        // TODO: Implement dataset saving
         break;
     }
   };
@@ -53,7 +66,10 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="min-h-[60px] pr-24"
+          className={cn(
+            "min-h-[60px] pr-24 transition-all duration-300",
+            isCommand && "border-2 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.3)] animate-pulse"
+          )}
         />
         <div className="absolute right-2 bottom-2 flex gap-2">
           <DropdownMenu>
@@ -78,7 +94,10 @@ export const ChatInput = ({ onSend, isLoading, placeholder }: ChatInputProps) =>
             type="submit" 
             size="icon"
             disabled={isLoading}
-            className="h-8 w-8"
+            className={cn(
+              "h-8 w-8",
+              isCommand && "bg-green-500 hover:bg-green-600"
+            )}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
