@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { toast } from "sonner";
+
+// Extend the Supabase User type with our additional properties
+interface User extends SupabaseUser {
+  avatar_url?: string;
+  username?: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
