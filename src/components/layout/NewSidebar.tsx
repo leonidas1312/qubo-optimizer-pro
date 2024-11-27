@@ -31,13 +31,13 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
   return (
     <SidebarProvider>
-      <Sidebar className="h-screen w-64 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/75">
+      <Sidebar className="h-screen w-64 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/75 border-r border-white/10">
         <SidebarHeader className="px-4 py-6">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-white/5 data-[state=open]:text-white"
               >
                 <Code2 className="h-6 w-6" />
                 <span className="font-bold text-xl">QUBOt</span>
@@ -48,11 +48,14 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-white/60">Platform</SidebarGroupLabel>
             <SidebarMenu>
               {navigationData.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton onClick={() => window.location.href = item.url}>
+                  <SidebarMenuButton 
+                    onClick={() => window.location.href = item.url}
+                    className="hover:bg-white/5"
+                  >
                     {item.icon && <item.icon className="h-4 w-4" />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>
@@ -62,7 +65,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="border-t border-gray-800 p-4">
+        <SidebarFooter className="border-t border-white/10 p-4">
           <SidebarMenu>
             <SidebarMenuItem>
               {user ? (
@@ -70,7 +73,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton
                       size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                      className="hover:bg-white/5"
                     >
                       <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage src={user.avatar_url} alt={user.email || ''} />
@@ -119,7 +122,7 @@ export const NewSidebar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: ()
                 <Button 
                   onClick={login}
                   variant="ghost" 
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-white/5"
                 >
                   Login with GitHub
                 </Button>

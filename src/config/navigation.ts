@@ -1,7 +1,13 @@
 import {
+  Code2,
+  Upload,
+  Database,
+  Cpu,
+  Activity,
+  CreditCard,
+  Settings2,
   BookOpen,
   Bot,
-  Settings2,
   SquareTerminal,
   Frame,
   PieChart,
@@ -9,76 +15,42 @@ import {
 } from "lucide-react"
 
 export const navigationData = {
-  user: {
-    name: "",
-    email: "",
-    avatar: "",
-  },
   navMain: [
     {
-      title: "Playground",
-      url: "/playground",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Create New",
-          url: "/playground",
-        },
-        {
-          title: "My Solutions",
-          url: "/playground/solutions",
-        },
-      ],
+      title: "Solvers",
+      url: "/solvers",
+      icon: Code2,
+      description: "Create and manage optimization solvers",
     },
     {
-      title: "QUBOts",
-      url: "/qubots",
-      icon: Bot,
-      items: [
-        {
-          title: "My QUBOts",
-          url: "/qubots",
-        },
-        {
-          title: "Create New",
-          url: "/qubots/new",
-        },
-      ],
+      title: "Datasets",
+      url: "/datasets",
+      icon: Database,
+      description: "Manage your QUBO problem datasets",
     },
     {
-      title: "Resources",
+      title: "Hardware",
+      url: "/hardware",
+      icon: Cpu,
+      description: "Configure computing resources",
+    },
+    {
+      title: "Jobs",
+      url: "/jobs",
+      icon: Activity,
+      description: "Monitor your optimization tasks",
+    },
+    {
+      title: "Billing",
+      url: "/billing",
+      icon: CreditCard,
+      description: "Manage your usage and payments",
+    },
+    {
+      title: "Documentation",
       url: "/docs",
       icon: BookOpen,
-      items: [
-        {
-          title: "Solvers",
-          url: "/solvers",
-        },
-        {
-          title: "Hardware",
-          url: "/hardware",
-        },
-        {
-          title: "Datasets",
-          url: "/datasets",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "Profile",
-          url: "/settings/profile",
-        },
-        {
-          title: "Preferences",
-          url: "/settings/preferences",
-        },
-      ],
+      description: "Learn how to use the platform",
     },
   ],
   projects: [

@@ -12,7 +12,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div className="flex min-h-screen">
-      <div className={`fixed inset-0 bg-background/80 backdrop-blur-sm transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} />
+      <div className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-all duration-300 ${isSidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} />
       <div className={`fixed left-0 top-0 h-full transition-transform duration-300 ease-in-out z-50 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <NewSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       </div>
@@ -21,7 +21,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           variant="ghost"
           size="icon"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed top-4 left-4 z-50"
+          className="fixed top-4 left-4 z-50 hover:bg-white/5"
         >
           <Menu className="h-4 w-4" />
         </Button>
