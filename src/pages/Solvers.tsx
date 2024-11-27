@@ -6,19 +6,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight, Bot, Database, Server } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { DatasetSelector } from "@/components/solver/DatasetSelector";
 import { HardwareSelector } from "@/components/solver/HardwareSelector";
-import { SolverChat } from "@/components/solver/chat/SolverChat";
-import { FileTree } from "@/components/github/FileTree";
-import { CodeEditor } from "@/components/playground/editor/CodeEditor";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RepositorySidebar } from "@/components/solver/sidebar/RepositorySidebar";
+import { AIChat } from "@/components/solver/chat/AIChat";
+import { CodePreview } from "@/components/solver/preview/CodePreview";
 
 const Solvers = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -97,10 +91,13 @@ const Solvers = () => {
         </Select>
 
         {createMode === "existing" ? (
-          <Select value={selectedSolver?.id} onValueChange={(value) => {
-            const solver = availableSolvers?.find(s => s.id === value);
-            setSelectedSolver(solver);
-          }}>
+          <Select
+            value={selectedSolver?.id}
+            onValueChange={(value) => {
+              const solver = availableSolvers?.find((s) => s.id === value);
+              setSelectedSolver(solver);
+            }}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a solver" />
             </SelectTrigger>
@@ -113,29 +110,10 @@ const Solvers = () => {
             </SelectContent>
           </Select>
         ) : (
-          <div className="grid grid-cols-12 gap-4 h-[600px]">
-            <div className="col-span-3 border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-4">Repository Files</h3>
-              <FileTree files={repositories || []} onFileSelect={setSelectedFile} />
-            </div>
-            <div className="col-span-6">
-              <SolverChat />
-            </div>
-            <div className="col-span-3 border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-4">Selected File</h3>
-              {selectedFile ? (
-                <CodeEditor
-                  value={fileContent}
-                  onChange={setFileContent}
-                  language="python"
-                  className="h-full"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  Select a file from the repository
-                </div>
-              )}
-            </div>
+          <div className="flex h-[calc(100vh-300px)]">
+            <RepositorySidebar files={repositories || []} onFileSelect={setSelectedFile} />
+            <AIChat />
+            <CodePreview fileContent={fileContent} />
           </div>
         )}
       </div>
@@ -154,45 +132,16 @@ const Solvers = () => {
           </div>
 
           <div className="flex justify-between items-start mb-8">
-            {steps.map((step, index) => (
-              <div
-                key={index}
-                className={`flex-1 ${
-                  index < steps.length - 1
-                    ? "border-t-2 border-muted relative"
-                    : ""
-                }`}
-              >
-                <div
-                  className={`absolute top-0 left-0 transition-all duration-300 border-t-2 border-primary ${
-                    index < currentStep
-                      ? "w-full"
-                      : index === currentStep
-                      ? "w-1/2"
-                      : "w-0"
-                  }`}
-                  style={{ transform: "translateY(-1px)" }}
-                />
-                <div className="pt-8">
-                  <Steps steps={[step]} currentStep={index <= currentStep - 1 ? 1 : 0} />
-                </div>
-              </div>
-            ))}
+            <Steps steps={steps} currentStep={currentStep} />
           </div>
 
           <Card className="p-6">
             {currentStep === 1 && renderStep1Content()}
             {currentStep === 2 && (
-              <DatasetSelector
-                selectedDataset={selectedDataset}
-                onSelect={setSelectedDataset}
-              />
+              <DatasetSelector selectedDataset={selectedDataset} onSelect={setSelectedDataset} />
             )}
             {currentStep === 3 && (
-              <HardwareSelector
-                selectedHardware={selectedHardware}
-                onSelect={setSelectedHardware}
-              />
+              <HardwareSelector selectedHardware={selectedHardware} onSelect={setSelectedHardware} />
             )}
 
             <div className="flex justify-between mt-8">
@@ -207,10 +156,7 @@ const Solvers = () => {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button 
-                  onClick={() => toast.success("QUBOt created successfully!")}
-                  className="ml-auto"
-                >
+                <Button onClick={() => toast.success("QUBOt created successfully!")} className="ml-auto">
                   Create QUBOt
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
