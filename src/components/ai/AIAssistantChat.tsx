@@ -8,8 +8,6 @@ import { Message, Repository } from "./types";
 import { AIResponse } from "./types/ai-types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
-import { CodeAnalyzer } from "./chat/CodeAnalyzer";
-import { CodeModifier } from "./chat/CodeModifier";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AIAssistantChatProps {
@@ -21,11 +19,7 @@ interface AIAssistantChatProps {
 export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAnalyzerOpen, setIsAnalyzerOpen] = useState(false);
-  const [isModifierOpen, setIsModifierOpen] = useState(false);
   const [repositories, setRepositories] = useState<Repository[]>([]);
-  const [analyzingFile, setAnalyzingFile] = useState<string | null>(null);
-  const [modifyingFile, setModifyingFile] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRepositories = async () => {
@@ -51,38 +45,79 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setMessages((prev) => [...prev, userMessage]);
 
     setIsLoading(true);
-    setAnalyzingFile(selectedFile);
-    setModifyingFile(selectedFile);
 
     try {
-      const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-        body: { messages: [...messages, userMessage] }
-      });
+      // Check if the message is an ADD SOLVER command
+      if (content.startsWith("ADD SOLVER") && selectedFile) {
+        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+          body: { 
+            messages: [
+              ...messages, 
+              userMessage,
+              {
+                role: "system",
+                content: `You are a specialized AI for analyzing and adapting solver code. 
+                Current file: ${selectedFile}
+                File content: ${fileContent}
+                Guidelines: The solver must follow our platform's standard format as shown in our example algorithms:
+                1. Must have a main function with the same name as the file
+                2. Must accept standardized QUBO matrix input
+                3. Must return solution in the format (best_solution, best_cost, costs_per_iteration, elapsed_time)
+                4. Must handle parameters consistently with other solvers
+                Please analyze the code and suggest necessary modifications.`
+              }
+            ],
+            command: "ADD_SOLVER",
+            fileContent,
+            fileName: selectedFile
+          }
+        });
 
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw error;
+        if (error) {
+          console.error("Supabase function error:", error);
+          throw error;
+        }
+
+        if (!data || !data.content) {
+          console.error("Invalid response format:", data);
+          throw new Error("Invalid response from chat completion");
+        }
+
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: data.content
+        };
+        
+        setMessages((prev) => [...prev, assistantMessage]);
+        toast.success("Solver analysis completed");
+      } else {
+        // Handle regular chat messages
+        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+          body: { messages: [...messages, userMessage] }
+        });
+
+        if (error) {
+          console.error("Supabase function error:", error);
+          throw error;
+        }
+
+        if (!data || !data.content) {
+          console.error("Invalid response format:", data);
+          throw new Error("Invalid response from chat completion");
+        }
+
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: data.content
+        };
+        
+        setMessages((prev) => [...prev, assistantMessage]);
       }
-
-      if (!data || !data.content) {
-        console.error("Invalid response format:", data);
-        throw new Error("Invalid response from chat completion");
-      }
-
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: data.content
-      };
-      
-      setMessages((prev) => [...prev, assistantMessage]);
-      toast.success("Response received successfully");
     } catch (error) {
       console.error("Error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
     } finally {
       setIsLoading(false);
-      setAnalyzingFile(null);
-      setModifyingFile(null);
     }
   };
 
@@ -100,22 +135,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 onSelectRepository={onSelectRepository}
               />
             </div>
-
-            <CodeAnalyzer
-              isOpen={isAnalyzerOpen}
-              onOpenChange={setIsAnalyzerOpen}
-              analyzingFile={analyzingFile}
-              selectedFile={selectedFile}
-              fileContent={fileContent}
-            />
-
-            <CodeModifier
-              isOpen={isModifierOpen}
-              onOpenChange={setIsModifierOpen}
-              modifyingFile={modifyingFile}
-              selectedFile={selectedFile}
-              fileContent={fileContent}
-            />
           </div>
 
           <ScrollArea className="flex-1 px-4">
@@ -130,7 +149,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           <ChatInput
             onSend={handleSendMessage}
             isLoading={isLoading}
-            placeholder="Enter a GitHub repository and file path (e.g., 'owner/repo/path/to/file.py') or ask for help..."
+            placeholder="Type 'ADD SOLVER filename' to create a solver, or ask for help..."
           />
         </div>
       </div>

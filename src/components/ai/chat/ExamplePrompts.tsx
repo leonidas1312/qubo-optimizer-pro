@@ -2,9 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Add framer-motion for smooth animations
-<lov-add-dependency>framer-motion@latest</lov-add-dependency>
-
 interface ExamplePromptsProps {
   onSelectPrompt: (prompt: string) => void;
 }
@@ -13,12 +10,11 @@ export const ExamplePrompts = ({ onSelectPrompt }: ExamplePromptsProps) => {
   const [visiblePromptIndex, setVisiblePromptIndex] = useState<number | null>(null);
   const [prompts, setPrompts] = useState<string[]>([]);
 
-  // Dynamic prompts based on context
   const contextualPrompts = [
     {
       trigger: "empty",
       prompts: [
-        "Help me create a solver for the Traveling Salesman Problem",
+        "ADD SOLVER my_solver.py",
         "How can I optimize my QUBO matrix?",
         "Show me how to implement simulated annealing",
       ]
@@ -30,22 +26,12 @@ export const ExamplePrompts = ({ onSelectPrompt }: ExamplePromptsProps) => {
         "How can I optimize this algorithm?",
         "What are the potential issues in this implementation?",
       ]
-    },
-    {
-      trigger: "error",
-      prompts: [
-        "Why am I getting this error?",
-        "How can I fix this issue?",
-        "What's causing this problem?",
-      ]
     }
   ];
 
   useEffect(() => {
-    // Start with empty state prompts
     setPrompts(contextualPrompts[0].prompts);
     
-    // Show prompts one by one with a delay
     const interval = setInterval(() => {
       setVisiblePromptIndex((prev) => {
         if (prev === null) return 0;

@@ -14,11 +14,31 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
-    console.log('Processing chat completion request with messages:', messages);
+    const { messages, command, fileContent, fileName } = await req.json();
+    console.log('Processing chat completion request:', { command, fileName });
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
+    }
+
+    let systemMessage = 'You are a helpful AI assistant that helps users understand and modify code.';
+    
+    if (command === 'ADD_SOLVER') {
+      systemMessage = `You are a specialized AI for analyzing and adapting solver code.
+      Your task is to analyze the provided code and suggest modifications to make it compatible with our platform's solver format.
+      
+      Guidelines:
+      1. The solver must have a main function with the same name as the file (without extension)
+      2. It must accept a QUBO matrix and optional parameters as input
+      3. It must return a tuple: (best_solution, best_cost, costs_per_iteration, elapsed_time)
+      4. Parameters should be consistent with other solvers
+      
+      Current file: ${fileName}
+      
+      Please analyze the code and provide:
+      1. Required modifications to match our format
+      2. Any potential issues or optimizations
+      3. Example of how to use the modified solver`;
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -30,7 +50,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful AI assistant that helps users understand and modify code.' },
+          { role: 'system', content: systemMessage },
           ...messages
         ],
         temperature: 0.7,
