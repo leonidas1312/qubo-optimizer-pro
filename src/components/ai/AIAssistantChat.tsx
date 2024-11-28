@@ -1,21 +1,12 @@
 import { useState, useEffect } from "react";
 import { ChatInput } from "./chat/ChatInput";
-import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
-import { ExamplePrompts } from "./chat/ExamplePrompts";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message, Repository } from "./types";
-import { AIResponse } from "./types/ai-types";
-import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
-import { FileTree } from "@/components/github/FileTree";
-import { Button } from "@/components/ui/button";
-import { Eye, ChevronDown, ChevronUp } from "lucide-react";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { SOLVER_SYSTEM_MESSAGE } from "./constants/ai-messages";
-import { AssistantSteps } from "./chat/AssistantSteps";
+import { toast } from "sonner";
+import { RepositorySection } from "./chat/RepositorySection";
+import { ChatSection } from "./chat/ChatSection";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -29,8 +20,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [fileStructure, setFileStructure] = useState<any[]>([]);
-  const [showFilePreview, setShowFilePreview] = useState(false);
-  const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(true);
   const [currentStep, setCurrentStep] = useState<string>("");
   const session = useSession();
@@ -70,6 +59,23 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     }
   };
 
+  const handleFileSelect = async (path: string) => {
+    try {
+      if (!selectedRepo) return;
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${selectedRepo.owner.login}/${selectedRepo.name}/contents/${path}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) throw new Error('Failed to fetch file content');
+      const data = await response.json();
+      const content = atob(data.content);
+      toast.success('File loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load file content');
+      console.error('Error fetching file content:', error);
+    }
+  };
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
     if (!session) {
@@ -83,7 +89,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setCurrentStep("Creating assistant...");
 
     try {
-      const response = await fetch(`${supabase.functions.url}/ai-assistant`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai-assistant`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +97,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          fileContent: generatedFileContent
+          fileContent
         })
       });
 
@@ -136,68 +142,22 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col">
-          <Collapsible
-            open={isSelectionOpen}
+          <RepositorySection
+            repositories={repositories}
+            selectedRepo={selectedRepo}
+            fileStructure={fileStructure}
+            isSelectionOpen={isSelectionOpen}
+            onSelectRepository={handleRepoSelect}
+            onFileSelect={handleFileSelect}
             onOpenChange={setIsSelectionOpen}
-            className="border-b"
-          >
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full flex items-center justify-between p-4 h-auto">
-                <span className="font-medium">Repository & File Selection</span>
-                {isSelectionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="p-4 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Select Repository</h3>
-                  <RepositoryCombobox
-                    repositories={repositories}
-                    onSelectRepository={handleRepoSelect}
-                  />
-                </div>
-                {selectedRepo && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Select File</h3>
-                    <div className="border rounded-lg max-h-48 overflow-y-auto">
-                      <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          />
 
-          <ScrollArea className="flex-1 px-4">
-            {messages.length === 0 ? (
-              <ExamplePrompts onSelectPrompt={(prompt) => handleSendMessage(prompt)} />
-            ) : (
-              <>
-                {messages.map((message, index) => (
-                  <ChatMessage key={index} message={message} />
-                ))}
-                {isLoading && <AssistantSteps currentStep={currentStep} />}
-              </>
-            )}
-          </ScrollArea>
-
-          {showFilePreview && generatedFileContent && (
-            <div className="p-4">
-              <Button
-                onClick={() => setShowFilePreview(!showFilePreview)}
-                variant="outline"
-                className="mb-2"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Toggle File Preview
-              </Button>
-              {showFilePreview && (
-                <pre className="p-4 bg-secondary rounded-lg overflow-x-auto">
-                  <code>{generatedFileContent}</code>
-                </pre>
-              )}
-            </div>
-          )}
+          <ChatSection
+            messages={messages}
+            isLoading={isLoading}
+            currentStep={currentStep}
+            onSelectPrompt={handleSendMessage}
+          />
 
           <ChatInput
             onSend={handleSendMessage}
