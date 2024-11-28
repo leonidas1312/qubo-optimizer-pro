@@ -40,6 +40,25 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     fetchRepositories();
   }, []);
 
+  const fetchFileContent = async (repo: Repository, filename: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/contents/${filename}`,
+        { credentials: 'include' }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch file content');
+      }
+      
+      const data = await response.json();
+      return atob(data.content); // Decode base64 content
+    } catch (error) {
+      console.error('Error fetching file:', error);
+      throw error;
+    }
+  };
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
     if (!session) {
@@ -54,48 +73,58 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
     try {
       // Check if the message is an ADD SOLVER command
-      if (content.startsWith("ADD SOLVER") && selectedFile) {
-        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-          body: { 
-            messages: [
-              ...messages, 
-              userMessage,
-              {
-                role: "system",
-                content: `You are a specialized AI for analyzing and adapting solver code. 
-                Current file: ${selectedFile}
-                File content: ${fileContent}
-                Guidelines: The solver must follow our platform's standard format as shown in our example algorithms:
-                1. Must have a main function with the same name as the file
-                2. Must accept standardized QUBO matrix input
-                3. Must return solution in the format (best_solution, best_cost, costs_per_iteration, elapsed_time)
-                4. Must handle parameters consistently with other solvers
-                Please analyze the code and suggest necessary modifications.`
-              }
-            ],
-            command: "ADD_SOLVER",
-            fileContent,
-            fileName: selectedFile
-          }
-        });
-
-        if (error) {
-          console.error("Supabase function error:", error);
-          throw error;
-        }
-
-        if (!data || !data.content) {
-          console.error("Invalid response format:", data);
-          throw new Error("Invalid response from chat completion");
-        }
-
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.content
-        };
+      if (content.startsWith("ADD SOLVER") && repositories.length > 0) {
+        const filename = content.split("ADD SOLVER")[1].trim();
+        const selectedRepo = repositories[0]; // Use first repo or let user select
         
-        setMessages((prev) => [...prev, assistantMessage]);
-        toast.success("Solver analysis completed");
+        try {
+          const fileContent = await fetchFileContent(selectedRepo, filename);
+          
+          const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+            body: { 
+              messages: [
+                ...messages, 
+                userMessage,
+                {
+                  role: "system",
+                  content: `You are a specialized AI for analyzing and adapting solver code. 
+                  Current file: ${filename}
+                  File content: ${fileContent}
+                  Guidelines: The solver must follow our platform's standard format as shown in our example algorithms:
+                  1. Must have a main function with the same name as the file
+                  2. Must accept standardized QUBO matrix input
+                  3. Must return solution in the format (best_solution, best_cost, costs_per_iteration, elapsed_time)
+                  4. Must handle parameters consistently with other solvers
+                  Please analyze the code and suggest necessary modifications.`
+                }
+              ],
+              command: "ADD_SOLVER",
+              fileContent,
+              fileName: filename
+            }
+          });
+
+          if (error) {
+            console.error("Supabase function error:", error);
+            throw error;
+          }
+
+          if (!data || !data.content) {
+            console.error("Invalid response format:", data);
+            throw new Error("Invalid response from chat completion");
+          }
+
+          const assistantMessage: Message = {
+            role: "assistant",
+            content: data.content
+          };
+          
+          setMessages((prev) => [...prev, assistantMessage]);
+          toast.success("Solver analysis completed");
+        } catch (error) {
+          console.error("Error processing file:", error);
+          toast.error("Failed to process file");
+        }
       } else {
         // Handle regular chat messages
         const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
