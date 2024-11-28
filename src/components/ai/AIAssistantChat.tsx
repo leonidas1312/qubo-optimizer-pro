@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { SOLVER_SYSTEM_MESSAGE } from "./constants/ai-messages";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -114,14 +115,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 userMessage,
                 {
                   role: "system",
-                  content: `You are a specialized AI for analyzing and adapting solver code. 
-                  Current file content: ${generatedFileContent}
-                  Guidelines: The solver must follow our platform's standard format as shown in our example algorithms:
-                  1. Must have a main function with the same name as the file
-                  2. Must accept standardized QUBO matrix input
-                  3. Must return solution in the format (best_solution, best_cost, costs_per_iteration, elapsed_time)
-                  4. Must handle parameters consistently with other solvers
-                  Please analyze the code and suggest necessary modifications.`
+                  content: SOLVER_SYSTEM_MESSAGE(generatedFileContent)
                 }
               ],
               command: "ADD_SOLVER",
