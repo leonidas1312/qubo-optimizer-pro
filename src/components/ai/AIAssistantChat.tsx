@@ -55,19 +55,23 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const { data: response, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+      const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
         body: { messages: [...messages, userMessage] }
       });
 
-      if (error) throw error;
-
-      if (!response?.content) {
-        throw new Error("Invalid response format from chat completion");
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw error;
       }
 
-      const assistantMessage = {
-        role: "assistant" as const,
-        content: response.content
+      if (!data || !data.content) {
+        console.error("Invalid response format:", data);
+        throw new Error("Invalid response from chat completion");
+      }
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.content
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
