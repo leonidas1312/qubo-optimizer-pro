@@ -1,59 +1,10 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-const SYSTEM_MESSAGES = {
-  analyzer: `You are LLM A, a specialized language model for code analysis.
-Your primary responsibilities include:
-- Code Parsing: Analyze the user's codebase to identify functions, classes, modules, and their interdependencies.
-- Dependency Mapping: Create dependency graphs and module interaction diagrams.
-- Code Summarization: Generate concise summaries of code components.
-- Data Extraction: Identify areas where the code interacts with datasets and external solvers.
-Focus on understanding the overall architecture without modifying the code.`,
-
-  modifier: `You are LLM B, a specialized language model for code modification and refactoring.
-Your primary responsibilities include:
-- Integration Planning: Determine where and how code should be modified for platform integration.
-- Code Refactoring: Generate code modifications that replace external solver calls with platform APIs.
-- Dependency Management: Adjust code to handle dependencies compatible with the platform.
-- Maintain Functionality: Preserve core functionality while making necessary changes.
-Write clear, efficient, and well-documented code following best practices.`,
-
-  communicator: `You are LLM C, a specialized language model for user communication and interaction.
-Your primary responsibilities include:
-- Coordinating with LLM A for code analysis and LLM B for code modifications
-- Presenting findings and code modifications in clear, user-friendly language
-- Walking users through proposed changes, highlighting benefits and addressing concerns
-- Engaging with users to answer questions and gather preferences
-- Generating documentation to help users understand the integration process
-Communicate professionally and empathetically, avoiding technical jargon unless appropriate.`
-};
-
-async function getAIResponse(messages: any[], systemMessage: string) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemMessage },
-        ...messages
-      ],
-      stream: true,
-    }),
-  });
-
-  return response;
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -62,38 +13,134 @@ serve(async (req) => {
 
   try {
     const { messages, fileContent } = await req.json();
-    console.log('Processing request with LLM C');
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
     }
 
-    // LLM C processes the user's request first
-    const communicatorSystemMessage = fileContent 
-      ? `${SYSTEM_MESSAGES.communicator}\n\nHere is the current file content:\n\n${fileContent}`
-      : SYSTEM_MESSAGES.communicator;
+    // Create an assistant
+    const assistantResponse = await fetch('https://api.openai.com/v1/assistants', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      },
+      body: JSON.stringify({
+        name: "Code Assistant",
+        instructions: "You are a specialized AI assistant for analyzing and modifying code.",
+        tools: [{ type: "code_interpreter" }],
+        model: "gpt-4o"
+      })
+    });
 
-    // Get response from LLM C
-    const response = await getAIResponse(messages, communicatorSystemMessage);
+    const assistant = await assistantResponse.json();
 
-    return new Response(response.body, {
+    // Create a thread
+    const threadResponse = await fetch('https://api.openai.com/v1/threads', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      }
+    });
+
+    const thread = await threadResponse.json();
+
+    // Add a message to the thread
+    await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      },
+      body: JSON.stringify({
+        role: "user",
+        content: messages[messages.length - 1].content
+      })
+    });
+
+    // Run the assistant
+    const runResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      },
+      body: JSON.stringify({
+        assistant_id: assistant.id
+      })
+    });
+
+    const run = await runResponse.json();
+
+    // Stream the response
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        while (true) {
+          const statusResponse = await fetch(
+            `https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${openAIApiKey}`,
+                'OpenAI-Beta': 'assistants=v2'
+              }
+            }
+          );
+
+          const status = await statusResponse.json();
+
+          if (status.status === 'completed') {
+            const messagesResponse = await fetch(
+              `https://api.openai.com/v1/threads/${thread.id}/messages`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${openAIApiKey}`,
+                  'OpenAI-Beta': 'assistants=v2'
+                }
+              }
+            );
+
+            const messages = await messagesResponse.json();
+            const lastMessage = messages.data[0];
+
+            controller.enqueue(encoder.encode(JSON.stringify({
+              content: lastMessage.content[0].text.value,
+              status: 'completed'
+            })));
+            controller.close();
+            break;
+          } else if (status.status === 'failed') {
+            throw new Error('Assistant run failed');
+          }
+
+          // Wait before checking again
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    });
+
+    return new Response(stream, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+        'Connection': 'keep-alive'
+      }
     });
 
   } catch (error) {
     console.error('Error in AI assistant function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unexpected error occurred' 
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }

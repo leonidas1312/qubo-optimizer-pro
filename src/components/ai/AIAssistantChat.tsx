@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SOLVER_SYSTEM_MESSAGE } from "./constants/ai-messages";
+import { AssistantSteps } from "./chat/AssistantSteps";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -31,6 +32,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(true);
+  const [currentStep, setCurrentStep] = useState<string>("");
   const session = useSession();
 
   useEffect(() => {
@@ -68,32 +70,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     }
   };
 
-  const handleFileSelect = async (path: string) => {
-    try {
-      if (!selectedRepo) {
-        toast.error("Please select a repository first");
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/github/repos/${selectedRepo.owner.login}/${selectedRepo.name}/contents/${path}`,
-        { credentials: 'include' }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch file content');
-      }
-      
-      const data = await response.json();
-      const content = atob(data.content);
-      setGeneratedFileContent(content);
-      toast.success('File loaded successfully');
-    } catch (error) {
-      toast.error('Failed to load file content');
-      console.error('Error fetching file:', error);
-    }
-  };
-
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
     if (!session) {
@@ -104,74 +80,53 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     const userMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setCurrentStep("Creating assistant...");
 
     try {
-      if (content.startsWith("ADD SOLVER") && selectedRepo && generatedFileContent) {
-        try {
-          const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-            body: { 
-              messages: [
-                ...messages, 
-                userMessage,
-                {
-                  role: "system",
-                  content: SOLVER_SYSTEM_MESSAGE(generatedFileContent)
-                }
-              ],
-              command: "ADD_SOLVER",
-              fileContent: generatedFileContent
-            }
-          });
+      const response = await fetch(`${supabase.functions.url}/ai-assistant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          fileContent: generatedFileContent
+        })
+      });
 
-          if (error) {
-            console.error("Supabase function error:", error);
-            throw error;
-          }
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
 
-          if (!data || !data.content) {
-            console.error("Invalid response format:", data);
-            throw new Error("Invalid response from chat completion");
-          }
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response stream available');
 
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = new TextDecoder().decode(value);
+        const data = JSON.parse(text);
+
+        if (data.status === 'completed') {
           const assistantMessage: Message = {
             role: "assistant",
             content: data.content
           };
-          
           setMessages((prev) => [...prev, assistantMessage]);
-          setShowFilePreview(true);
-          toast.success("Solver analysis completed");
-        } catch (error) {
-          console.error("Error processing file:", error);
-          toast.error("Failed to process file");
+          break;
+        } else {
+          setCurrentStep(data.step || "Processing...");
         }
-      } else {
-        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-          body: { messages: [...messages, userMessage] }
-        });
-
-        if (error) {
-          console.error("Supabase function error:", error);
-          throw error;
-        }
-
-        if (!data || !data.content) {
-          console.error("Invalid response format:", data);
-          throw new Error("Invalid response from chat completion");
-        }
-
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.content
-        };
-        
-        setMessages((prev) => [...prev, assistantMessage]);
       }
+
     } catch (error) {
       console.error("Error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
     } finally {
       setIsLoading(false);
+      setCurrentStep("");
     }
   };
 
@@ -214,12 +169,16 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           </Collapsible>
 
           <ScrollArea className="flex-1 px-4">
-            {messages.length === 0 && (
+            {messages.length === 0 ? (
               <ExamplePrompts onSelectPrompt={(prompt) => handleSendMessage(prompt)} />
+            ) : (
+              <>
+                {messages.map((message, index) => (
+                  <ChatMessage key={index} message={message} />
+                ))}
+                {isLoading && <AssistantSteps currentStep={currentStep} />}
+              </>
             )}
-            {messages.map((message, index) => (
-              <ChatMessage key={index} message={message} />
-            ))}
           </ScrollArea>
 
           {showFilePreview && generatedFileContent && (
@@ -243,7 +202,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           <ChatInput
             onSend={handleSendMessage}
             isLoading={isLoading}
-            placeholder="Type 'ADD_SOLVER' to create a solver, or ask for help..."
+            placeholder="Ask me anything about the code..."
           />
         </div>
       </div>
