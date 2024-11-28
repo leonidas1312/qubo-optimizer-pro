@@ -61,13 +61,14 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
       if (error) throw error;
 
-      if (!response?.content) {
-        throw new Error("Invalid response format from chat completion");
+      if (!response) {
+        throw new Error("No response received from chat completion");
       }
 
-      const assistantMessage = {
-        role: "assistant" as const,
-        content: response.content
+      // Create assistant message from the response content
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: response.content || "I apologize, but I couldn't generate a proper response."
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
@@ -75,6 +76,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     } catch (error) {
       console.error("Error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
+      
+      // Add an error message to the chat
+      const errorMessage: Message = {
+        role: "assistant",
+        content: "I apologize, but I encountered an error while processing your request. Please try again."
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
       setAnalyzingFile(null);
