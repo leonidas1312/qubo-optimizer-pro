@@ -56,16 +56,17 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const { data: response, error } = await supabase.functions.invoke('chat-completion', {
-        body: { messages: [...messages, userMessage] }
+      const { data: response, error } = await supabase.functions.invoke('ai-assistant', {
+          body: { messages: [...messages, userMessage] }
       });
 
       if (error) throw error;
 
-      const assistantMessage = {
-        role: "assistant" as const,
-        content: response.choices[0].message.content
-      };
+      const assistantMessage ={
+
+          role: "assistant" as const,
+          content: response.choices[0].message?.content
+          };
       
       setMessages((prev) => [...prev, assistantMessage]);
       toast.success("Response received successfully");
