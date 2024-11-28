@@ -8,7 +8,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { ChevronsUpDown, Code, FileCode, Loader2 } from "lucide-react";
 import { Message, Repository } from "./types";
-import { ChatCompletionResponse } from "./types/responses";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
@@ -18,6 +17,15 @@ interface AIAssistantChatProps {
   selectedFile: string | null;
   fileContent: string;
   onSelectRepository: (repo: Repository) => void;
+}
+
+// Extracted types for better type safety
+interface ChatCompletionResponse {
+  choices?: Array<{
+    message: {
+      content: string;
+    };
+  }>;
 }
 
 export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
@@ -64,13 +72,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       if (error) throw error;
 
       // Validate response structure
-      if (!response?.data?.content) {
+      if (!response?.choices?.[0]?.message?.content) {
         throw new Error("Invalid response format from chat completion");
       }
 
       const assistantMessage = {
         role: "assistant" as const,
-        content: response.data.content
+        content: response.choices[0].message.content
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
