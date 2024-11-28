@@ -4,28 +4,18 @@ import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
 import { ExamplePrompts } from "./chat/ExamplePrompts";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, Code, FileCode, Loader2 } from "lucide-react";
 import { Message, Repository } from "./types";
+import { AIResponse } from "./types/ai-types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
-import { CodeEditor } from "@/components/playground/editor/CodeEditor";
+import { CodeAnalyzer } from "./chat/CodeAnalyzer";
+import { CodeModifier } from "./chat/CodeModifier";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
   fileContent: string;
   onSelectRepository: (repo: Repository) => void;
-}
-
-// Extracted types for better type safety
-interface ChatCompletionResponse {
-  choices?: Array<{
-    message: {
-      content: string;
-    };
-  }>;
 }
 
 export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
@@ -65,20 +55,19 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const { data: response, error } = await supabase.functions.invoke<ChatCompletionResponse>('chat-completion', {
+      const { data: response, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
         body: { messages: [...messages, userMessage] }
       });
 
       if (error) throw error;
 
-      // Validate response structure
-      if (!response?.choices?.[0]?.message?.content) {
+      if (!response?.content) {
         throw new Error("Invalid response format from chat completion");
       }
 
       const assistantMessage = {
         role: "assistant" as const,
-        content: response.choices[0].message.content
+        content: response.content
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
@@ -108,97 +97,21 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
               />
             </div>
 
-            <Collapsible
-              open={isAnalyzerOpen}
+            <CodeAnalyzer
+              isOpen={isAnalyzerOpen}
               onOpenChange={setIsAnalyzerOpen}
-              className="w-full space-y-2"
-            >
-            <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                {analyzingFile ? (
-                  <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-                ) : (
-                  <Code className="h-5 w-5 text-blue-500" />
-                )}
-                <h4 className="text-sm font-semibold">Code Analyzer (LLM A)</h4>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-9 p-0">
-                  <ChevronsUpDown className="h-4 w-4" />
-                  <span className="sr-only">Toggle</span>
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="space-y-2">
-              <div className="rounded-md border px-4 py-3 text-sm space-y-2">
-                {analyzingFile ? (
-                  <p className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing file: {analyzingFile}
-                  </p>
-                ) : selectedFile ? (
-                  <CodeEditor
-                    value={fileContent}
-                    onChange={() => {}}
-                    language="javascript"
-                    className="h-[200px] border-none"
-                  />
-                ) : (
-                  <>
-                    <p>Analyzing code structure and dependencies...</p>
-                    <p>Identifying key components and interactions...</p>
-                    <p>Generating code insights for modification...</p>
-                  </>
-                )}
-              </div>
-            </CollapsibleContent>
-            </Collapsible>
+              analyzingFile={analyzingFile}
+              selectedFile={selectedFile}
+              fileContent={fileContent}
+            />
 
-            <Collapsible
-              open={isModifierOpen}
+            <CodeModifier
+              isOpen={isModifierOpen}
               onOpenChange={setIsModifierOpen}
-              className="w-full space-y-2"
-            >
-            <div className="flex items-center justify-between space-x-4 p-2 bg-muted/50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                {modifyingFile ? (
-                  <Loader2 className="h-5 w-5 text-green-500 animate-spin" />
-                ) : (
-                  <FileCode className="h-5 w-5 text-green-500" />
-                )}
-                <h4 className="text-sm font-semibold">Code Modifier (LLM B)</h4>
-              </div>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-9 p-0">
-                  <ChevronsUpDown className="h-4 w-4" />
-                  <span className="sr-only">Toggle</span>
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="space-y-2">
-              <div className="rounded-md border px-4 py-3 text-sm space-y-2">
-                {modifyingFile ? (
-                  <p className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Modifying file: {modifyingFile}
-                  </p>
-                ) : selectedFile ? (
-                  <CodeEditor
-                    value={fileContent}
-                    onChange={() => {}}
-                    language="javascript"
-                    className="h-[200px] border-none"
-                  />
-                ) : (
-                  <>
-                    <p>Planning code modifications...</p>
-                    <p>Implementing platform integrations...</p>
-                    <p>Validating changes and maintaining functionality...</p>
-                  </>
-                )}
-              </div>
-            </CollapsibleContent>
-            </Collapsible>
+              modifyingFile={modifyingFile}
+              selectedFile={selectedFile}
+              fileContent={fileContent}
+            />
           </div>
 
           <ScrollArea className="flex-1 px-4">
