@@ -19,6 +19,15 @@ interface AIAssistantChatProps {
   onSelectRepository: (repo: Repository) => void;
 }
 
+// Extracted types for better type safety
+interface ChatCompletionResponse {
+  choices?: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+}
+
 export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,11 +65,16 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setModifyingFile(selectedFile);
 
     try {
-      const { data: response, error } = await supabase.functions.invoke('chat-completion', {
+      const { data: response, error } = await supabase.functions.invoke<ChatCompletionResponse>('chat-completion', {
         body: { messages: [...messages, userMessage] }
       });
 
       if (error) throw error;
+
+      // Validate response structure
+      if (!response?.choices?.[0]?.message?.content) {
+        throw new Error("Invalid response format from chat completion");
+      }
 
       const assistantMessage = {
         role: "assistant" as const,
@@ -71,7 +85,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       toast.success("Response received successfully");
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to get AI response");
+      toast.error(error instanceof Error ? error.message : "Failed to get AI response");
     } finally {
       setIsLoading(false);
       setAnalyzingFile(null);
