@@ -7,6 +7,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message, Repository } from "./types";
 import { AIResponse } from "./types/ai-types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
+import { FileTree } from "@/components/github/FileTree";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
@@ -21,6 +24,10 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
+  const [fileStructure, setFileStructure] = useState<any[]>([]);
+  const [showFilePreview, setShowFilePreview] = useState(false);
+  const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
   const session = useSession();
 
   useEffect(() => {
@@ -40,10 +47,33 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     fetchRepositories();
   }, []);
 
-  const fetchFileContent = async (repo: Repository, filename: string) => {
+  const handleRepoSelect = async (repo: Repository) => {
     try {
+      setSelectedRepo(repo);
+      onSelectRepository(repo);
       const response = await fetch(
-        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/contents/${filename}`,
+        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/tree`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) throw new Error('Failed to fetch file structure');
+      const structure = await response.json();
+      setFileStructure(structure);
+      toast.success('Repository files loaded successfully');
+    } catch (error) {
+      toast.error('Failed to load repository files');
+      console.error('Error fetching file structure:', error);
+    }
+  };
+
+  const handleFileSelect = async (path: string) => {
+    try {
+      if (!selectedRepo) {
+        toast.error("Please select a repository first");
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:8000/api/github/repos/${selectedRepo.owner.login}/${selectedRepo.name}/contents/${path}`,
         { credentials: 'include' }
       );
       
@@ -52,10 +82,12 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       }
       
       const data = await response.json();
-      return atob(data.content); // Decode base64 content
+      const content = atob(data.content);
+      setGeneratedFileContent(content);
+      toast.success('File loaded successfully');
     } catch (error) {
+      toast.error('Failed to load file content');
       console.error('Error fetching file:', error);
-      throw error;
     }
   };
 
@@ -68,18 +100,11 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
     const userMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, userMessage]);
-
     setIsLoading(true);
 
     try {
-      // Check if the message is an ADD SOLVER command
-      if (content.startsWith("ADD SOLVER") && repositories.length > 0) {
-        const filename = content.split("ADD SOLVER")[1].trim();
-        const selectedRepo = repositories[0]; // Use first repo or let user select
-        
+      if (content.startsWith("ADD SOLVER") && selectedRepo && generatedFileContent) {
         try {
-          const fileContent = await fetchFileContent(selectedRepo, filename);
-          
           const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
             body: { 
               messages: [
@@ -88,8 +113,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 {
                   role: "system",
                   content: `You are a specialized AI for analyzing and adapting solver code. 
-                  Current file: ${filename}
-                  File content: ${fileContent}
+                  Current file content: ${generatedFileContent}
                   Guidelines: The solver must follow our platform's standard format as shown in our example algorithms:
                   1. Must have a main function with the same name as the file
                   2. Must accept standardized QUBO matrix input
@@ -99,8 +123,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
                 }
               ],
               command: "ADD_SOLVER",
-              fileContent,
-              fileName: filename
+              fileContent: generatedFileContent
             }
           });
 
@@ -120,13 +143,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           };
           
           setMessages((prev) => [...prev, assistantMessage]);
+          setShowFilePreview(true);
           toast.success("Solver analysis completed");
         } catch (error) {
           console.error("Error processing file:", error);
           toast.error("Failed to process file");
         }
       } else {
-        // Handle regular chat messages
         const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
           body: { messages: [...messages, userMessage] }
         });
@@ -158,7 +181,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <ChatHeader selectedFile={selectedFile} />
+      <ChatHeader selectedFile={selectedFile} selectedRepo={selectedRepo?.name} />
       
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col">
@@ -167,8 +190,16 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
               <h3 className="text-sm font-medium mb-2">Select Repository</h3>
               <RepositoryCombobox
                 repositories={repositories}
-                onSelectRepository={onSelectRepository}
+                onSelectRepository={handleRepoSelect}
               />
+              {selectedRepo && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium mb-2">Select File</h3>
+                  <div className="border rounded-lg max-h-60 overflow-y-auto">
+                    <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -181,10 +212,28 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             ))}
           </ScrollArea>
 
+          {showFilePreview && generatedFileContent && (
+            <div className="p-4">
+              <Button
+                onClick={() => setShowFilePreview(!showFilePreview)}
+                variant="outline"
+                className="mb-2"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Toggle File Preview
+              </Button>
+              {showFilePreview && (
+                <pre className="p-4 bg-secondary rounded-lg overflow-x-auto">
+                  <code>{generatedFileContent}</code>
+                </pre>
+              )}
+            </div>
+          )}
+
           <ChatInput
             onSend={handleSendMessage}
             isLoading={isLoading}
-            placeholder="Type 'ADD SOLVER filename' to create a solver, or ask for help..."
+            placeholder="Type 'ADD SOLVER' to create a solver, or ask for help..."
           />
         </div>
       </div>

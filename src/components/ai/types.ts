@@ -1,5 +1,5 @@
 export interface Message {
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system";
   content: string;
 }
 
@@ -14,18 +14,11 @@ export interface Repository {
 
 export interface ChatHeaderProps {
   selectedFile: string | null;
+  selectedRepo?: string | null;
 }
 
 export interface ChatInputProps {
-  onSend: (content: string) => Promise<void>;
+  onSend: (content: string) => void;
   isLoading: boolean;
   placeholder?: string;
-}
-
-export interface ChatMessageProps {
-  message: Message;
-}
-
-export interface AIAssistantSidebarProps {
-  onFileSelect: (path: string, repo: Repository) => void;
 }
