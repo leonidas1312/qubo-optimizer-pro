@@ -53,6 +53,36 @@ export type Database = {
           },
         ]
       }
+      guideline_solvers: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_content: string
+          id: string
+          name: string
+          openai_file_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_content: string
+          id?: string
+          name: string
+          openai_file_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_content?: string
+          id?: string
+          name?: string
+          openai_file_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hardware_providers: {
         Row: {
           availability: boolean
