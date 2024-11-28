@@ -9,23 +9,16 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Check hash fragment
+        // Get the hash fragment from the URL
         const hashFragment = window.location.hash;
-        let accessToken, refreshToken;
-
-        if (hashFragment) {
-          // Parse hash fragment for tokens
-          const params = new URLSearchParams(hashFragment.substring(1));
-          accessToken = params.get('access_token');
-          refreshToken = params.get('refresh_token');
+        if (!hashFragment) {
+          throw new Error('No hash fragment found in URL');
         }
 
-        // Check query parameters as fallback
-        if (!accessToken || !refreshToken) {
-          const searchParams = new URLSearchParams(window.location.search);
-          accessToken = searchParams.get('access_token');
-          refreshToken = searchParams.get('refresh_token');
-        }
+        // Parse the hash fragment to get the access_token and refresh_token
+        const params = new URLSearchParams(hashFragment.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
 
         if (!accessToken || !refreshToken) {
           throw new Error('Missing tokens in URL');
@@ -50,8 +43,7 @@ export const AuthCallback = () => {
         toast.error('Authentication failed');
         navigate('/');
       }
-};
-
+    };
 
     handleCallback();
   }, [navigate]);

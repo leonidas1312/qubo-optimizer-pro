@@ -58,7 +58,7 @@ const AIAssistant = () => {
     <DashboardLayout>
       <div className="flex h-[calc(100vh-4rem)] relative">
 
-
+        
         <div className="flex-1">
           <AIAssistantChat 
             selectedFile={selectedFile} 
