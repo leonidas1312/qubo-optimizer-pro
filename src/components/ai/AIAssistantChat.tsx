@@ -9,6 +9,7 @@ import { AIResponse } from "./types/ai-types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from '@supabase/auth-helpers-react';
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -20,6 +21,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [repositories, setRepositories] = useState<Repository[]>([]);
+  const session = useSession();
 
   useEffect(() => {
     const fetchRepositories = async () => {
@@ -40,6 +42,10 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
+    if (!session) {
+      toast.error("Please log in to use the AI assistant");
+      return;
+    }
 
     const userMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, userMessage]);
