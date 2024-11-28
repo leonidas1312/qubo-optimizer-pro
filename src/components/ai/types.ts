@@ -22,3 +22,7 @@ export interface ChatInputProps {
   isLoading: boolean;
   placeholder?: string;
 }
+
+export interface ChatMessageProps {
+  message: Message;
+}

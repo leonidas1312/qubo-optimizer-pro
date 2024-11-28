@@ -9,10 +9,11 @@ import { AIResponse } from "./types/ai-types";
 import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
 import { FileTree } from "@/components/github/FileTree";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -28,6 +29,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [fileStructure, setFileStructure] = useState<any[]>([]);
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
+  const [isSelectionOpen, setIsSelectionOpen] = useState(true);
   const session = useSession();
 
   useEffect(() => {
@@ -185,23 +187,37 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col">
-          <div className="p-4 space-y-4">
-            <div className="p-4 border rounded-lg">
-              <h3 className="text-sm font-medium mb-2">Select Repository</h3>
-              <RepositoryCombobox
-                repositories={repositories}
-                onSelectRepository={handleRepoSelect}
-              />
-              {selectedRepo && (
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium mb-2">Select File</h3>
-                  <div className="border rounded-lg max-h-60 overflow-y-auto">
-                    <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                  </div>
+          <Collapsible
+            open={isSelectionOpen}
+            onOpenChange={setIsSelectionOpen}
+            className="border-b"
+          >
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="w-full flex items-center justify-between p-4 h-auto">
+                <span className="font-medium">Repository & File Selection</span>
+                {isSelectionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-4 space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Select Repository</h3>
+                  <RepositoryCombobox
+                    repositories={repositories}
+                    onSelectRepository={handleRepoSelect}
+                  />
                 </div>
-              )}
-            </div>
-          </div>
+                {selectedRepo && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Select File</h3>
+                    <div className="border rounded-lg max-h-48 overflow-y-auto">
+                      <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           <ScrollArea className="flex-1 px-4">
             {messages.length === 0 && (
@@ -233,7 +249,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
           <ChatInput
             onSend={handleSendMessage}
             isLoading={isLoading}
-            placeholder="Type 'ADD SOLVER' to create a solver, or ask for help..."
+            placeholder="Type 'ADD_SOLVER' to create a solver, or ask for help..."
           />
         </div>
       </div>
