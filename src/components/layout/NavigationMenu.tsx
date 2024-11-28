@@ -38,15 +38,15 @@ export function CustomNavigationMenu() {
               <NavigationMenuTrigger>
                 <div className="flex items-center gap-2">
                   <Puzzle className="h-4 w-4" />
-                  Optimization Lab
+                  Resources
                 </div>
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 w-[400px]">
-                  <ListItem to="/solvers" title="Create Solver">
+                  <ListItem to="/solvers" title="Browse Solvers">
                     <div className="flex items-center gap-2">
                       <Beaker className="h-4 w-4" />
-                      <span>Create or use existing QUBO solvers</span>
+                      <span>View public QUBO solvers</span>
                     </div>
                   </ListItem>
                   <ListItem to="/hardware" title="Hardware">
@@ -58,55 +58,56 @@ export function CustomNavigationMenu() {
                   <ListItem to="/datasets" title="Datasets">
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4" />
-                      <span>Manage QUBO problem datasets</span>
+                      <span>Browse public datasets</span>
                     </div>
                   </ListItem>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>
-                <div className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4" />
-                  Community
-                </div>
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 w-[400px]">
-                  <ListItem to="/qubots" title="Browse QUBOts">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>Browse and use community QUBOts</span>
-                    </div>
-                  </ListItem>
-                  <ListItem to="/leaderboard" title="Leaderboard">
+            {isAuthenticated && (
+              <>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4" />
-                      <span>View top performing solvers and users</span>
+                      Community
                     </div>
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 w-[400px]">
+                      <ListItem to="/qubots" title="Browse QUBOts">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          <span>Browse and use community QUBOts</span>
+                        </div>
+                      </ListItem>
+                      <ListItem to="/leaderboard" title="Leaderboard">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-4 w-4" />
+                          <span>View top performing solvers and users</span>
+                        </div>
+                      </ListItem>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </>
+            )}
 
             <NavigationMenuItem>
               <NavigationMenuTrigger>
                 <div className="flex items-center gap-2">
                   <Book className="h-4 w-4" />
-                  Documentation
+                  Help
                 </div>
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
-                  <ListItem to="/docs/introduction" title="Introduction">
+                  <ListItem to="/docs/introduction" title="Documentation">
                     Overview of the platform and its features
                   </ListItem>
-                  <ListItem to="/docs/getting-started" title="Getting Started">
-                    How to get started with the platform
-                  </ListItem>
-                  <ListItem to="/docs/api" title="API Reference">
-                    Detailed API documentation
+                  <ListItem to="/ai-assistant" title="AI Assistant">
+                    Get help with using the platform
                   </ListItem>
                 </ul>
               </NavigationMenuContent>

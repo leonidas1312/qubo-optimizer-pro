@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { AuthCallback } from "@/components/auth/AuthCallback";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
@@ -31,14 +32,30 @@ const App = () => {
               <TooltipProvider>
                 <Routes>
                   <Route path="/" element={<Index />} />
-                  <Route path="/playground" element={<Playground />} />
+                  <Route path="/playground" element={
+                    <ProtectedRoute>
+                      <Playground />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/solvers" element={<Solvers />} />
                   <Route path="/hardware" element={<Hardware />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/qubots" element={<QUBOts />} />
+                  <Route path="/qubots" element={
+                    <ProtectedRoute>
+                      <QUBOts />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/datasets" element={<Datasets />} />
-                  <Route path="/jobs" element={<Jobs />} />
-                  <Route path="/billing" element={<Billing />} />
+                  <Route path="/jobs" element={
+                    <ProtectedRoute>
+                      <Jobs />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/billing" element={
+                    <ProtectedRoute>
+                      <Billing />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/ai-assistant" element={<AIAssistant />} />
                 </Routes>
