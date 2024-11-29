@@ -33,15 +33,27 @@ async def load_matrix(file: UploadFile = File(...)):
 @router.post("/solve")
 async def solve(data: Dict[Any, Any]):
     try:
-        matrix = np.array(data["matrix"])
-        constant = float(data.get("constant", 0.0))
-        solver_type = data.get("solver", "tabu-search")
-        parameters = data.get("parameters", {})
+        # Extract solver configuration
+        solver = data.get("solver", {})
+        dataset = data.get("dataset", {})
+        hardware = data.get("hardware", {})
 
+        # Configure solver parameters based on hardware
+        solver_parameters = {
+            **solver.get("solver_parameters", {}),
+            "hardware_type": hardware.get("provider_type"),
+            "hardware_specs": hardware.get("specs", {})
+        }
+
+        # Load dataset
+        matrix = np.array(dataset.get("matrix", []))
+        constant = float(dataset.get("constant", 0.0))
+
+        # Run optimization
         best_solution, best_cost, iterations_cost, time_taken = solve_qubo(
             qubo_matrix=matrix,
-            solver_type=solver_type,
-            parameters=parameters,
+            solver_type=solver.get("solver_type", "tabu-search"),
+            parameters=solver_parameters,
             constant=constant
         )
 
