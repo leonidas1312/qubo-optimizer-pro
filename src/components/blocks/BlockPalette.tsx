@@ -96,7 +96,12 @@ export const BlockPalette = () => {
                     handleDragStart(e, { ...hw, type: "hardware" })
                   }
                 >
-                  {hw.name}
+                  <div>
+                    <div className="font-medium">{hw.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      ${hw.cost_per_hour}/hour
+                    </div>
+                  </div>
                 </Card>
               ))}
             </div>

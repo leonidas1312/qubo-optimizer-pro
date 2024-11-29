@@ -157,27 +157,39 @@ export type Database = {
       hardware_providers: {
         Row: {
           availability: boolean
+          base_cost_per_hour: number | null
+          cloud_provider: string | null
           cost_per_hour: number
           description: string | null
           id: string
+          instance_type: string | null
+          markup_percentage: number | null
           name: string
           provider_type: string
           specs: Json
         }
         Insert: {
           availability?: boolean
+          base_cost_per_hour?: number | null
+          cloud_provider?: string | null
           cost_per_hour: number
           description?: string | null
           id?: string
+          instance_type?: string | null
+          markup_percentage?: number | null
           name: string
           provider_type: string
           specs?: Json
         }
         Update: {
           availability?: boolean
+          base_cost_per_hour?: number | null
+          cloud_provider?: string | null
           cost_per_hour?: number
           description?: string | null
           id?: string
+          instance_type?: string | null
+          markup_percentage?: number | null
           name?: string
           provider_type?: string
           specs?: Json

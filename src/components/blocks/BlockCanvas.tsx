@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { ResultsChart } from "@/components/visualization/ResultsChart";
+import { HardwareSelector } from "@/components/hardware/HardwareSelector";
 
 interface BlockCanvasProps {
   connections: any[];
@@ -78,7 +79,7 @@ export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) =
       if (saveError) throw saveError;
 
       // Execute the optimization
-      const response = await fetch('http://localhost:8000/api/solve', {
+      const response = await fetch('/api/solve', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +96,17 @@ export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) =
       }
 
       const data = await response.json();
-      setResults(data);
+      
+      // Calculate cost
+      const hardware = connections.find(c => c.type === "hardware");
+      const executionTimeHours = data.time / 3600; // Convert seconds to hours
+      const cost = executionTimeHours * hardware.cost_per_hour;
+      
+      setResults({
+        ...data,
+        cost: cost.toFixed(2)
+      });
+      
       toast.success("Optimization completed successfully!");
     } catch (error) {
       console.error('Error running optimization:', error);
@@ -144,12 +155,21 @@ export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) =
         <Card className="p-4">
           <h3 className="text-lg font-semibold mb-4">Results</h3>
           <div className="space-y-4">
-            <div>
-              <p className="font-medium">Best Cost: {results.cost}</p>
-              <p className="text-sm text-muted-foreground">
-                Time taken: {results.time.toFixed(2)}s
-              </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">Best Cost</p>
+                <p className="text-2xl font-bold">{results.cost}</p>
+              </div>
+              <div>
+                <p className="font-medium">Execution Cost</p>
+                <p className="text-2xl font-bold text-green-600">${results.cost}</p>
+              </div>
+              <div>
+                <p className="font-medium">Time Taken</p>
+                <p className="text-2xl font-bold">{results.time.toFixed(2)}s</p>
+              </div>
             </div>
+            
             {results.iterations_cost && (
               <ResultsChart data={results.iterations_cost} />
             )}
