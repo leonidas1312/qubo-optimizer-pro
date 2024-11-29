@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      block_connections: {
+        Row: {
+          configuration: Json | null
+          created_at: string
+          creator_id: string | null
+          dataset_id: string | null
+          description: string | null
+          hardware_id: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          solver_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json | null
+          created_at?: string
+          creator_id?: string | null
+          dataset_id?: string | null
+          description?: string | null
+          hardware_id?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          solver_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json | null
+          created_at?: string
+          creator_id?: string | null
+          dataset_id?: string | null
+          description?: string | null
+          hardware_id?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          solver_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "block_connections_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_connections_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_connections_hardware_id_fkey"
+            columns: ["hardware_id"]
+            isOneToOne: false
+            referencedRelation: "hardware_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_connections_solver_id_fkey"
+            columns: ["solver_id"]
+            isOneToOne: false
+            referencedRelation: "solvers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets: {
         Row: {
           created_at: string

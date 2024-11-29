@@ -1,57 +1,45 @@
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 
 interface CodePreviewProps {
-  solver: any;
-  dataset: any;
-  hardware: any;
+  connections: any[];
 }
 
-export const CodePreview = ({ solver, dataset, hardware }: CodePreviewProps) => {
+export const CodePreview = ({ connections }: CodePreviewProps) => {
   const generateCode = () => {
-    if (!solver || !dataset || !hardware) {
-      return "# Select blocks to generate code";
-    }
+    const solver = connections.find((c) => c.type === "solver");
+    const dataset = connections.find((c) => c.type === "dataset");
+    const hardware = connections.find((c) => c.type === "hardware");
 
-    return `
-import numpy as np
-from ${solver.name.toLowerCase()} import solve_qubo
+    return `# Generated Python Code
+${solver ? `# Solver: ${solver.name}` : "# No solver selected"}
+${dataset ? `# Dataset: ${dataset.name}` : "# No dataset selected"}
+${hardware ? `# Hardware: ${hardware.name}` : "# No hardware selected"}
 
-# Load dataset
-data = np.load("${dataset.file_path}")
-qubo_matrix = data[0]
-constant = data[1]
+def main():
+    # Initialize components
+    ${solver ? `solver = load_solver("${solver.name}")` : "# No solver"}
+    ${dataset ? `data = load_dataset("${dataset.name}")` : "# No dataset"}
+    ${hardware ? `hardware = initialize_hardware("${hardware.name}")` : "# No hardware"}
 
-# Configure solver parameters
-solver_params = ${JSON.stringify(solver.solver_parameters, null, 2)}
+    # Run optimization
+    if solver and data and hardware:
+        result = solver.optimize(data, hardware=hardware)
+        return result
+    else:
+        return "Missing components"
 
-# Configure hardware
-hardware_config = {
-    "provider": "${hardware.name}",
-    "specs": ${JSON.stringify(hardware.specs, null, 2)}
-}
-
-# Run optimization
-solution, cost, iterations_cost, time_taken = solve_qubo(
-    qubo_matrix=qubo_matrix,
-    constant=constant,
-    solver_type="${solver.solver_type}",
-    parameters=solver_params,
-    hardware_config=hardware_config
-)
-
-print(f"Best solution found: {solution}")
-print(f"Cost: {cost}")
-print(f"Time taken: {time_taken}s")
-`.trim();
+if __name__ == "__main__":
+    main()
+`;
   };
 
   return (
-    <div className="h-full">
+    <div className="flex-1">
       <CodeEditor
         value={generateCode()}
         onChange={() => {}}
         language="python"
-        className="h-full"
+        className="h-[calc(100vh-12rem)]"
       />
     </div>
   );

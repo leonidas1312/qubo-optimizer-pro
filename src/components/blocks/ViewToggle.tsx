@@ -1,29 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Code } from "lucide-react";
+import { Code2, Blocks } from "lucide-react";
 
 interface ViewToggleProps {
-  value: "visual" | "code";
-  onChange: (value: "visual" | "code") => void;
+  currentView: "visual" | "code";
+  onViewChange: (view: "visual" | "code") => void;
 }
 
-export const ViewToggle = ({ value, onChange }: ViewToggleProps) => {
+export const ViewToggle = ({ currentView, onViewChange }: ViewToggleProps) => {
   return (
     <div className="flex gap-2">
       <Button
-        variant={value === "visual" ? "default" : "outline"}
-        size="sm"
-        onClick={() => onChange("visual")}
+        variant={currentView === "visual" ? "default" : "outline"}
+        onClick={() => onViewChange("visual")}
       >
-        <Eye className="mr-2 h-4 w-4" />
-        Visual
+        <Blocks className="h-4 w-4 mr-2" />
+        Visual Editor
       </Button>
       <Button
-        variant={value === "code" ? "default" : "outline"}
-        size="sm"
-        onClick={() => onChange("code")}
+        variant={currentView === "code" ? "default" : "outline"}
+        onClick={() => onViewChange("code")}
       >
-        <Code className="mr-2 h-4 w-4" />
-        Code
+        <Code2 className="h-4 w-4 mr-2" />
+        Code View
       </Button>
     </div>
   );
