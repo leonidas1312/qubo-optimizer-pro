@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Code2, Settings, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 
@@ -29,20 +29,16 @@ export const Navbar = () => {
       <div className="container flex h-16 items-center">
         {/* Logo and Brand Name - Left Side */}
         <Link to="/" className="flex items-center space-x-2">
-          <Code2 className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl">QUBOt</span>
+          <span className="font-bold text-xl">CEPTUM</span>
         </Link>
 
         {/* Navigation Links - Center */}
         <div className="flex items-center space-x-6 ml-8">
-          <Link to="/playground" className="text-muted-foreground hover:text-foreground transition-colors">
-            Playground
-          </Link>
-          <Link to="/solvers" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/docs" className="text-muted-foreground hover:text-foreground transition-colors">
             Documentation
           </Link>
-          <Link to="/uploadalgos" className="text-muted-foreground hover:text-foreground transition-colors">
-            Workspace
+          <Link to="/datasets" className="text-muted-foreground hover:text-foreground transition-colors">
+            Datasets
           </Link>
         </div>
 

@@ -12,10 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import Solvers from "./pages/Solvers";
 import Hardware from "./pages/Hardware";
-import Playground from "./pages/Playground";
-import QUBOts from "./pages/QUBOts";
 import Datasets from "./pages/Datasets";
 import Jobs from "./pages/Jobs";
 import Billing from "./pages/Billing";
@@ -48,24 +45,9 @@ const App = () => {
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   
                   {/* Protected routes with dashboard layout */}
-                  <Route path="/playground" element={
-                    <ProtectedDashboardRoute>
-                      <Playground />
-                    </ProtectedDashboardRoute>
-                  } />
-                  <Route path="/solvers" element={
-                    <ProtectedDashboardRoute>
-                      <Solvers />
-                    </ProtectedDashboardRoute>
-                  } />
                   <Route path="/hardware" element={
                     <ProtectedDashboardRoute>
                       <Hardware />
-                    </ProtectedDashboardRoute>
-                  } />
-                  <Route path="/qubots" element={
-                    <ProtectedDashboardRoute>
-                      <QUBOts />
                     </ProtectedDashboardRoute>
                   } />
                   <Route path="/datasets" element={
