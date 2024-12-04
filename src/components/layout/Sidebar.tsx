@@ -13,14 +13,21 @@ export function Sidebar({ className }: { className?: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const mainElementRef = React.useRef<HTMLElement | null>(null);
 
-  // Set data attribute on the main element when sidebar state changes
   React.useEffect(() => {
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-      mainElement.setAttribute('data-sidebar-collapsed', collapsed.toString());
-    }
-  }, [collapsed]);
+    mainElementRef.current = document.querySelector('main');
+  }, []);
+
+  const handleToggle = () => {
+    setCollapsed((prev) => {
+      const newState = !prev;
+      if (mainElementRef.current) {
+        mainElementRef.current.setAttribute('data-sidebar-collapsed', newState.toString());
+      }
+      return newState;
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -49,7 +56,7 @@ export function Sidebar({ className }: { className?: string }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleToggle}
           className="ml-auto"
         >
           {collapsed ? (
