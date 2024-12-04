@@ -39,7 +39,7 @@ const Login = () => {
         const currentIndex = industries.indexOf(prev);
         return industries[(currentIndex + 1) % industries.length];
       });
-    }, 3000); // Change every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -106,15 +106,17 @@ const Login = () => {
               Providing scalable, efficient, and accessible optimization solutions for businesses
               and researchers via a cloud-based platform.
             </p>
-            <motion.p 
-              key={currentIndustry}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-lg text-purple-300/60"
-            >
-              Transforming operations in <span className="text-purple-300 font-semibold">{currentIndustry}</span> through advanced optimization.
-            </motion.p>
+            <div className="h-[50px] relative"> {/* Fixed height container */}
+              <motion.p 
+                key={currentIndustry}
+                initial={{ opacity: 0, y: 10, position: 'absolute' }}
+                animate={{ opacity: 1, y: 0, position: 'absolute' }}
+                exit={{ opacity: 0, y: -10, position: 'absolute' }}
+                className="text-lg text-purple-300/60 w-full"
+              >
+                Transforming operations in <span className="text-purple-300 font-semibold">{currentIndustry}</span> through advanced optimization.
+              </motion.p>
+            </div>
           </div>
           <div className="hidden md:block">
             <motion.div 
