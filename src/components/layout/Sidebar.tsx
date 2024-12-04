@@ -1,14 +1,18 @@
 import * as React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { navigationData } from "@/config/navigation";
-import { ToggleLeft, ToggleRight } from "lucide-react";
+import { ToggleLeft, ToggleRight, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export function Sidebar({ className }: { className?: string }) {
   const [collapsed, setCollapsed] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Set data attribute on the main element when sidebar state changes
   React.useEffect(() => {
@@ -17,6 +21,16 @@ export function Sidebar({ className }: { className?: string }) {
       mainElement.setAttribute('data-sidebar-collapsed', collapsed.toString());
     }
   }, [collapsed]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
 
   return (
     <div
@@ -27,7 +41,11 @@ export function Sidebar({ className }: { className?: string }) {
       )}
     >
       <div className="flex h-16 items-center justify-between px-4 border-b">
-        {!collapsed && <span className="font-bold text-xl">CEPTUM</span>}
+        {!collapsed && (
+          <Link to="/" className="font-bold text-xl hover:text-primary transition-colors">
+            CEPTUM
+          </Link>
+        )}
         <Button
           variant="ghost"
           size="icon"
@@ -62,6 +80,19 @@ export function Sidebar({ className }: { className?: string }) {
           ))}
         </nav>
       </ScrollArea>
+      <div className="border-t p-2">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full justify-start text-muted-foreground hover:text-foreground",
+            collapsed && "justify-center"
+          )}
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">Logout</span>}
+        </Button>
+      </div>
     </div>
   );
 }
