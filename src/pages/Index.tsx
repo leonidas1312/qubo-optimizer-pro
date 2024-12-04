@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 import {
   Cloud,
   Database,
@@ -21,6 +23,18 @@ import {
 } from "@/components/ui/card";
 
 const Index = () => {
+  const { isAuthenticated, login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleTryPlatform = () => {
+    if (isAuthenticated) {
+      navigate('/playground');
+    } else {
+      toast.error("Please log in to access the platform");
+      login();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -36,8 +50,13 @@ const Index = () => {
               Scale your optimization problems effortlessly with our cloud-native platform.
             </p>
             <div className="flex justify-center gap-4 pt-8">
-              <Button asChild size="lg" className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                <Link to="/playground">Try Platform</Link>
+              <Button 
+                size="lg" 
+                className="animate-fade-in" 
+                style={{ animationDelay: "0.2s" }}
+                onClick={handleTryPlatform}
+              >
+                Try Platform
               </Button>
               <Button asChild variant="outline" size="lg" className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
                 <Link to="/docs">Documentation</Link>
