@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Upload } from "lucide-react";
+import { CodeEditor } from "@/components/playground/editor/CodeEditor";
+import { BasicInfoForm } from "@/components/upload/BasicInfoForm";
+import { FileUploadSection } from "@/components/upload/FileUploadSection";
+import { Code2, FileText } from "lucide-react";
 
 export default function UploadSolver() {
   const { user } = useAuth();
@@ -21,25 +20,7 @@ export default function UploadSolver() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [verificationResults, setVerificationResults] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.name.endsWith('.py')) {
-        setSelectedFile(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const content = e.target?.result as string;
-          setOriginalCode(content);
-        };
-        reader.readAsText(file);
-        toast.success('File loaded successfully');
-      } else {
-        toast.error('Please select a Python file');
-        event.target.value = '';
-      }
-    }
-  };
+  const [showCode, setShowCode] = useState(false);
 
   const analyzeSolver = async () => {
     if (!originalCode || !description) {
@@ -112,67 +93,39 @@ export default function UploadSolver() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
           <div className="space-y-6">
-            <div>
-              <Label htmlFor="name">Solver Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter a name for your solver"
-              />
+            <div className="flex justify-end mb-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowCode(!showCode)}
+                className="flex items-center gap-2"
+              >
+                {showCode ? (
+                  <>
+                    <FileText className="h-4 w-4" />
+                    Show Info
+                  </>
+                ) : (
+                  <>
+                    <Code2 className="h-4 w-4" />
+                    Show Code
+                  </>
+                )}
+              </Button>
             </div>
 
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain how your solver works and what problems it can solve"
-                className="min-h-[100px]"
+            {showCode ? (
+              <FileUploadSection
+                originalCode={originalCode}
+                setOriginalCode={setOriginalCode}
+                setSelectedFile={setSelectedFile}
               />
-            </div>
-
-            {!originalCode ? (
-              <div className="border-2 border-dashed rounded-lg p-6 space-y-4">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <Upload className="h-10 w-10 text-muted-foreground mb-4" />
-                  <h3 className="font-semibold mb-2">Upload Your Python File</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Select a .py file containing your optimization algorithm
-                  </p>
-                  <Input
-                    type="file"
-                    accept=".py"
-                    onChange={handleFileChange}
-                    className="max-w-xs"
-                  />
-                </div>
-              </div>
             ) : (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label>Original Code</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setOriginalCode("");
-                      setSelectedFile(null);
-                    }}
-                  >
-                    Change File
-                  </Button>
-                </div>
-                <div className="border rounded-md overflow-hidden">
-                  <CodeEditor
-                    value={originalCode}
-                    onChange={setOriginalCode}
-                    language="python"
-                    className="min-h-[400px]"
-                  />
-                </div>
-              </div>
+              <BasicInfoForm
+                name={name}
+                setName={setName}
+                description={description}
+                setDescription={setDescription}
+              />
             )}
 
             <Button 
@@ -195,7 +148,6 @@ export default function UploadSolver() {
 
               <TabsContent value="transformed" className="mt-4">
                 <div className="space-y-4">
-                  <Label>Transformed Code</Label>
                   <div className="border rounded-md overflow-hidden">
                     <CodeEditor
                       value={transformedCode}
