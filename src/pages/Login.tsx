@@ -164,7 +164,7 @@ const Login = () => {
                     padding: '10px 15px',
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     color: 'white',
-                    '::placeholder': {
+                    '&::placeholder': {
                       color: 'rgba(255, 255, 255, 0.5)',
                     },
                   },
