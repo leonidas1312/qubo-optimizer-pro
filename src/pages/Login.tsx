@@ -6,15 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
-const Login = () => {
-  const session = useSession();
-  const navigate = useNavigate();
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 500, damping: 100 });
-  const springY = useSpring(mouseY, { stiffness: 500, damping: 100 });
-
-  // Dynamic industries for the mission statement
+// Separate component for the dynamic industry text
+const DynamicIndustry = () => {
   const industries = [
     "healthcare",
     "finance",
@@ -27,13 +20,6 @@ const Login = () => {
   const [currentIndustry, setCurrentIndustry] = useState(industries[0]);
 
   useEffect(() => {
-    if (session) {
-      navigate('/playground');
-    }
-  }, [session, navigate]);
-
-  // Handle industry rotation
-  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndustry(prev => {
         const currentIndex = industries.indexOf(prev);
@@ -44,14 +30,42 @@ const Login = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle mouse movement
+  return (
+    <div className="h-[50px] relative overflow-hidden">
+      <motion.p 
+        key={currentIndustry}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+        className="text-lg text-purple-300/60 absolute w-full"
+      >
+        Transforming operations in <span className="text-purple-300 font-semibold">{currentIndustry}</span> through advanced optimization.
+      </motion.p>
+    </div>
+  );
+};
+
+const Login = () => {
+  const session = useSession();
+  const navigate = useNavigate();
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 500, damping: 100 });
+  const springY = useSpring(mouseY, { stiffness: 500, damping: 100 });
+
+  useEffect(() => {
+    if (session) {
+      navigate('/playground');
+    }
+  }, [session, navigate]);
+
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     mouseX.set(e.clientX - rect.left);
     mouseY.set(e.clientY - rect.top);
   };
 
-  // Animation variants for the floating elements
   const floatingAnimation = {
     animate: {
       y: ["0px", "-20px", "0px"],
@@ -106,17 +120,7 @@ const Login = () => {
               Providing scalable, efficient, and accessible optimization solutions for businesses
               and researchers via a cloud-based platform.
             </p>
-            <div className="h-[50px] relative"> {/* Fixed height container */}
-              <motion.p 
-                key={currentIndustry}
-                initial={{ opacity: 0, y: 10, position: 'absolute' }}
-                animate={{ opacity: 1, y: 0, position: 'absolute' }}
-                exit={{ opacity: 0, y: -10, position: 'absolute' }}
-                className="text-lg text-purple-300/60 w-full"
-              >
-                Transforming operations in <span className="text-purple-300 font-semibold">{currentIndustry}</span> through advanced optimization.
-              </motion.p>
-            </div>
+            <DynamicIndustry />
           </div>
           <div className="hidden md:block">
             <motion.div 
