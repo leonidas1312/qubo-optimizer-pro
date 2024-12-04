@@ -1,15 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
 import {
   Cloud,
   Database,
   Server,
   Cpu,
-  Users,
-  Lock,
-  Workflow,
   ArrowRight,
   GitBranch,
   Network,
@@ -23,17 +19,18 @@ import {
 } from "@/components/ui/card";
 
 const Index = () => {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleTryPlatform = () => {
-    if (isAuthenticated) {
-      navigate('/playground');
-    } else {
-      toast.error("Please log in to access the platform");
-      login();
-    }
+  const handleGetStarted = () => {
+    navigate('/login');
   };
+
+  // If user is already authenticated, redirect to platform
+  if (isAuthenticated) {
+    navigate('/playground');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,12 +51,9 @@ const Index = () => {
                 size="lg" 
                 className="animate-fade-in" 
                 style={{ animationDelay: "0.2s" }}
-                onClick={handleTryPlatform}
+                onClick={handleGetStarted}
               >
-                Try Platform
-              </Button>
-              <Button asChild variant="outline" size="lg" className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                <Link to="/docs">Documentation</Link>
+                Login to Try Platform <ArrowRight className="ml-2" />
               </Button>
             </div>
           </div>
@@ -79,7 +73,7 @@ const Index = () => {
               description="Leverage AWS EC2 for scalable computing and S3 for secure data storage."
             />
             <FeatureCard
-              icon={<Lock className="w-10 h-10" />}
+              icon={<Database className="w-10 h-10" />}
               title="Private & Open Source"
               description="Choose between private algorithms or contribute to the open-source community."
             />
@@ -118,30 +112,11 @@ const Index = () => {
               align="right"
             />
             <WorkflowStep
-              icon={<Workflow />}
+              icon={<Cpu />}
               title="Execute Workflow"
               description="Run your optimization tasks with automatic scaling."
               align="left"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-24 bg-muted/50">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <h2 className="text-4xl font-bold gradient-text">
-              Ready to Optimize?
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Start solving optimization problems in the cloud today.
-            </p>
-            <Button asChild size="lg" className="mt-8">
-              <Link to="/playground">
-                Get Started <ArrowRight className="ml-2" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>

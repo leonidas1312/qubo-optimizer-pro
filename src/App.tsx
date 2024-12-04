@@ -3,12 +3,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { AuthCallback } from "@/components/auth/AuthCallback";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Solvers from "./pages/Solvers";
@@ -23,6 +24,15 @@ import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
+// Wrapper component for protected routes that need the dashboard layout
+const ProtectedDashboardRoute = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>{children}</DashboardLayout>
+    </ProtectedRoute>
+  );
+};
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -32,34 +42,57 @@ const App = () => {
             <AuthProvider>
               <TooltipProvider>
                 <Routes>
+                  {/* Public routes */}
                   <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/playground" element={
-                    <ProtectedRoute>
-                      <Playground />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/solvers" element={<Solvers />} />
-                  <Route path="/hardware" element={<Hardware />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
-                  <Route path="/qubots" element={
-                    <ProtectedRoute>
-                      <QUBOts />
-                    </ProtectedRoute>
+                  
+                  {/* Protected routes with dashboard layout */}
+                  <Route path="/playground" element={
+                    <ProtectedDashboardRoute>
+                      <Playground />
+                    </ProtectedDashboardRoute>
                   } />
-                  <Route path="/datasets" element={<Datasets />} />
+                  <Route path="/solvers" element={
+                    <ProtectedDashboardRoute>
+                      <Solvers />
+                    </ProtectedDashboardRoute>
+                  } />
+                  <Route path="/hardware" element={
+                    <ProtectedDashboardRoute>
+                      <Hardware />
+                    </ProtectedDashboardRoute>
+                  } />
+                  <Route path="/qubots" element={
+                    <ProtectedDashboardRoute>
+                      <QUBOts />
+                    </ProtectedDashboardRoute>
+                  } />
+                  <Route path="/datasets" element={
+                    <ProtectedDashboardRoute>
+                      <Datasets />
+                    </ProtectedDashboardRoute>
+                  } />
                   <Route path="/jobs" element={
-                    <ProtectedRoute>
+                    <ProtectedDashboardRoute>
                       <Jobs />
-                    </ProtectedRoute>
+                    </ProtectedDashboardRoute>
                   } />
                   <Route path="/billing" element={
-                    <ProtectedRoute>
+                    <ProtectedDashboardRoute>
                       <Billing />
-                    </ProtectedRoute>
+                    </ProtectedDashboardRoute>
                   } />
-                  <Route path="/docs" element={<Documentation />} />
-                  <Route path="/ai-assistant" element={<AIAssistant />} />
+                  <Route path="/docs" element={
+                    <ProtectedDashboardRoute>
+                      <Documentation />
+                    </ProtectedDashboardRoute>
+                  } />
+                  <Route path="/ai-assistant" element={
+                    <ProtectedDashboardRoute>
+                      <AIAssistant />
+                    </ProtectedDashboardRoute>
+                  } />
                 </Routes>
                 <Toaster />
                 <Sonner />

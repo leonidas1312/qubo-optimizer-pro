@@ -1,4 +1,3 @@
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,36 +11,37 @@ const Login = () => {
 
   useEffect(() => {
     if (session) {
-      navigate('/');
+      navigate('/playground');
     }
   }, [session, navigate]);
 
   return (
-    <DashboardLayout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-md mx-auto">
-          <h1 className="text-3xl font-bold mb-8 gradient-text text-center">Welcome to QUBOt</h1>
-          <div className="bg-card p-6 rounded-lg shadow-lg border">
-            <Auth
-              supabaseClient={supabase}
-              appearance={{
-                theme: ThemeSupa,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: '#3b82f6',
-                      brandAccent: '#2563eb',
-                    },
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-full max-w-md px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold gradient-text">Welcome to QUBOt</h1>
+          <p className="text-muted-foreground mt-2">Sign in to access the platform</p>
+        </div>
+        <div className="bg-card p-8 rounded-lg shadow-lg border">
+          <Auth
+            supabaseClient={supabase}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#3b82f6',
+                    brandAccent: '#2563eb',
                   },
                 },
-              }}
-              providers={["github"]}
-              redirectTo={`${window.location.origin}/auth/callback`}
-            />
-          </div>
+              },
+            }}
+            providers={["github"]}
+            redirectTo={`${window.location.origin}/auth/callback`}
+          />
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 
