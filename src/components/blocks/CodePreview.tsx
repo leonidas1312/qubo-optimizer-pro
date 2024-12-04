@@ -34,12 +34,12 @@ if __name__ == "__main__":
   };
 
   return (
-    <div className="flex-1">
+    <div className="h-full">
       <CodeEditor
         value={generateCode()}
         onChange={() => {}}
         language="python"
-        className="h-[calc(100vh-12rem)]"
+        className="h-[calc(100vh-16rem)]"
       />
     </div>
   );
