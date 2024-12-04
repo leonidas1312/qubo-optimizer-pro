@@ -40,7 +40,7 @@ const App = () => {
               <TooltipProvider>
                 <Routes>
                   {/* Public routes */}
-                  <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
+                  <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   
