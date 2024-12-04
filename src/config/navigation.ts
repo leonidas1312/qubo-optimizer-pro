@@ -13,7 +13,7 @@ export const navigation = [
   },
   {
     title: "Upload Solver",
-    href: "/upload",
+    href: "/upload-solver",
     icon: Upload,
   },
   {

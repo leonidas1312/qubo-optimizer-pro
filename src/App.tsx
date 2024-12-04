@@ -18,6 +18,7 @@ import Jobs from "./pages/Jobs";
 import Billing from "./pages/Billing";
 import Documentation from "./pages/Documentation";
 import AIAssistant from "./pages/AIAssistant";
+import UploadSolver from "./pages/UploadSolver";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,13 @@ const App = () => {
                     <ProtectedRoute>
                       <DashboardLayout>
                         <Index />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/upload-solver" element={
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <UploadSolver />
                       </DashboardLayout>
                     </ProtectedRoute>
                   } />
