@@ -21,15 +21,6 @@ import AIAssistant from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
-// Wrapper component for protected routes that need the dashboard layout
-const ProtectedDashboardRoute = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ProtectedRoute>
-      <DashboardLayout>{children}</DashboardLayout>
-    </ProtectedRoute>
-  );
-};
-
 const App = () => {
   return (
     <React.StrictMode>
@@ -40,40 +31,58 @@ const App = () => {
               <TooltipProvider>
                 <Routes>
                   {/* Public routes */}
-                  <Route path="/" element={<Index />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   
                   {/* Protected routes with dashboard layout */}
+                  <Route path="/" element={
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Index />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  } />
                   <Route path="/hardware" element={
-                    <ProtectedDashboardRoute>
-                      <Hardware />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Hardware />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                   <Route path="/datasets" element={
-                    <ProtectedDashboardRoute>
-                      <Datasets />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Datasets />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                   <Route path="/jobs" element={
-                    <ProtectedDashboardRoute>
-                      <Jobs />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Jobs />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                   <Route path="/billing" element={
-                    <ProtectedDashboardRoute>
-                      <Billing />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Billing />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                   <Route path="/docs" element={
-                    <ProtectedDashboardRoute>
-                      <Documentation />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <Documentation />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                   <Route path="/ai-assistant" element={
-                    <ProtectedDashboardRoute>
-                      <AIAssistant />
-                    </ProtectedDashboardRoute>
+                    <ProtectedRoute>
+                      <DashboardLayout>
+                        <AIAssistant />
+                      </DashboardLayout>
+                    </ProtectedRoute>
                   } />
                 </Routes>
                 <Toaster />
