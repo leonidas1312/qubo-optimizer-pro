@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,102 +80,105 @@ export default function UploadSolver() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Upload Solver</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <div className="space-y-6">
-              <div>
-                <Label htmlFor="name">Solver Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter a name for your solver"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Explain how your solver works and what problems it can solve"
-                  className="h-32"
-                />
-              </div>
-
-              <div>
-                <Label>Original Code</Label>
-                <CodeEditor
-                  value={originalCode}
-                  onChange={setOriginalCode}
-                  language="python"
-                  className="h-[400px]"
-                />
-              </div>
-
-              <Button 
-                onClick={analyzeSolver} 
-                disabled={isAnalyzing}
-                className="w-full"
-              >
-                {isAnalyzing ? "Analyzing..." : "Analyze & Transform"}
-              </Button>
-            </div>
-          </Card>
-
+    <div className="container mx-auto py-8 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold gradient-text">Upload Solver</h1>
+        <p className="text-muted-foreground mt-2">
+          Transform your optimization code into a platform-compatible solver
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
           <div className="space-y-6">
-            <Card className="p-6">
-              <Tabs defaultValue="transformed">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="transformed">Transformed Code</TabsTrigger>
-                  <TabsTrigger value="verification">Verification</TabsTrigger>
-                </TabsList>
+            <div>
+              <Label htmlFor="name">Solver Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter a name for your solver"
+              />
+            </div>
 
-                <TabsContent value="transformed">
-                  <div className="space-y-4">
-                    <Label>Transformed Code</Label>
-                    <CodeEditor
-                      value={transformedCode}
-                      onChange={setTransformedCode}
-                      language="python"
-                      className="h-[400px]"
-                    />
-                  </div>
-                </TabsContent>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Explain how your solver works and what problems it can solve"
+                className="h-32"
+              />
+            </div>
 
-                <TabsContent value="verification">
-                  <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                    <div className="space-y-4">
-                      <h3 className="font-medium">Verification Steps</h3>
-                      {verificationResults.map((step, index) => (
-                        <div 
-                          key={index}
-                          className="p-4 rounded-lg bg-muted"
-                        >
-                          {step}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
+            <div>
+              <Label>Original Code</Label>
+              <CodeEditor
+                value={originalCode}
+                onChange={setOriginalCode}
+                language="python"
+                className="h-[400px]"
+              />
+            </div>
 
-              <Button 
-                onClick={handleSave}
-                className="w-full mt-6"
-                disabled={!transformedCode}
-              >
-                Save Solver
-              </Button>
-            </Card>
+            <Button 
+              onClick={analyzeSolver} 
+              disabled={isAnalyzing}
+              className="w-full"
+            >
+              {isAnalyzing ? "Analyzing..." : "Analyze & Transform"}
+            </Button>
           </div>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className="p-6">
+            <Tabs defaultValue="transformed">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="transformed">Transformed Code</TabsTrigger>
+                <TabsTrigger value="verification">Verification</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="transformed">
+                <div className="space-y-4">
+                  <Label>Transformed Code</Label>
+                  <CodeEditor
+                    value={transformedCode}
+                    onChange={setTransformedCode}
+                    language="python"
+                    className="h-[400px]"
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="verification">
+                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Verification Steps</h3>
+                    {verificationResults.map((step, index) => (
+                      <div 
+                        key={index}
+                        className="p-4 rounded-lg bg-muted"
+                      >
+                        {step}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
+
+            <Button 
+              onClick={handleSave}
+              className="w-full mt-6"
+              disabled={!transformedCode}
+            >
+              Save Solver
+            </Button>
+          </Card>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
