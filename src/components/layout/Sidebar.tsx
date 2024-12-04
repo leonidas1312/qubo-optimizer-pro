@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { navigationData } from "@/config/navigation";
+import { navigation } from "@/config/navigation";
 import { ToggleLeft, ToggleRight, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -63,14 +63,14 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
       <ScrollArea className="flex-1">
         <nav className="flex flex-col gap-2 p-2">
-          {navigationData.navMain.map((item) => (
+          {navigation.map((item) => (
             <Link
               key={item.title}
-              to={item.url}
+              to={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
-                location.pathname === item.url
+                location.pathname === item.href
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground",
                 collapsed && "justify-center px-2"
