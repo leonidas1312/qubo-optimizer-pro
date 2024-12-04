@@ -1,20 +1,55 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 const Login = () => {
   const session = useSession();
   const navigate = useNavigate();
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 500, damping: 100 });
+  const springY = useSpring(mouseY, { stiffness: 500, damping: 100 });
+
+  // Dynamic industries for the mission statement
+  const industries = [
+    "healthcare",
+    "finance",
+    "logistics",
+    "manufacturing",
+    "telecommunications",
+    "energy",
+    "retail"
+  ];
+  const [currentIndustry, setCurrentIndustry] = useState(industries[0]);
 
   useEffect(() => {
     if (session) {
       navigate('/playground');
     }
   }, [session, navigate]);
+
+  // Handle industry rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndustry(prev => {
+        const currentIndex = industries.indexOf(prev);
+        return industries[(currentIndex + 1) % industries.length];
+      });
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Handle mouse movement
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
+  };
 
   // Animation variants for the floating elements
   const floatingAnimation = {
@@ -29,7 +64,21 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+    <div 
+      className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden"
+      onMouseMove={handleMouseMove}
+    >
+      {/* Cursor-following blur */}
+      <motion.div
+        className="pointer-events-none absolute w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px]"
+        style={{
+          x: springX,
+          y: springY,
+          translateX: "-50%",
+          translateY: "-50%"
+        }}
+      />
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div 
@@ -52,10 +101,21 @@ const Login = () => {
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-100">
             CEPTUM
           </h1>
-          <p className="text-xl text-purple-200/80 leading-relaxed">
-            Providing scalable, efficient, and accessible optimization solutions for businesses
-            and researchers via a cloud-based platform.
-          </p>
+          <div className="space-y-4">
+            <p className="text-xl text-purple-200/80 leading-relaxed">
+              Providing scalable, efficient, and accessible optimization solutions for businesses
+              and researchers via a cloud-based platform.
+            </p>
+            <motion.p 
+              key={currentIndustry}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-lg text-purple-300/60"
+            >
+              Transforming operations in <span className="text-purple-300 font-semibold">{currentIndustry}</span> through advanced optimization.
+            </motion.p>
+          </div>
           <div className="hidden md:block">
             <motion.div 
               className="w-20 h-20 bg-purple-500/20 rounded-full absolute -bottom-10 -left-10 blur-xl"
