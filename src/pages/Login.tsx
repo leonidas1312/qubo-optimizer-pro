@@ -145,9 +145,9 @@ const Login = () => {
                     colors: {
                       brand: '#9b87f5',
                       brandAccent: '#7E69AB',
+                      inputBackground: 'transparent',
+                      inputBorder: 'lightgray',
                       inputText: 'white',
-                      inputLabel: 'white',
-                      inputPlaceholder: 'rgba(255, 255, 255, 0.5)',
                     },
                   },
                 },
@@ -162,7 +162,11 @@ const Login = () => {
                     borderRadius: '8px',
                     fontSize: '16px',
                     padding: '10px 15px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     color: 'white',
+                    '::placeholder': {
+                      color: 'rgba(255, 255, 255, 0.5)',
+                    },
                   },
                   label: {
                     color: 'white',
