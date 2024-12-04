@@ -3,8 +3,6 @@ import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Repository } from "@/components/ai/types";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const AIAssistant = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -55,10 +53,8 @@ const AIAssistant = () => {
   };
 
   return (
-    <DashboardLayout>
+    <div className="w-full">
       <div className="flex h-[calc(100vh-4rem)] relative">
-
-        
         <div className="flex-1">
           <AIAssistantChat 
             selectedFile={selectedFile} 
@@ -67,7 +63,7 @@ const AIAssistant = () => {
           />
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

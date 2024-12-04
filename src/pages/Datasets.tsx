@@ -83,7 +83,7 @@ const Datasets = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-8 px-4">
+      <div className="w-full">
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
