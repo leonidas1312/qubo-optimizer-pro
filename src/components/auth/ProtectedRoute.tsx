@@ -14,7 +14,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (!isAuthenticated) {
       toast.error("Please log in to access this page");
-      navigate('/');
+      navigate('/login');
     }
   }, [isAuthenticated, navigate]);
 

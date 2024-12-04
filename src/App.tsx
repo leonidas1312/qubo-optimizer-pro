@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
 import Solvers from "./pages/Solvers";
 import Hardware from "./pages/Hardware";
 import Playground from "./pages/Playground";
@@ -32,6 +33,7 @@ const App = () => {
               <TooltipProvider>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
                   <Route path="/playground" element={
                     <ProtectedRoute>
                       <Playground />

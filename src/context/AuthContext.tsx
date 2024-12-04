@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Session, User, AuthError } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 interface AuthUser extends User {
   username?: string;
@@ -47,13 +48,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (!session && !location.pathname.startsWith('/login')) {
+        navigate('/login');
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, location.pathname]);
 
   const login = async () => {
-    // Store the current path before redirecting
     localStorage.setItem('preAuthPath', location.pathname);
     
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -62,13 +66,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) throw error;
+    
+    if (error) {
+      toast.error("Failed to login");
+      throw error;
+    }
   };
 
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    navigate('/');
+    if (error) {
+      toast.error("Failed to logout");
+      throw error;
+    }
+    navigate('/login');
+    toast.success("Logged out successfully");
   };
 
   const signOut = async () => {
