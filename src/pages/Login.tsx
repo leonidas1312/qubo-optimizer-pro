@@ -145,6 +145,9 @@ const Login = () => {
                     colors: {
                       brand: '#9b87f5',
                       brandAccent: '#7E69AB',
+                      inputText: 'white',
+                      inputLabel: 'white',
+                      inputPlaceholder: 'rgba(255, 255, 255, 0.5)',
                     },
                   },
                 },
@@ -159,6 +162,10 @@ const Login = () => {
                     borderRadius: '8px',
                     fontSize: '16px',
                     padding: '10px 15px',
+                    color: 'white',
+                  },
+                  label: {
+                    color: 'white',
                   },
                 },
               }}
