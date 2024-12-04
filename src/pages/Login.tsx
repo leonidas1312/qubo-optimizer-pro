@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
-// Separate component for the dynamic industry text
 const DynamicIndustry = () => {
   const industries = [
     "healthcare",
@@ -164,9 +163,6 @@ const Login = () => {
                     padding: '10px 15px',
                     backgroundColor: 'rgba(0, 0, 0, 0.2)',
                     color: 'white',
-                    '&::placeholder': {
-                      color: 'rgba(255, 255, 255, 0.5)',
-                    },
                   },
                   label: {
                     color: 'white',
