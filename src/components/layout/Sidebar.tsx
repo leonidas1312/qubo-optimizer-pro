@@ -13,20 +13,15 @@ export function Sidebar({ className }: { className?: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const mainElementRef = React.useRef<HTMLElement | null>(null);
-
-  React.useEffect(() => {
-    mainElementRef.current = document.querySelector('main');
-  }, []);
 
   const handleToggle = () => {
-    setCollapsed((prev) => {
-      const newState = !prev;
-      if (mainElementRef.current) {
-        mainElementRef.current.setAttribute('data-sidebar-collapsed', newState.toString());
-      }
-      return newState;
-    });
+    const mainElement = document.querySelector('main');
+    const newState = !collapsed;
+    
+    if (mainElement) {
+      mainElement.setAttribute('data-sidebar-collapsed', newState.toString());
+    }
+    setCollapsed(newState);
   };
 
   const handleLogout = async () => {
