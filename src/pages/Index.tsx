@@ -1,22 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import {
-  Cloud,
-  Database,
-  Server,
-  Cpu,
-  ArrowRight,
-  GitBranch,
-  Network,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -33,133 +18,77 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-purple-900/20 z-0" />
-        <div className="container mx-auto px-4 z-10">
-          <div className="text-center space-y-6 animate-fade-in">
-            <h1 className="text-6xl font-bold gradient-text">
-              Cloud Optimization Platform
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-background to-background" />
+      
+      {/* Animated circles in background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-700" />
+      </div>
+
+      {/* Main content */}
+      <div className="relative container mx-auto px-4 h-screen flex flex-col items-center justify-center text-center">
+        {/* Hero Section */}
+        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+          {/* Logo and Brand */}
+          <div className="mb-12">
+            <h1 className="text-7xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-100">
+              CEPTUM
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Connect optimization algorithms with datasets and cloud hardware resources. 
-              Scale your optimization problems effortlessly with our cloud-native platform.
+            <p className="text-xl text-purple-200/80">
+              Cloud Optimization Platform
             </p>
-            <div className="flex justify-center gap-4 pt-8">
-              <Button 
-                size="lg" 
-                className="animate-fade-in" 
-                style={{ animationDelay: "0.2s" }}
-                onClick={handleGetStarted}
-              >
-                Login to Try Platform <ArrowRight className="ml-2" />
-              </Button>
+          </div>
+
+          {/* Main Message */}
+          <h2 className="text-4xl sm:text-5xl font-semibold leading-tight gradient-text">
+            Scalable Optimization Solutions for the Modern Enterprise
+          </h2>
+          
+          {/* Description */}
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Empower your business with our cloud-based platform, delivering efficient and accessible optimization solutions for enterprises and researchers alike.
+          </p>
+
+          {/* CTA Button */}
+          <div className="pt-8">
+            <Button 
+              size="lg" 
+              onClick={handleGetStarted}
+              className="text-lg px-8 py-6 bg-purple-600 hover:bg-purple-700 transition-all duration-300 transform hover:scale-105"
+            >
+              Login to Try Platform
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-2">Scalable</h3>
+              <p className="text-muted-foreground">
+                Grow your optimization capacity seamlessly with cloud infrastructure
+              </p>
+            </div>
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-2">Efficient</h3>
+              <p className="text-muted-foreground">
+                Leverage advanced algorithms and computing resources
+              </p>
+            </div>
+            <div className="glass p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-2">Accessible</h3>
+              <p className="text-muted-foreground">
+                Easy-to-use interface for complex optimization problems
+              </p>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Cloud Features Grid */}
-      <section className="py-24 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-            Cloud-Native Optimization
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Cloud className="w-10 h-10" />}
-              title="Cloud Infrastructure"
-              description="Leverage AWS EC2 for scalable computing and S3 for secure data storage."
-            />
-            <FeatureCard
-              icon={<Database className="w-10 h-10" />}
-              title="Private & Open Source"
-              description="Choose between private algorithms or contribute to the open-source community."
-            />
-            <FeatureCard
-              icon={<Network className="w-10 h-10" />}
-              title="Seamless Integration"
-              description="Connect algorithms, datasets, and hardware resources effortlessly."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-            How It Works
-          </h2>
-          <div className="space-y-24">
-            <WorkflowStep
-              icon={<GitBranch />}
-              title="Import Your Algorithm"
-              description="Upload your optimization algorithm or use our open-source collection."
-              align="right"
-            />
-            <WorkflowStep
-              icon={<Database />}
-              title="Connect Your Data"
-              description="Link your datasets securely through Amazon S3 integration."
-              align="left"
-            />
-            <WorkflowStep
-              icon={<Server />}
-              title="Select Computing Resources"
-              description="Choose the right EC2 instance for your workload."
-              align="right"
-            />
-            <WorkflowStep
-              icon={<Cpu />}
-              title="Execute Workflow"
-              description="Run your optimization tasks with automatic scaling."
-              align="left"
-            />
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 };
-
-const FeatureCard = ({ icon, title, description }: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) => (
-  <Card className="hover-card glass animate-fade-in">
-    <CardHeader>
-      <div className="mb-4 text-primary">{icon}</div>
-      <CardTitle>{title}</CardTitle>
-      <CardDescription>{description}</CardDescription>
-    </CardHeader>
-  </Card>
-);
-
-const WorkflowStep = ({ icon, title, description, align }: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  align: "left" | "right";
-}) => (
-  <div className={`flex items-center gap-8 ${align === "right" ? "flex-row-reverse" : ""}`}>
-    <div className="flex-1">
-      <Card className="hover-card glass animate-fade-in">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="text-primary">{icon}</div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2">{title}</h3>
-              <p className="text-muted-foreground">{description}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-    <div className="flex-1" />
-  </div>
-);
 
 export default Index;

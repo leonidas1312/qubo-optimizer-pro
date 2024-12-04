@@ -29,7 +29,7 @@ export function CustomNavigationMenu() {
       <div className="container mx-auto flex justify-between items-center h-16 px-4">
         <Link to="/" className="flex items-center space-x-2">
           <Code2 className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl">QUBOt</span>
+          <span className="font-bold text-xl">CEPTUM</span>
         </Link>
 
         <NavigationMenu className="hidden md:flex">
