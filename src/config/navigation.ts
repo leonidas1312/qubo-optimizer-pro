@@ -1,15 +1,10 @@
 import {
-  Code2,
-  Upload,
+  Bot,
   Database,
   Cpu,
   Activity,
   CreditCard,
-  Settings2,
   BookOpen,
-  Bot,
-  SquareTerminal,
-  Frame,
   PieChart,
   Map,
 } from "lucide-react"
@@ -21,12 +16,6 @@ export const navigationData = {
       url: "/ai-assistant",
       icon: Bot,
       description: "Create QUBOts with AI help",
-    },
-    {
-      title: "Solvers",
-      url: "/solvers",
-      icon: Code2,
-      description: "Create and manage optimization solvers",
     },
     {
       title: "Datasets",
@@ -60,11 +49,6 @@ export const navigationData = {
     },
   ],
   projects: [
-    {
-      name: "Recent Solvers",
-      url: "/solvers",
-      icon: Frame,
-    },
     {
       name: "Analytics",
       url: "/analytics",
