@@ -108,18 +108,20 @@ export default function UploadSolver() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Explain how your solver works and what problems it can solve"
-                className="h-32"
+                className="min-h-[100px]"
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label>Original Code</Label>
-              <CodeEditor
-                value={originalCode}
-                onChange={setOriginalCode}
-                language="python"
-                className="h-[400px]"
-              />
+              <div className="border rounded-md overflow-hidden">
+                <CodeEditor
+                  value={originalCode}
+                  onChange={setOriginalCode}
+                  language="python"
+                  className="min-h-[400px]"
+                />
+              </div>
             </div>
 
             <Button 
@@ -140,20 +142,22 @@ export default function UploadSolver() {
                 <TabsTrigger value="verification">Verification</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="transformed">
+              <TabsContent value="transformed" className="mt-4">
                 <div className="space-y-4">
                   <Label>Transformed Code</Label>
-                  <CodeEditor
-                    value={transformedCode}
-                    onChange={setTransformedCode}
-                    language="python"
-                    className="h-[400px]"
-                  />
+                  <div className="border rounded-md overflow-hidden">
+                    <CodeEditor
+                      value={transformedCode}
+                      onChange={setTransformedCode}
+                      language="python"
+                      className="min-h-[400px]"
+                    />
+                  </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="verification">
-                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+              <TabsContent value="verification" className="mt-4">
+                <ScrollArea className="h-[500px] w-full rounded-md border p-4">
                   <div className="space-y-4">
                     <h3 className="font-medium">Verification Steps</h3>
                     {verificationResults.map((step, index) => (
