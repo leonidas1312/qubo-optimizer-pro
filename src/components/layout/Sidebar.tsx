@@ -10,10 +10,18 @@ export function Sidebar({ className }: { className?: string }) {
   const [collapsed, setCollapsed] = React.useState(false);
   const location = useLocation();
 
+  // Set data attribute on the main element when sidebar state changes
+  React.useEffect(() => {
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.setAttribute('data-sidebar-collapsed', collapsed.toString());
+    }
+  }, [collapsed]);
+
   return (
     <div
       className={cn(
-        "relative flex flex-col border-r bg-background",
+        "relative flex flex-col border-r bg-background transition-all duration-300",
         collapsed ? "w-16" : "w-64",
         className
       )}
