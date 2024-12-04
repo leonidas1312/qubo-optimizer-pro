@@ -1,15 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
-  Blocks,
+  Cloud,
   Database,
-  Network,
+  Server,
   Cpu,
   Users,
+  Lock,
   Workflow,
-  Link as LinkIcon,
-  Sparkles,
   ArrowRight,
+  GitBranch,
+  Network,
 } from "lucide-react";
 import {
   Card,
@@ -24,45 +25,49 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background to-muted z-0" />
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-purple-900/20 z-0" />
         <div className="container mx-auto px-4 z-10">
           <div className="text-center space-y-6 animate-fade-in">
             <h1 className="text-6xl font-bold gradient-text">
-              Welcome to QUBOt
+              Cloud Optimization Platform
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Solve complex optimization problems with our innovative platform connecting quantum-inspired algorithms, datasets, and computing resources.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Connect optimization algorithms with datasets and cloud hardware resources. 
+              Scale your optimization problems effortlessly with our cloud-native platform.
             </p>
             <div className="flex justify-center gap-4 pt-8">
               <Button asChild size="lg" className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                <Link to="/playground">Try Playground</Link>
+                <Link to="/playground">Try Platform</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                <Link to="/docs">Learn More</Link>
+                <Link to="/docs">Documentation</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Cloud Features Grid */}
       <section className="py-24 bg-muted/50">
         <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
+            Cloud-Native Optimization
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<Users className="w-10 h-10" />}
-              title="Community-Driven"
-              description="Join a growing community of researchers, developers, and optimization enthusiasts."
+              icon={<Cloud className="w-10 h-10" />}
+              title="Cloud Infrastructure"
+              description="Leverage AWS EC2 for scalable computing and S3 for secure data storage."
             />
             <FeatureCard
-              icon={<Blocks className="w-10 h-10" />}
-              title="QUBOt Blocks"
-              description="Create and connect modular optimization components for complex problem-solving."
+              icon={<Lock className="w-10 h-10" />}
+              title="Private & Open Source"
+              description="Choose between private algorithms or contribute to the open-source community."
             />
             <FeatureCard
               icon={<Network className="w-10 h-10" />}
-              title="Flexible Connections"
-              description="Connect solvers, datasets, and hardware resources seamlessly."
+              title="Seamless Integration"
+              description="Connect algorithms, datasets, and hardware resources effortlessly."
             />
           </div>
         </div>
@@ -72,26 +77,32 @@ const Index = () => {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 gradient-text">
-            How QUBOt Works
+            How It Works
           </h2>
           <div className="space-y-24">
             <WorkflowStep
-              icon={<Blocks />}
-              title="Create QUBOts"
-              description="Design optimization blocks with our intuitive interface."
+              icon={<GitBranch />}
+              title="Import Your Algorithm"
+              description="Upload your optimization algorithm or use our open-source collection."
               align="right"
             />
             <WorkflowStep
               icon={<Database />}
-              title="Connect Data"
-              description="Link your datasets to QUBOt blocks for processing."
+              title="Connect Your Data"
+              description="Link your datasets securely through Amazon S3 integration."
               align="left"
             />
             <WorkflowStep
-              icon={<Cpu />}
-              title="Execute"
-              description="Run your workflows on optimized hardware."
+              icon={<Server />}
+              title="Select Computing Resources"
+              description="Choose the right EC2 instance for your workload."
               align="right"
+            />
+            <WorkflowStep
+              icon={<Workflow />}
+              title="Execute Workflow"
+              description="Run your optimization tasks with automatic scaling."
+              align="left"
             />
           </div>
         </div>
@@ -105,7 +116,7 @@ const Index = () => {
               Ready to Optimize?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Start building your optimization workflows today.
+              Start solving optimization problems in the cloud today.
             </p>
             <Button asChild size="lg" className="mt-8">
               <Link to="/playground">
