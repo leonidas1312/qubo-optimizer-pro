@@ -10,6 +10,7 @@ import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { BasicInfoForm } from "@/components/upload/BasicInfoForm";
 import { FileUploadSection } from "@/components/upload/FileUploadSection";
 import { Code2, FileText } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 export default function UploadSolver() {
   const { user } = useAuth();
@@ -148,27 +149,27 @@ export default function UploadSolver() {
 
               <TabsContent value="transformed" className="mt-4">
                 <div className="space-y-4">
-                  <div className="border rounded-md overflow-hidden">
+                  <div className="border rounded-md overflow-hidden h-[600px]">
                     <CodeEditor
                       value={transformedCode}
                       onChange={setTransformedCode}
                       language="python"
-                      className="min-h-[400px]"
+                      className="h-full"
                     />
                   </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="verification" className="mt-4">
-                <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+                <ScrollArea className="h-[600px] w-full rounded-md border p-4">
                   <div className="space-y-4">
                     <h3 className="font-medium">Verification Steps</h3>
                     {verificationResults.map((step, index) => (
                       <div 
                         key={index}
-                        className="p-4 rounded-lg bg-muted"
+                        className="p-4 rounded-lg bg-muted prose prose-invert max-w-none"
                       >
-                        {step}
+                        <ReactMarkdown>{step}</ReactMarkdown>
                       </div>
                     ))}
                   </div>

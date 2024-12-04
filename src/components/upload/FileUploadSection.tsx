@@ -68,12 +68,12 @@ export const FileUploadSection = ({
               Change File
             </Button>
           </div>
-          <div className="border rounded-md overflow-hidden">
+          <div className="border rounded-md overflow-hidden h-[600px]">
             <CodeEditor
               value={originalCode}
               onChange={setOriginalCode}
               language="python"
-              className="min-h-[400px]"
+              className="h-full"
             />
           </div>
         </div>
