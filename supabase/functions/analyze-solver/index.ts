@@ -1,8 +1,9 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import OpenAI from "https://deno.land/x/openai@v4.50.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const MAX_CODE_SIZE = 10000;
+const openai = new OpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,63 +41,37 @@ serve(async (req) => {
   try {
     const { code, description } = await req.json();
 
-    if (!code || code.length > MAX_CODE_SIZE) {
-      throw new Error(`Code size exceeds maximum limit of ${MAX_CODE_SIZE} characters`);
-    }
-
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key is not configured');
+    if (!code) {
+      throw new Error('No code provided');
     }
 
     console.log('Processing code analysis request...');
+    console.log('Code length:', code.length);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: `Code:\n${code}\n\nDescription:\n${description}` }
-        ],
-        stream: true,
-      }),
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: `Code:\n${code}\n\nDescription:\n${description}` }
+      ],
+      stream: true,
+      temperature: 0.1,
+      max_tokens: 2000,
     });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${errorData}`);
-    }
-
-    const transformStream = new TransformStream({
-      async transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        const lines = text.split('\n');
-        
-        for (const line of lines) {
-          if (line.trim() === '') continue;
-          if (line.trim() === 'data: [DONE]') continue;
-          
-          if (line.startsWith('data: ')) {
-            try {
-              const json = JSON.parse(line.slice(6));
-              const content = json.choices[0]?.delta?.content || '';
-              if (content) {
-                controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
-              }
-            } catch (e) {
-              console.error('Error parsing JSON:', e);
-            }
-          }
+    // Create a readable stream that processes the OpenAI response
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        for await (const chunk of response.toReadableStream()) {
+          const text = JSON.stringify(chunk);
+          controller.enqueue(encoder.encode(`data: ${text}\n\n`));
         }
+        controller.close();
       },
     });
 
-    return new Response(response.body?.pipeThrough(transformStream), {
+    return new Response(readableStream, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/event-stream',
