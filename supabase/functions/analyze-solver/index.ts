@@ -57,7 +57,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: `Code:\n${code}\n\nDescription:\n${description}` }
@@ -76,7 +76,6 @@ serve(async (req) => {
     const stream = response.body;
     const reader = stream?.getReader();
     const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
 
     const readableStream = new ReadableStream({
       async start(controller) {
@@ -87,8 +86,8 @@ serve(async (req) => {
             const { done, value } = await reader.read();
             if (done) break;
             
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n');
+            const text = new TextDecoder().decode(value);
+            const lines = text.split('\n');
             
             for (const line of lines) {
               if (line.trim() === '') continue;
@@ -98,7 +97,9 @@ serve(async (req) => {
                 try {
                   const json = JSON.parse(line.slice(6));
                   const content = json.choices[0]?.delta?.content || '';
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                  if (content) {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                  }
                 } catch (e) {
                   console.error('Error parsing JSON:', e);
                 }
@@ -107,6 +108,7 @@ serve(async (req) => {
           }
         } catch (error) {
           console.error('Error reading stream:', error);
+          controller.error(error);
         } finally {
           controller.close();
           reader.releaseLock();

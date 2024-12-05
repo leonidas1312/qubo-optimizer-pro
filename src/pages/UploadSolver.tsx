@@ -2,18 +2,16 @@ import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { CodeEditor } from "@/components/playground/editor/CodeEditor";
+import { Progress } from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 import { BasicInfoForm } from "@/components/upload/BasicInfoForm";
 import { FileUploadSection } from "@/components/upload/FileUploadSection";
-import { Code2, FileText, Loader2 } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
-import { Progress } from "@/components/ui/progress";
+import { CodeEditor } from "@/components/playground/editor/CodeEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function UploadSolver() {
-  const { user } = useAuth();
   const [originalCode, setOriginalCode] = useState("");
   const [transformedCode, setTransformedCode] = useState("");
   const [description, setDescription] = useState("");
@@ -48,8 +46,7 @@ export default function UploadSolver() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to analyze solver');
+        throw new Error('Failed to analyze solver');
       }
 
       // Start progress animation
@@ -63,8 +60,8 @@ export default function UploadSolver() {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
-      while (true) {
-        const { done, value } = await reader!.read();
+      while (reader) {
+        const { done, value } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value);
@@ -118,17 +115,7 @@ export default function UploadSolver() {
                 onClick={() => setShowCode(!showCode)}
                 className="flex items-center gap-2"
               >
-                {showCode ? (
-                  <>
-                    <FileText className="h-4 w-4" />
-                    Show Info
-                  </>
-                ) : (
-                  <>
-                    <Code2 className="h-4 w-4" />
-                    Show Code
-                  </>
-                )}
+                {showCode ? "Show Info" : "Show Code"}
               </Button>
             </div>
 
