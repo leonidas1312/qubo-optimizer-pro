@@ -196,6 +196,80 @@ export type Database = {
         }
         Relationships: []
       }
+      jobs: {
+        Row: {
+          configuration: Json | null
+          created_at: string
+          creator_id: string
+          dataset_id: string | null
+          error: string | null
+          hardware_id: string | null
+          id: string
+          name: string
+          result: Json | null
+          solver_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          configuration?: Json | null
+          created_at?: string
+          creator_id: string
+          dataset_id?: string | null
+          error?: string | null
+          hardware_id?: string | null
+          id?: string
+          name: string
+          result?: Json | null
+          solver_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          configuration?: Json | null
+          created_at?: string
+          creator_id?: string
+          dataset_id?: string | null
+          error?: string | null
+          hardware_id?: string | null
+          id?: string
+          name?: string
+          result?: Json | null
+          solver_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_hardware_id_fkey"
+            columns: ["hardware_id"]
+            isOneToOne: false
+            referencedRelation: "hardware_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_solver_id_fkey"
+            columns: ["solver_id"]
+            isOneToOne: false
+            referencedRelation: "solvers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

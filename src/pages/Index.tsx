@@ -1,8 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { BlockPalette } from "@/components/blocks/BlockPalette";
 import { BlockCanvas } from "@/components/blocks/BlockCanvas";
-import { CodePreview } from "@/components/blocks/CodePreview";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -35,23 +33,10 @@ const Index = () => {
         </div>
         
         <div className="col-span-9">
-          <Tabs defaultValue="canvas" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="canvas">Visual Editor</TabsTrigger>
-              <TabsTrigger value="preview">Code Preview</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="canvas" className="space-y-4">
-              <BlockCanvas 
-                connections={connections} 
-                setConnections={setConnections}
-              />
-            </TabsContent>
-            
-            <TabsContent value="preview">
-              <CodePreview connections={connections} />
-            </TabsContent>
-          </Tabs>
+          <BlockCanvas 
+            connections={connections} 
+            setConnections={setConnections}
+          />
         </div>
       </div>
     </div>

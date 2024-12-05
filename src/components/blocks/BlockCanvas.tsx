@@ -5,7 +5,7 @@ import { Play, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { ResultsChart } from "@/components/visualization/ResultsChart";
+import { useNavigate } from "react-router-dom";
 
 interface BlockCanvasProps {
   connections: any[];
@@ -13,9 +13,9 @@ interface BlockCanvasProps {
 }
 
 export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -56,76 +56,56 @@ export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) =
     const hardware = connections.find(c => c.type === "hardware");
 
     if (!solver || !dataset || !hardware) {
-      toast.error("Please add a solver, dataset, and hardware to run the optimization");
+      toast.error("Please add a solver, dataset, and hardware to submit a job");
       return false;
     }
     return true;
   };
 
-  const handleRun = async () => {
+  const handleSubmitJob = async () => {
     if (!validateConnections()) return;
     if (!user) {
-      toast.error("Please log in to run optimizations");
+      toast.error("Please log in to submit jobs");
       return;
     }
 
-    setIsRunning(true);
-    setResults(null);
+    setIsSubmitting(true);
 
     try {
-      const { data: blockConnection, error: saveError } = await supabase
-        .from('block_connections')
-        .insert({
-          creator_id: user.id,
-          name: "Optimization Run",
-          solver_id: connections.find(c => c.type === "solver")?.id,
-          dataset_id: connections.find(c => c.type === "dataset")?.id,
-          hardware_id: connections.find(c => c.type === "hardware")?.id,
-          configuration: { connections }
-        })
-        .select()
-        .single();
+      const solver = connections.find(c => c.type === "solver");
+      const dataset = connections.find(c => c.type === "dataset");
+      const hardware = connections.find(c => c.type === "hardware");
 
-      if (saveError) throw saveError;
-
-      const response = await fetch('/api/solve', {
+      const response = await fetch('/api/create-job', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          solver: connections.find(c => c.type === "solver"),
-          dataset: connections.find(c => c.type === "dataset"),
-          hardware: connections.find(c => c.type === "hardware"),
+          solver,
+          dataset,
+          hardware,
+          userId: user.id
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to run optimization');
+        throw new Error('Failed to create job');
       }
 
-      const data = await response.json();
+      const { job } = await response.json();
       
-      const hardware = connections.find(c => c.type === "hardware");
-      const executionTimeHours = data.time / 3600;
-      const cost = executionTimeHours * hardware.cost_per_hour;
+      toast.success("Job submitted successfully!");
+      navigate('/jobs'); // Redirect to jobs page
       
-      setResults({
-        ...data,
-        cost: cost.toFixed(2)
-      });
-      
-      toast.success("Optimization completed successfully!");
     } catch (error) {
-      console.error('Error running optimization:', error);
-      toast.error("Failed to run optimization");
+      console.error('Error submitting job:', error);
+      toast.error("Failed to submit job");
     } finally {
-      setIsRunning(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="space-y-6 flex-1">
+    <div className="space-y-6">
       <Card
         className="flex-1 p-6 bg-black/20 backdrop-blur-sm border-white/10 min-h-[300px] transition-all duration-300"
         onDrop={handleDrop}
@@ -161,51 +141,22 @@ export const BlockCanvas = ({ connections, setConnections }: BlockCanvasProps) =
       </Card>
 
       <Button
-        onClick={handleRun}
-        disabled={isRunning || connections.length < 3}
+        onClick={handleSubmitJob}
+        disabled={isSubmitting || connections.length < 3}
         className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:opacity-90 transition-opacity h-12"
       >
-        {isRunning ? (
+        {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Running Optimization...
+            Submitting Job...
           </>
         ) : (
           <>
             <Play className="mr-2 h-4 w-4" />
-            Run Optimization
+            Submit Job
           </>
         )}
       </Button>
-
-      {results && (
-        <Card className="p-6 bg-black/20 backdrop-blur-sm border-white/10 animate-fade-in">
-          <h3 className="text-lg font-semibold mb-6">Results</h3>
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Best Cost</p>
-                <p className="text-2xl font-bold">{results.cost}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Execution Cost</p>
-                <p className="text-2xl font-bold text-green-400">${results.cost}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Time Taken</p>
-                <p className="text-2xl font-bold">{results.time.toFixed(2)}s</p>
-              </div>
-            </div>
-            
-            {results.iterations_cost && (
-              <div className="mt-6">
-                <h4 className="text-sm font-medium mb-4">Optimization Progress</h4>
-                <ResultsChart data={results.iterations_cost} />
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
     </div>
   );
 };
