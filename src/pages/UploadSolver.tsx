@@ -10,6 +10,7 @@ import { FileUploadSection } from "@/components/upload/FileUploadSection";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession } from '@supabase/auth-helpers-react';
 
 export default function UploadSolver() {
   const [originalCode, setOriginalCode] = useState("");
@@ -22,8 +23,14 @@ export default function UploadSolver() {
   const [showCode, setShowCode] = useState(false);
   const [progress, setProgress] = useState(0);
   const progressInterval = useRef<number | NodeJS.Timeout>();
+  const session = useSession();
 
   const analyzeSolver = async () => {
+    if (!session) {
+      toast.error("Please log in to analyze solvers");
+      return;
+    }
+
     if (!originalCode || !description) {
       toast.error("Please provide both code and description");
       return;
@@ -38,6 +45,7 @@ export default function UploadSolver() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ 
           code: originalCode,
@@ -46,7 +54,8 @@ export default function UploadSolver() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze solver');
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to analyze solver');
       }
 
       // Start progress animation
