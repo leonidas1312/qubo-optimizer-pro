@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CodeEditor } from "@/components/playground/editor/CodeEditor";
 import { BasicInfoForm } from "@/components/upload/BasicInfoForm";
 import { FileUploadSection } from "@/components/upload/FileUploadSection";
-import { Code2, FileText } from "lucide-react";
+import { Code2, FileText, Loader2 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
+import { Progress } from "@/components/ui/progress";
 
 export default function UploadSolver() {
   const { user } = useAuth();
@@ -19,9 +19,11 @@ export default function UploadSolver() {
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [verificationResults, setVerificationResults] = useState<string[]>([]);
+  const [analysisOutput, setAnalysisOutput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCode, setShowCode] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const progressInterval = useRef<number>();
 
   const analyzeSolver = async () => {
     if (!originalCode || !description) {
@@ -30,55 +32,71 @@ export default function UploadSolver() {
     }
 
     setIsAnalyzing(true);
+    setAnalysisOutput("");
+    setProgress(0);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('analyze-solver', {
-        body: { 
+      const response = await fetch('https://zddqnxesbhbvmdcyqpuw.supabase.co/functions/v1/analyze-solver', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
           code: originalCode,
           description: description
-        }
+        })
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to analyze solver');
+      }
 
-      setTransformedCode(data.transformedCode);
-      setVerificationResults(data.verificationSteps);
-      toast.success("Code analyzed and transformed successfully");
+      // Start progress animation
+      progressInterval.current = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) return prev;
+          return prev + 1;
+        });
+      }, 500);
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          if (line.startsWith('data: ')) {
+            try {
+              const { content } = JSON.parse(line.slice(5));
+              setAnalysisOutput(prev => prev + content);
+            } catch (e) {
+              console.error('Error parsing chunk:', e);
+            }
+          }
+        }
+      }
+
+      // Extract transformed code from markdown
+      const codeMatch = analysisOutput.match(/```python\n([\s\S]*?)```/);
+      if (codeMatch) {
+        setTransformedCode(codeMatch[1]);
+      }
+
+      toast.success("Analysis completed successfully");
     } catch (error) {
       console.error("Error analyzing solver:", error);
-      toast.error("Failed to analyze solver");
+      toast.error(error instanceof Error ? error.message : "Failed to analyze solver");
     } finally {
+      clearInterval(progressInterval.current);
+      setProgress(100);
       setIsAnalyzing(false);
-    }
-  };
-
-  const handleSave = async () => {
-    if (!user) {
-      toast.error("Please log in to save solvers");
-      return;
-    }
-
-    if (!name || !transformedCode) {
-      toast.error("Please provide a name and analyze the code first");
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('solvers')
-        .insert({
-          name,
-          description,
-          code_content: transformedCode,
-          creator_id: user.id,
-          is_public: true,
-          solver_type: 'custom'
-        });
-
-      if (error) throw error;
-      toast.success("Solver saved successfully");
-    } catch (error) {
-      console.error("Error saving solver:", error);
-      toast.error("Failed to save solver");
     }
   };
 
@@ -134,20 +152,39 @@ export default function UploadSolver() {
               disabled={isAnalyzing || !originalCode}
               className="w-full"
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze & Transform"}
+              {isAnalyzing ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Analyzing...
+                </div>
+              ) : (
+                "Analyze & Transform"
+              )}
             </Button>
+
+            {isAnalyzing && (
+              <Progress value={progress} className="w-full" />
+            )}
           </div>
         </Card>
 
         <div className="space-y-6">
           <Card className="p-6">
-            <Tabs defaultValue="transformed">
+            <Tabs defaultValue="analysis">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="transformed">Transformed Code</TabsTrigger>
-                <TabsTrigger value="verification">Verification</TabsTrigger>
+                <TabsTrigger value="analysis">Analysis</TabsTrigger>
+                <TabsTrigger value="code">Transformed Code</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="transformed" className="mt-4">
+              <TabsContent value="analysis" className="mt-4">
+                <ScrollArea className="h-[600px] w-full rounded-md border p-4">
+                  <div className="prose prose-invert max-w-none">
+                    <ReactMarkdown>{analysisOutput}</ReactMarkdown>
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+
+              <TabsContent value="code" className="mt-4">
                 <div className="space-y-4">
                   <div className="border rounded-md overflow-hidden h-[600px]">
                     <CodeEditor
@@ -159,31 +196,7 @@ export default function UploadSolver() {
                   </div>
                 </div>
               </TabsContent>
-
-              <TabsContent value="verification" className="mt-4">
-                <ScrollArea className="h-[600px] w-full rounded-md border p-4">
-                  <div className="space-y-4">
-                    <h3 className="font-medium">Verification Steps</h3>
-                    {verificationResults.map((step, index) => (
-                      <div 
-                        key={index}
-                        className="p-4 rounded-lg bg-muted prose prose-invert max-w-none"
-                      >
-                        <ReactMarkdown>{step}</ReactMarkdown>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </TabsContent>
             </Tabs>
-
-            <Button 
-              onClick={handleSave}
-              className="w-full mt-6"
-              disabled={!transformedCode}
-            >
-              Save Solver
-            </Button>
           </Card>
         </div>
       </div>

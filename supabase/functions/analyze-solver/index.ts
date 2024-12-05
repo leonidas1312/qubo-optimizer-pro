@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const MAX_CODE_SIZE = 10000; // Maximum characters for code input
+const MAX_CODE_SIZE = 10000;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,17 +11,26 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `You are an expert at analyzing and transforming optimization algorithms. Your task is to:
 
-1. Analyze the provided solver code and understand its core logic
-2. Transform it to match our platform's requirements:
+1. First, analyze the provided solver code and explain your findings step by step
+2. Then, transform it to match our platform's requirements:
    - Main function should accept (qubo_matrix: np.ndarray, parameters: dict = None)
    - Return tuple: (best_solution, best_cost, costs_per_iteration, elapsed_time)
-3. Verify logical equivalence by:
+3. Finally, verify logical equivalence by:
    - Identifying key mathematical operations
    - Ensuring optimization objectives remain unchanged
    - Preserving the core algorithm steps
-   - Adding detailed comments explaining the transformation
 
-Provide both the transformed code and verification steps that prove logical equivalence.`;
+Format your response like this:
+# Analysis
+[Your step-by-step analysis]
+
+# Transformed Code
+\`\`\`python
+[Your transformed code]
+\`\`\`
+
+# Verification Steps
+[Your verification steps]`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -31,7 +40,6 @@ serve(async (req) => {
   try {
     const { code, description } = await req.json();
 
-    // Validate input size
     if (!code || code.length > MAX_CODE_SIZE) {
       throw new Error(`Code size exceeds maximum limit of ${MAX_CODE_SIZE} characters`);
     }
@@ -42,68 +50,78 @@ serve(async (req) => {
 
     console.log('Processing code analysis request...');
 
-    // Set up AbortController for timeout
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: `Code:\n${code}\n\nDescription:\n${description}` }
+        ],
+        stream: true,
+      }),
+    });
 
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Code:\n${code}\n\nDescription:\n${description}` }
-          ],
-          temperature: 0.2,
-          max_tokens: 2000,
-        }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('OpenAI API error:', errorData);
-        throw new Error(`OpenAI API error: ${errorData}`);
-      }
-
-      const data = await response.json();
-      console.log('Successfully received OpenAI response');
-
-      const aiResponse = data.choices[0].message.content;
-
-      // Parse the AI response to extract code and verification steps
-      const codeMatch = aiResponse.match(/```python\n([\s\S]*?)```/);
-      const transformedCode = codeMatch ? codeMatch[1] : '';
-      
-      // Extract verification steps (everything after the code block)
-      const verificationSteps = aiResponse
-        .split('```')[2]
-        .trim()
-        .split('\n')
-        .filter(step => step.trim().length > 0);
-
-      return new Response(
-        JSON.stringify({
-          transformedCode,
-          verificationSteps,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-
-    } catch (error) {
-      clearTimeout(timeout);
-      if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 25 seconds');
-      }
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData}`);
     }
+
+    // Set up streaming response
+    const stream = response.body;
+    const reader = stream?.getReader();
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        if (!reader) return;
+        
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.trim() === '') continue;
+              if (line.trim() === 'data: [DONE]') continue;
+              
+              if (line.startsWith('data: ')) {
+                try {
+                  const json = JSON.parse(line.slice(6));
+                  const content = json.choices[0]?.delta?.content || '';
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                } catch (e) {
+                  console.error('Error parsing JSON:', e);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error reading stream:', error);
+        } finally {
+          controller.close();
+          reader.releaseLock();
+        }
+      },
+    });
+
+    return new Response(readableStream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
 
   } catch (error) {
     console.error('Error in analyze-solver function:', error);
