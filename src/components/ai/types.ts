@@ -26,3 +26,11 @@ export interface ChatInputProps {
 export interface ChatMessageProps {
   message: Message;
 }
+
+export interface ChatContainerProps {
+  messages: Message[];
+  showFilePreview: boolean;
+  generatedFileContent: string | null;
+  setShowFilePreview: (show: boolean) => void;
+  onSendMessage: (content: string) => void;
+}

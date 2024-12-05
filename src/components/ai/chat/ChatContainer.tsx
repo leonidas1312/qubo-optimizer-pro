@@ -10,6 +10,7 @@ interface ChatContainerProps {
   showFilePreview: boolean;
   generatedFileContent: string | null;
   setShowFilePreview: (show: boolean) => void;
+  onSendMessage: (content: string) => void;
 }
 
 export const ChatContainer = ({
@@ -17,11 +18,12 @@ export const ChatContainer = ({
   showFilePreview,
   generatedFileContent,
   setShowFilePreview,
+  onSendMessage,
 }: ChatContainerProps) => {
   return (
     <ScrollArea className="flex-1 px-4">
       {messages.length === 0 && (
-        <ExamplePrompts onSelectPrompt={(prompt) => handleSendMessage(prompt)} />
+        <ExamplePrompts onSelectPrompt={(prompt) => onSendMessage(prompt)} />
       )}
       {messages.map((message, index) => (
         <ChatMessage key={index} message={message} />

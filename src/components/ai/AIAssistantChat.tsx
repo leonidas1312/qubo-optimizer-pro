@@ -169,6 +169,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             showFilePreview={showFilePreview}
             generatedFileContent={generatedFileContent}
             setShowFilePreview={setShowFilePreview}
+            onSendMessage={handleSendMessage}
           />
 
           <ChatInput
