@@ -23,7 +23,7 @@ export default function UploadSolver() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCode, setShowCode] = useState(false);
   const [progress, setProgress] = useState(0);
-  const progressInterval = useRef<number>();
+  const progressInterval = useRef<number | NodeJS.Timeout>();
 
   const analyzeSolver = async () => {
     if (!originalCode || !description) {
