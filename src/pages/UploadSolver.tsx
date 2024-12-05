@@ -57,33 +57,32 @@ export default function UploadSolver() {
         });
       }, 500);
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      while (reader) {
+      const reader = new ReadableStreamDefaultReader(response.body!);
+      
+      while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
+        
+        const text = new TextDecoder().decode(value);
+        const lines = text.split('\n');
+        
         for (const line of lines) {
           if (line.trim() === '') continue;
           if (line.startsWith('data: ')) {
             try {
               const { content } = JSON.parse(line.slice(5));
               setAnalysisOutput(prev => prev + content);
+              
+              // Extract transformed code if present
+              const codeMatch = content.match(/```python\n([\s\S]*?)```/);
+              if (codeMatch) {
+                setTransformedCode(codeMatch[1]);
+              }
             } catch (e) {
               console.error('Error parsing chunk:', e);
             }
           }
         }
-      }
-
-      // Extract transformed code from markdown
-      const codeMatch = analysisOutput.match(/```python\n([\s\S]*?)```/);
-      if (codeMatch) {
-        setTransformedCode(codeMatch[1]);
       }
 
       toast.success("Analysis completed successfully");
