@@ -7,8 +7,8 @@ export const navigation = [
     icon: LayoutDashboard,
   },
   {
-    title: "Public Solvers",
-    href: "/public-solvers",
+    title: "Solvers",
+    href: "/solvers",
     icon: Users,
   },
   {
