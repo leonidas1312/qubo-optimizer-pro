@@ -362,6 +362,7 @@ export type Database = {
           created_at: string
           creator_id: string
           description: string | null
+          download_url: string | null
           file_path: string | null
           id: string
           is_public: boolean
@@ -376,6 +377,7 @@ export type Database = {
           created_at?: string
           creator_id: string
           description?: string | null
+          download_url?: string | null
           file_path?: string | null
           id?: string
           is_public?: boolean
@@ -390,6 +392,7 @@ export type Database = {
           created_at?: string
           creator_id?: string
           description?: string | null
+          download_url?: string | null
           file_path?: string | null
           id?: string
           is_public?: boolean
