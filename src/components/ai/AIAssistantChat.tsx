@@ -1,19 +1,13 @@
 import { useState, useEffect } from "react";
 import { ChatInput } from "./chat/ChatInput";
-import { ChatMessage } from "./chat/ChatMessage";
 import { ChatHeader } from "./chat/ChatHeader";
-import { ExamplePrompts } from "./chat/ExamplePrompts";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatContainer } from "./chat/ChatContainer";
+import { RepositorySection } from "./chat/RepositorySection";
 import { Message, Repository } from "./types";
 import { AIResponse } from "./types/ai-types";
-import { RepositoryCombobox } from "@/components/github/RepositoryCombobox";
-import { FileTree } from "@/components/github/FileTree";
-import { Button } from "@/components/ui/button";
-import { Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SOLVER_SYSTEM_MESSAGE } from "./constants/ai-messages";
 
 interface AIAssistantChatProps {
@@ -80,9 +74,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
         { credentials: 'include' }
       );
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch file content');
-      }
+      if (!response.ok) throw new Error('Failed to fetch file content');
       
       const data = await response.json();
       const content = atob(data.content);
@@ -107,58 +99,39 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
 
     try {
       if (content.startsWith("ADD SOLVER") && selectedRepo && generatedFileContent) {
-        try {
-          const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-            body: { 
-              messages: [
-                ...messages, 
-                userMessage,
-                {
-                  role: "system",
-                  content: SOLVER_SYSTEM_MESSAGE(generatedFileContent)
-                }
-              ],
-              command: "ADD_SOLVER",
-              fileContent: generatedFileContent
-            }
-          });
-
-          if (error) {
-            console.error("Supabase function error:", error);
-            throw error;
+        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+          body: { 
+            messages: [
+              ...messages, 
+              userMessage,
+              {
+                role: "system",
+                content: SOLVER_SYSTEM_MESSAGE(generatedFileContent)
+              }
+            ],
+            command: "ADD_SOLVER",
+            fileContent: generatedFileContent
           }
+        });
 
-          if (!data || !data.content) {
-            console.error("Invalid response format:", data);
-            throw new Error("Invalid response from chat completion");
-          }
+        if (error) throw error;
+        if (!data?.content) throw new Error("Invalid response from chat completion");
 
-          const assistantMessage: Message = {
-            role: "assistant",
-            content: data.content
-          };
-          
-          setMessages((prev) => [...prev, assistantMessage]);
-          setShowFilePreview(true);
-          toast.success("Solver analysis completed");
-        } catch (error) {
-          console.error("Error processing file:", error);
-          toast.error("Failed to process file");
-        }
+        const assistantMessage: Message = {
+          role: "assistant",
+          content: data.content
+        };
+        
+        setMessages((prev) => [...prev, assistantMessage]);
+        setShowFilePreview(true);
+        toast.success("Solver analysis completed");
       } else {
         const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
           body: { messages: [...messages, userMessage] }
         });
 
-        if (error) {
-          console.error("Supabase function error:", error);
-          throw error;
-        }
-
-        if (!data || !data.content) {
-          console.error("Invalid response format:", data);
-          throw new Error("Invalid response from chat completion");
-        }
+        if (error) throw error;
+        if (!data?.content) throw new Error("Invalid response from chat completion");
 
         const assistantMessage: Message = {
           role: "assistant",
@@ -181,64 +154,22 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
       
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col">
-          <Collapsible
-            open={isSelectionOpen}
-            onOpenChange={setIsSelectionOpen}
-            className="border-b"
-          >
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full flex items-center justify-between p-4 h-auto">
-                <span className="font-medium">Repository & File Selection</span>
-                {isSelectionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="p-4 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Select Repository</h3>
-                  <RepositoryCombobox
-                    repositories={repositories}
-                    onSelectRepository={handleRepoSelect}
-                  />
-                </div>
-                {selectedRepo && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Select File</h3>
-                    <div className="border rounded-lg max-h-48 overflow-y-auto">
-                      <FileTree files={fileStructure} onFileSelect={handleFileSelect} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          <RepositorySection
+            isSelectionOpen={isSelectionOpen}
+            setIsSelectionOpen={setIsSelectionOpen}
+            repositories={repositories}
+            selectedRepo={selectedRepo}
+            fileStructure={fileStructure}
+            onRepoSelect={handleRepoSelect}
+            onFileSelect={handleFileSelect}
+          />
 
-          <ScrollArea className="flex-1 px-4">
-            {messages.length === 0 && (
-              <ExamplePrompts onSelectPrompt={(prompt) => handleSendMessage(prompt)} />
-            )}
-            {messages.map((message, index) => (
-              <ChatMessage key={index} message={message} />
-            ))}
-          </ScrollArea>
-
-          {showFilePreview && generatedFileContent && (
-            <div className="p-4">
-              <Button
-                onClick={() => setShowFilePreview(!showFilePreview)}
-                variant="outline"
-                className="mb-2"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Toggle File Preview
-              </Button>
-              {showFilePreview && (
-                <pre className="p-4 bg-secondary rounded-lg overflow-x-auto">
-                  <code>{generatedFileContent}</code>
-                </pre>
-              )}
-            </div>
-          )}
+          <ChatContainer
+            messages={messages}
+            showFilePreview={showFilePreview}
+            generatedFileContent={generatedFileContent}
+            setShowFilePreview={setShowFilePreview}
+          />
 
           <ChatInput
             onSend={handleSendMessage}
