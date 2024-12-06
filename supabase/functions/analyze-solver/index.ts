@@ -11,6 +11,29 @@ const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
+const SYSTEM_MESSAGE = `You are an expert at analyzing and transforming optimization algorithms. Your task is to:
+
+1. First, analyze the provided solver code and explain your findings step by step
+2. Then, transform it to match our platform's requirements:
+   - Main function should accept (qubo_matrix: np.ndarray, parameters: dict = None)
+   - Return tuple: (best_solution, best_cost, costs_per_iteration, elapsed_time)
+3. Finally, verify logical equivalence by:
+   - Identifying key mathematical operations
+   - Ensuring optimization objectives remain unchanged
+   - Preserving the core algorithm steps
+
+Format your response like this:
+# Analysis
+[Your step-by-step analysis]
+
+# Transformed Code
+\`\`\`python
+[Your transformed code]
+\`\`\`
+
+# Verification Steps
+[Your verification steps]`;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -39,6 +62,8 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
+    console.log('Analyzing solver code with length:', code.length);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -50,11 +75,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert at analyzing solver code. Analyze the following code and provide:
-1. A summary of the solver's approach
-2. Key functions and their purposes
-3. Potential optimizations
-4. Integration requirements`
+            content: SYSTEM_MESSAGE
           },
           {
             role: 'user',
