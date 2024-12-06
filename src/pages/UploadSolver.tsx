@@ -80,12 +80,21 @@ export default function UploadSolver() {
 
         for (const line of lines) {
           if (line.trim() === '') continue;
-          if (line.trim() === '[DONE]') continue; // Skip the [DONE] message
+          
+          // Handle the [DONE] message without trying to parse it
+          if (line === 'data: [DONE]') {
+            console.log('Received DONE signal');
+            continue;
+          }
           
           if (line.startsWith('data: ')) {
             try {
-              const chunk = JSON.parse(line.slice(5));
-              console.log('Received chunk:', chunk); // Debug log
+              const jsonStr = line.slice(5);
+              // Skip empty data messages
+              if (jsonStr.trim() === '') continue;
+              
+              const chunk = JSON.parse(jsonStr);
+              console.log('Processing chunk:', chunk);
               
               if (chunk.choices?.[0]?.delta?.content) {
                 const content = chunk.choices[0].delta.content;
@@ -119,6 +128,7 @@ export default function UploadSolver() {
                   case 'code':
                     if (isInCodeBlock) {
                       codeBuffer += content;
+                      setTransformedCode(codeBuffer);
                     }
                     break;
                   case 'verification':
@@ -127,7 +137,7 @@ export default function UploadSolver() {
                 }
               }
             } catch (e) {
-              console.error('Error parsing chunk:', e, 'Line:', line);
+              console.error('Error parsing chunk:', e, 'Raw line:', line);
               // Continue processing other chunks even if one fails
               continue;
             }
