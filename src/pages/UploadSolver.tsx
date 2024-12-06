@@ -69,6 +69,7 @@ export default function UploadSolver() {
 
       let currentSection = '';
       let codeBuffer = '';
+      let isInCodeBlock = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -87,28 +88,38 @@ export default function UploadSolver() {
                 
                 if (content.includes('# Analysis')) {
                   currentSection = 'analysis';
+                  continue;
                 } else if (content.includes('# Transformed Code')) {
                   currentSection = 'code';
+                  continue;
                 } else if (content.includes('# Verification Steps')) {
                   currentSection = 'verification';
-                } else {
-                  switch (currentSection) {
-                    case 'analysis':
-                      setAnalysis(prev => prev + content);
-                      break;
-                    case 'code':
-                      if (content.includes('```python')) {
-                        codeBuffer = '';
-                      } else if (content.includes('```')) {
-                        setTransformedCode(codeBuffer);
-                      } else {
-                        codeBuffer += content;
-                      }
-                      break;
-                    case 'verification':
-                      setVerificationSteps(prev => prev + content);
-                      break;
+                  continue;
+                }
+
+                if (content.includes('```python')) {
+                  isInCodeBlock = true;
+                  continue;
+                } else if (content.includes('```')) {
+                  isInCodeBlock = false;
+                  if (currentSection === 'code') {
+                    setTransformedCode(codeBuffer);
                   }
+                  continue;
+                }
+
+                switch (currentSection) {
+                  case 'analysis':
+                    setAnalysis(prev => prev + content);
+                    break;
+                  case 'code':
+                    if (isInCodeBlock) {
+                      codeBuffer += content;
+                    }
+                    break;
+                  case 'verification':
+                    setVerificationSteps(prev => prev + content);
+                    break;
                 }
               }
             } catch (e) {
