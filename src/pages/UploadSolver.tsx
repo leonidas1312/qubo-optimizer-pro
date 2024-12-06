@@ -1,15 +1,11 @@
 import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Progress } from "@/components/ui/progress";
-import { Loader2 } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
 import { BasicInfoForm } from "@/components/upload/BasicInfoForm";
 import { FileUploadSection } from "@/components/upload/FileUploadSection";
-import { CodeEditor } from "@/components/playground/editor/CodeEditor";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { AnalyzerHeader } from "@/components/upload/AnalyzerHeader";
+import { AnalyzerButton } from "@/components/upload/AnalyzerButton";
+import { AnalysisResults } from "@/components/upload/AnalysisResults";
 import { useSession } from '@supabase/auth-helpers-react';
 
 export default function UploadSolver() {
@@ -18,7 +14,8 @@ export default function UploadSolver() {
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisOutput, setAnalysisOutput] = useState("");
+  const [analysis, setAnalysis] = useState("");
+  const [verificationSteps, setVerificationSteps] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCode, setShowCode] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -37,7 +34,9 @@ export default function UploadSolver() {
     }
 
     setIsAnalyzing(true);
-    setAnalysisOutput("");
+    setAnalysis("");
+    setVerificationSteps("");
+    setTransformedCode("");
     setProgress(0);
     
     try {
@@ -58,7 +57,6 @@ export default function UploadSolver() {
         throw new Error(error.error || 'Failed to analyze solver');
       }
 
-      // Start progress animation
       progressInterval.current = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) return prev;
@@ -68,6 +66,9 @@ export default function UploadSolver() {
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No reader available');
+
+      let currentSection = '';
+      let codeBuffer = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -83,12 +84,31 @@ export default function UploadSolver() {
               const chunk = JSON.parse(line.slice(5));
               if (chunk.choices?.[0]?.delta?.content) {
                 const content = chunk.choices[0].delta.content;
-                setAnalysisOutput(prev => prev + content);
                 
-                // Extract transformed code if present
-                const codeMatch = content.match(/```python\n([\s\S]*?)```/);
-                if (codeMatch) {
-                  setTransformedCode(codeMatch[1]);
+                if (content.includes('# Analysis')) {
+                  currentSection = 'analysis';
+                } else if (content.includes('# Transformed Code')) {
+                  currentSection = 'code';
+                } else if (content.includes('# Verification Steps')) {
+                  currentSection = 'verification';
+                } else {
+                  switch (currentSection) {
+                    case 'analysis':
+                      setAnalysis(prev => prev + content);
+                      break;
+                    case 'code':
+                      if (content.includes('```python')) {
+                        codeBuffer = '';
+                      } else if (content.includes('```')) {
+                        setTransformedCode(codeBuffer);
+                      } else {
+                        codeBuffer += content;
+                      }
+                      break;
+                    case 'verification':
+                      setVerificationSteps(prev => prev + content);
+                      break;
+                  }
                 }
               }
             } catch (e) {
@@ -121,15 +141,7 @@ export default function UploadSolver() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
           <div className="space-y-6">
-            <div className="flex justify-end mb-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowCode(!showCode)}
-                className="flex items-center gap-2"
-              >
-                {showCode ? "Show Info" : "Show Code"}
-              </Button>
-            </div>
+            <AnalyzerHeader showCode={showCode} setShowCode={setShowCode} />
 
             {showCode ? (
               <FileUploadSection
@@ -146,58 +158,23 @@ export default function UploadSolver() {
               />
             )}
 
-            <Button 
-              onClick={analyzeSolver} 
+            <AnalyzerButton
+              isAnalyzing={isAnalyzing}
               disabled={isAnalyzing || !originalCode}
-              className="w-full"
-            >
-              {isAnalyzing ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Analyzing...
-                </div>
-              ) : (
-                "Analyze & Transform"
-              )}
-            </Button>
-
-            {isAnalyzing && (
-              <Progress value={progress} className="w-full" />
-            )}
+              onClick={analyzeSolver}
+              progress={progress}
+            />
           </div>
         </Card>
 
-        <div className="space-y-6">
-          <Card className="p-6">
-            <Tabs defaultValue="analysis">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="analysis">Analysis</TabsTrigger>
-                <TabsTrigger value="code">Transformed Code</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="analysis" className="mt-4">
-                <ScrollArea className="h-[600px] w-full rounded-md border p-4">
-                  <div className="prose prose-invert max-w-none">
-                    <ReactMarkdown>{analysisOutput}</ReactMarkdown>
-                  </div>
-                </ScrollArea>
-              </TabsContent>
-
-              <TabsContent value="code" className="mt-4">
-                <div className="space-y-4">
-                  <div className="border rounded-md overflow-hidden h-[600px]">
-                    <CodeEditor
-                      value={transformedCode}
-                      onChange={setTransformedCode}
-                      language="python"
-                      className="h-full"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </Card>
-        </div>
+        <Card className="p-6">
+          <AnalysisResults
+            analysis={analysis}
+            transformedCode={transformedCode}
+            setTransformedCode={setTransformedCode}
+            verificationSteps={verificationSteps}
+          />
+        </Card>
       </div>
     </div>
   );
