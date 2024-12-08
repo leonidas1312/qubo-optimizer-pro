@@ -147,6 +147,44 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     }
   };
 
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim()) return;
+
+    const userMessage: Message = {
+      role: "user",
+      content: content.trim(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      if (content.startsWith("/add_solver")) {
+        setActiveCommand("ADD_SOLVER");
+      } else if (content.startsWith("/add_dataset")) {
+        setActiveCommand("ADD_DATASET");
+      } else {
+        // Handle regular chat messages
+        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+          body: { messages: [...messages, userMessage] }
+        });
+
+        if (error) throw error;
+        if (!data?.content) throw new Error("Invalid response from chat completion");
+
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          content: data.content
+        }]);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to get response");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-full bg-background">
       <div className="w-[30%] border-r border-border flex flex-col">
