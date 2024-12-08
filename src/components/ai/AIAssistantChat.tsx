@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatHeader } from "./chat/ChatHeader";
 import { ChatContainer } from "./chat/ChatContainer";
 import { RepositorySection } from "./chat/RepositorySection";
 import { TransformedCode } from "./chat/TransformedCode";
-import { Message, Repository } from "./types";
-import { CommandType } from "./types/commands";
-import { AIResponse } from "./types/ai-types";
+import { Repository } from "./types";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useSession } from '@supabase/auth-helpers-react';
+import { useCommandHandler } from "./hooks/useCommandHandler";
+import { useRepositoryHandler } from "./hooks/useRepositoryHandler";
+import { useCodeTransformation } from "./hooks/useCodeTransformation";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -18,17 +17,35 @@ interface AIAssistantChatProps {
 }
 
 export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository }: AIAssistantChatProps) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [repositories, setRepositories] = useState<Repository[]>([]);
-  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
-  const [fileStructure, setFileStructure] = useState<any[]>([]);
-  const [activeCommand, setActiveCommand] = useState<CommandType | null>(null);
-  const [showFilePreview, setShowFilePreview] = useState(false);
-  const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
-  const [isSelectionOpen, setIsSelectionOpen] = useState(true);
-  const [transformedCode, setTransformedCode] = useState<string | null>(null);
-  const session = useSession();
+  const {
+    activeCommand,
+    setActiveCommand,
+    messages,
+    setMessages,
+    isLoading,
+    transformedCode,
+    setTransformedCode,
+    handleSendMessage,
+  } = useCommandHandler();
+
+  const {
+    repositories,
+    setRepositories,
+    selectedRepo,
+    fileStructure,
+    isSelectionOpen,
+    setIsSelectionOpen,
+    generatedFileContent,
+    showFilePreview,
+    setShowFilePreview,
+    handleRepoSelect,
+    handleFileSelect,
+  } = useRepositoryHandler();
+
+  const {
+    handleFinalize,
+    handleApproveChanges,
+  } = useCodeTransformation(messages, setMessages);
 
   useEffect(() => {
     const fetchRepositories = async () => {
@@ -47,142 +64,17 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     fetchRepositories();
   }, []);
 
-  const handleRepoSelect = async (repo: Repository) => {
-    try {
-      setSelectedRepo(repo);
-      onSelectRepository(repo);
-      const response = await fetch(
-        `http://localhost:8000/api/github/repos/${repo.owner.login}/${repo.name}/tree`,
-        { credentials: 'include' }
-      );
-      if (!response.ok) throw new Error('Failed to fetch file structure');
-      const structure = await response.json();
-      setFileStructure(structure);
-      toast.success('Repository files loaded successfully');
-    } catch (error) {
-      toast.error('Failed to load repository files');
-      console.error('Error fetching file structure:', error);
+  const handleFinalizeWrapper = async () => {
+    const transformed = await handleFinalize(generatedFileContent);
+    if (transformed) {
+      setTransformedCode(transformed);
     }
   };
 
-  const handleFileSelect = async (path: string) => {
-    try {
-      if (!selectedRepo) {
-        toast.error("Please select a repository first");
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:8000/api/github/repos/${selectedRepo.owner.login}/${selectedRepo.name}/contents/${path}`,
-        { credentials: 'include' }
-      );
-      
-      if (!response.ok) throw new Error('Failed to fetch file content');
-      
-      const data = await response.json();
-      const content = atob(data.content);
-      setGeneratedFileContent(content);
-      toast.success('File loaded successfully');
-    } catch (error) {
-      toast.error('Failed to load file content');
-      console.error('Error fetching file:', error);
-    }
-  };
-
-  const handleFinalize = async () => {
-    if (!generatedFileContent) {
-      toast.error("Please select a file first");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-        body: { 
-          messages: [
-            ...messages,
-            {
-              role: "system",
-              content: "Transform the following code to match our solver guidelines. Explain the changes made."
-            },
-            {
-              role: "user",
-              content: generatedFileContent
-            }
-          ],
-          command: activeCommand,
-        }
-      });
-
-      if (error) throw error;
-      if (!data?.content) throw new Error("Invalid response from chat completion");
-
-      setTransformedCode(data.content);
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: "I've transformed your code according to our guidelines. Please review the changes on the right."
-      }]);
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to transform code");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleApproveChanges = async () => {
-    if (!transformedCode || !selectedRepo || !selectedFile) {
-      toast.error("Missing required information");
-      return;
-    }
-
-    try {
-      // Here you would implement the logic to save the transformed code
-      toast.success("Changes approved! The solver has been saved.");
-      setActiveCommand(null);
-      setTransformedCode(null);
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to save changes");
-    }
-  };
-
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return;
-
-    const userMessage: Message = {
-      role: "user",
-      content: content.trim(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-
-    try {
-      if (content.startsWith("/add_solver")) {
-        setActiveCommand("ADD_SOLVER");
-      } else if (content.startsWith("/add_dataset")) {
-        setActiveCommand("ADD_DATASET");
-      } else {
-        // Handle regular chat messages
-        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-          body: { messages: [...messages, userMessage] }
-        });
-
-        if (error) throw error;
-        if (!data?.content) throw new Error("Invalid response from chat completion");
-
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: data.content
-        }]);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to get response");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleApproveChangesWrapper = async () => {
+    await handleApproveChanges(transformedCode, selectedFile);
+    setActiveCommand(null);
+    setTransformedCode(null);
   };
 
   return (
@@ -213,13 +105,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             onFileSelect={handleFileSelect}
             isSelectionOpen={isSelectionOpen}
             setIsSelectionOpen={setIsSelectionOpen}
-            onFinalize={handleFinalize}
+            onFinalize={handleFinalizeWrapper}
           />
         )}
         {activeCommand === 'ADD_SOLVER' && transformedCode && (
           <TransformedCode
             code={transformedCode}
-            onApprove={handleApproveChanges}
+            onApprove={handleApproveChangesWrapper}
           />
         )}
         {activeCommand === 'ADD_DATASET' && (
