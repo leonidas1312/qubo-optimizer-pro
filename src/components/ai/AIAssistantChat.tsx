@@ -26,6 +26,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [activeCommand, setActiveCommand] = useState<CommandType | null>(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
+  const [isSelectionOpen, setIsSelectionOpen] = useState(true);
   const session = useSession();
 
   useEffect(() => {
@@ -163,6 +164,8 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             fileStructure={fileStructure}
             onRepoSelect={handleRepoSelect}
             onFileSelect={handleFileSelect}
+            isSelectionOpen={isSelectionOpen}
+            setIsSelectionOpen={setIsSelectionOpen}
           />
         )}
         {activeCommand === 'ADD_DATASET' && (

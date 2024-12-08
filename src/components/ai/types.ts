@@ -34,3 +34,11 @@ export interface ChatContainerProps {
   setShowFilePreview: (show: boolean) => void;
   onSendMessage: (content: string) => void;
 }
+
+export interface RepositorySectionProps {
+  repositories: Repository[];
+  selectedRepo: Repository | null;
+  fileStructure: any[];
+  onRepoSelect: (repo: Repository) => void;
+  onFileSelect: (path: string) => void;
+}

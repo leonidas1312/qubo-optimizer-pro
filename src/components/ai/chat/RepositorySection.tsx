@@ -6,23 +6,23 @@ import { ChevronDown, ChevronUp, FolderGit2, FileCode2 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface RepositorySectionProps {
-  isSelectionOpen: boolean;
-  setIsSelectionOpen: (open: boolean) => void;
   repositories: Repository[];
   selectedRepo: Repository | null;
   fileStructure: any[];
   onRepoSelect: (repo: Repository) => void;
   onFileSelect: (path: string) => void;
+  isSelectionOpen: boolean;
+  setIsSelectionOpen: (open: boolean) => void;
 }
 
 export const RepositorySection = ({
-  isSelectionOpen,
-  setIsSelectionOpen,
   repositories,
   selectedRepo,
   fileStructure,
   onRepoSelect,
   onFileSelect,
+  isSelectionOpen,
+  setIsSelectionOpen,
 }: RepositorySectionProps) => {
   return (
     <Collapsible
