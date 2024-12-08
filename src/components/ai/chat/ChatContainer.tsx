@@ -22,30 +22,31 @@ export const ChatContainer = ({
   onSendMessage,
 }: ChatContainerProps) => {
   return (
-    <ScrollArea className="flex-1 px-6">
-      {messages.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="py-8"
-        >
-          <div className="text-center mb-8">
-            <h3 className="text-lg font-semibold mb-2">Welcome to AI Assistant! 👋</h3>
-            <p className="text-muted-foreground">
-              Select a file from your repository and start a conversation. 
-              I can help you understand, modify, or optimize your code.
-            </p>
+    <ScrollArea className="flex-1">
+      <div className="p-4 space-y-4">
+        {messages.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-6"
+          >
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-2">Welcome to AI Assistant! 👋</h3>
+              <p className="text-muted-foreground">
+                Try these commands to get started:
+              </p>
+            </div>
+            <ExamplePrompts onSelectPrompt={(prompt) => onSendMessage(prompt)} />
+          </motion.div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message, index) => (
+              <ChatMessage key={index} message={message} />
+            ))}
           </div>
-          <ExamplePrompts onSelectPrompt={(prompt) => onSendMessage(prompt)} />
-        </motion.div>
-      ) : (
-        <div className="py-6 space-y-6">
-          {messages.map((message, index) => (
-            <ChatMessage key={index} message={message} />
-          ))}
-        </div>
-      )}
+        )}
+      </div>
       {showFilePreview && generatedFileContent && (
         <FilePreview
           content={generatedFileContent}

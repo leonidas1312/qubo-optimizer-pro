@@ -4,6 +4,7 @@ import { ChatHeader } from "./chat/ChatHeader";
 import { ChatContainer } from "./chat/ChatContainer";
 import { RepositorySection } from "./chat/RepositorySection";
 import { Message, Repository } from "./types";
+import { CommandType } from "./types/commands";
 import { AIResponse } from "./types/ai-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,9 +23,9 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [fileStructure, setFileStructure] = useState<any[]>([]);
+  const [activeCommand, setActiveCommand] = useState<CommandType | null>(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
-  const [isSelectionOpen, setIsSelectionOpen] = useState(true);
   const session = useSession();
 
   useEffect(() => {
@@ -98,48 +99,34 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     setIsLoading(true);
 
     try {
-      if (content.startsWith("ADD SOLVER") && selectedRepo && generatedFileContent) {
-        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-          body: { 
-            messages: [
-              ...messages, 
-              userMessage,
-              {
-                role: "system",
-                content: SOLVER_SYSTEM_MESSAGE(generatedFileContent)
-              }
-            ],
-            command: "ADD_SOLVER",
-            fileContent: generatedFileContent
-          }
-        });
-
-        if (error) throw error;
-        if (!data?.content) throw new Error("Invalid response from chat completion");
-
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.content
-        };
-        
-        setMessages((prev) => [...prev, assistantMessage]);
-        setShowFilePreview(true);
-        toast.success("Solver analysis completed");
-      } else {
-        const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
-          body: { messages: [...messages, userMessage] }
-        });
-
-        if (error) throw error;
-        if (!data?.content) throw new Error("Invalid response from chat completion");
-
-        const assistantMessage: Message = {
-          role: "assistant",
-          content: data.content
-        };
-        
-        setMessages((prev) => [...prev, assistantMessage]);
+      // Handle commands
+      if (content.toUpperCase().startsWith('ADD SOLVER')) {
+        setActiveCommand('ADD_SOLVER');
+      } else if (content.toUpperCase().startsWith('ADD DATASET')) {
+        setActiveCommand('ADD_DATASET');
+      } else if (content.toUpperCase().startsWith('USE SOLVER')) {
+        setActiveCommand('USE_SOLVER');
+      } else if (content.toUpperCase().startsWith('USE DATASET')) {
+        setActiveCommand('USE_DATASET');
       }
+
+      const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
+        body: { 
+          messages: [...messages, userMessage],
+          command: activeCommand,
+          fileContent: generatedFileContent
+        }
+      });
+
+      if (error) throw error;
+      if (!data?.content) throw new Error("Invalid response from chat completion");
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.content
+      };
+      
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get AI response");
@@ -149,35 +136,62 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <ChatHeader selectedFile={selectedFile} selectedRepo={selectedRepo?.name} />
-      
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full flex flex-col">
+    <div className="flex h-full bg-background">
+      {/* Chat Section (30%) */}
+      <div className="w-[30%] border-r border-border flex flex-col">
+        <ChatHeader selectedFile={selectedFile} selectedRepo={selectedRepo?.name} />
+        <ChatContainer
+          messages={messages}
+          showFilePreview={showFilePreview}
+          generatedFileContent={generatedFileContent}
+          setShowFilePreview={setShowFilePreview}
+          onSendMessage={handleSendMessage}
+        />
+        <ChatInput
+          onSend={handleSendMessage}
+          isLoading={isLoading}
+          placeholder="Type a command or ask for help..."
+        />
+      </div>
+
+      {/* Dynamic Content Section (70%) */}
+      <div className="w-[70%] p-6">
+        {activeCommand === 'ADD_SOLVER' && (
           <RepositorySection
-            isSelectionOpen={isSelectionOpen}
-            setIsSelectionOpen={setIsSelectionOpen}
             repositories={repositories}
             selectedRepo={selectedRepo}
             fileStructure={fileStructure}
             onRepoSelect={handleRepoSelect}
             onFileSelect={handleFileSelect}
           />
-
-          <ChatContainer
-            messages={messages}
-            showFilePreview={showFilePreview}
-            generatedFileContent={generatedFileContent}
-            setShowFilePreview={setShowFilePreview}
-            onSendMessage={handleSendMessage}
-          />
-
-          <ChatInput
-            onSend={handleSendMessage}
-            isLoading={isLoading}
-            placeholder="Type 'ADD_SOLVER' to create a solver, or ask for help..."
-          />
-        </div>
+        )}
+        {activeCommand === 'ADD_DATASET' && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Upload Dataset</h2>
+            <p className="text-muted-foreground">
+              Upload your QUBO matrix file (.npy or .xlsx)
+            </p>
+            {/* Add MatrixUpload component here */}
+          </div>
+        )}
+        {activeCommand === 'USE_SOLVER' && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Select Solver</h2>
+            <p className="text-muted-foreground">
+              Choose from available solvers
+            </p>
+            {/* Add SolverSelector component here */}
+          </div>
+        )}
+        {activeCommand === 'USE_DATASET' && (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Select Dataset</h2>
+            <p className="text-muted-foreground">
+              Choose from available datasets
+            </p>
+            {/* Add DatasetSelector component here */}
+          </div>
+        )}
       </div>
     </div>
   );
