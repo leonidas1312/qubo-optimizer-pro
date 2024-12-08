@@ -13,6 +13,7 @@ interface RepositorySectionProps {
   onFileSelect: (path: string) => void;
   isSelectionOpen: boolean;
   setIsSelectionOpen: (open: boolean) => void;
+  onFinalize?: () => void;
 }
 
 export const RepositorySection = ({
@@ -23,12 +24,13 @@ export const RepositorySection = ({
   onFileSelect,
   isSelectionOpen,
   setIsSelectionOpen,
+  onFinalize,
 }: RepositorySectionProps) => {
   return (
     <Collapsible
       open={isSelectionOpen}
       onOpenChange={setIsSelectionOpen}
-      className="border-b bg-card/50 backdrop-blur-sm"
+      className="w-full space-y-4"
     >
       <CollapsibleTrigger asChild>
         <Button variant="ghost" className="w-full flex items-center justify-between p-4 h-auto">
@@ -39,30 +41,36 @@ export const RepositorySection = ({
           {isSelectionOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="p-4 space-y-4">
+      <CollapsibleContent className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium flex items-center gap-2">
+            <FolderGit2 className="h-4 w-4" />
+            Select Repository
+          </label>
+          <RepositoryCombobox
+            repositories={repositories}
+            onSelectRepository={onRepoSelect}
+          />
+        </div>
+        {selectedRepo && (
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
-              <FolderGit2 className="h-4 w-4" />
-              Select Repository
+              <FileCode2 className="h-4 w-4" />
+              Select File
             </label>
-            <RepositoryCombobox
-              repositories={repositories}
-              onSelectRepository={onRepoSelect}
-            />
-          </div>
-          {selectedRepo && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <FileCode2 className="h-4 w-4" />
-                Select File
-              </label>
-              <div className="border rounded-lg max-h-48 overflow-y-auto bg-background/50">
-                <FileTree files={fileStructure} onFileSelect={onFileSelect} />
-              </div>
+            <div className="border rounded-lg max-h-[400px] overflow-y-auto bg-background/50">
+              <FileTree files={fileStructure} onFileSelect={onFileSelect} />
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        {selectedRepo && (
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700"
+            onClick={onFinalize}
+          >
+            Finalize Selection
+          </Button>
+        )}
       </CollapsibleContent>
     </Collapsible>
   );

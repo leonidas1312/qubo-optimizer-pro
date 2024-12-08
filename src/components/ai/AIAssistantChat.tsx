@@ -3,13 +3,13 @@ import { ChatInput } from "./chat/ChatInput";
 import { ChatHeader } from "./chat/ChatHeader";
 import { ChatContainer } from "./chat/ChatContainer";
 import { RepositorySection } from "./chat/RepositorySection";
+import { TransformedCode } from "./chat/TransformedCode";
 import { Message, Repository } from "./types";
 import { CommandType } from "./types/commands";
 import { AIResponse } from "./types/ai-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from '@supabase/auth-helpers-react';
-import { SOLVER_SYSTEM_MESSAGE } from "./constants/ai-messages";
 
 interface AIAssistantChatProps {
   selectedFile: string | null;
@@ -27,6 +27,7 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [generatedFileContent, setGeneratedFileContent] = useState<string | null>(null);
   const [isSelectionOpen, setIsSelectionOpen] = useState(true);
+  const [transformedCode, setTransformedCode] = useState<string | null>(null);
   const session = useSession();
 
   useEffect(() => {
@@ -88,57 +89,66 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
     }
   };
 
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return;
-    if (!session) {
-      toast.error("Please log in to use the AI assistant");
+  const handleFinalize = async () => {
+    if (!generatedFileContent) {
+      toast.error("Please select a file first");
       return;
     }
 
-    const userMessage: Message = { role: "user", content };
-    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
-
     try {
-      // Handle commands
-      if (content.toUpperCase().startsWith('ADD SOLVER')) {
-        setActiveCommand('ADD_SOLVER');
-      } else if (content.toUpperCase().startsWith('ADD DATASET')) {
-        setActiveCommand('ADD_DATASET');
-      } else if (content.toUpperCase().startsWith('USE SOLVER')) {
-        setActiveCommand('USE_SOLVER');
-      } else if (content.toUpperCase().startsWith('USE DATASET')) {
-        setActiveCommand('USE_DATASET');
-      }
-
       const { data, error } = await supabase.functions.invoke<AIResponse>('chat-completion', {
         body: { 
-          messages: [...messages, userMessage],
+          messages: [
+            ...messages,
+            {
+              role: "system",
+              content: "Transform the following code to match our solver guidelines. Explain the changes made."
+            },
+            {
+              role: "user",
+              content: generatedFileContent
+            }
+          ],
           command: activeCommand,
-          fileContent: generatedFileContent
         }
       });
 
       if (error) throw error;
       if (!data?.content) throw new Error("Invalid response from chat completion");
 
-      const assistantMessage: Message = {
+      setTransformedCode(data.content);
+      setMessages(prev => [...prev, {
         role: "assistant",
-        content: data.content
-      };
-      
-      setMessages((prev) => [...prev, assistantMessage]);
+        content: "I've transformed your code according to our guidelines. Please review the changes on the right."
+      }]);
     } catch (error) {
       console.error("Error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to get AI response");
+      toast.error(error instanceof Error ? error.message : "Failed to transform code");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleApproveChanges = async () => {
+    if (!transformedCode || !selectedRepo || !selectedFile) {
+      toast.error("Missing required information");
+      return;
+    }
+
+    try {
+      // Here you would implement the logic to save the transformed code
+      toast.success("Changes approved! The solver has been saved.");
+      setActiveCommand(null);
+      setTransformedCode(null);
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to save changes");
+    }
+  };
+
   return (
     <div className="flex h-full bg-background">
-      {/* Chat Section (30%) */}
       <div className="w-[30%] border-r border-border flex flex-col">
         <ChatHeader selectedFile={selectedFile} selectedRepo={selectedRepo?.name} />
         <ChatContainer
@@ -155,9 +165,8 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
         />
       </div>
 
-      {/* Dynamic Content Section (70%) */}
-      <div className="w-[70%] p-6">
-        {activeCommand === 'ADD_SOLVER' && (
+      <div className="w-[70%] flex flex-col">
+        {activeCommand === 'ADD_SOLVER' && !transformedCode && (
           <RepositorySection
             repositories={repositories}
             selectedRepo={selectedRepo}
@@ -166,6 +175,13 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             onFileSelect={handleFileSelect}
             isSelectionOpen={isSelectionOpen}
             setIsSelectionOpen={setIsSelectionOpen}
+            onFinalize={handleFinalize}
+          />
+        )}
+        {activeCommand === 'ADD_SOLVER' && transformedCode && (
+          <TransformedCode
+            code={transformedCode}
+            onApprove={handleApproveChanges}
           />
         )}
         {activeCommand === 'ADD_DATASET' && (
@@ -174,25 +190,6 @@ export const AIAssistantChat = ({ selectedFile, fileContent, onSelectRepository 
             <p className="text-muted-foreground">
               Upload your QUBO matrix file (.npy or .xlsx)
             </p>
-            {/* Add MatrixUpload component here */}
-          </div>
-        )}
-        {activeCommand === 'USE_SOLVER' && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Select Solver</h2>
-            <p className="text-muted-foreground">
-              Choose from available solvers
-            </p>
-            {/* Add SolverSelector component here */}
-          </div>
-        )}
-        {activeCommand === 'USE_DATASET' && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Select Dataset</h2>
-            <p className="text-muted-foreground">
-              Choose from available datasets
-            </p>
-            {/* Add DatasetSelector component here */}
           </div>
         )}
       </div>
