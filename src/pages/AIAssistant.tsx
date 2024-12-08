@@ -1,6 +1,5 @@
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
 import { useState } from "react";
+import { AIAssistantChat } from "@/components/ai/AIAssistantChat";
 import { toast } from "sonner";
 import { Repository } from "@/components/ai/types";
 
