@@ -35,7 +35,7 @@ export const useCodeTransformation = (messages: Message[], setMessages: (message
       if (error) throw error;
       if (!data?.content) throw new Error("Invalid response from chat completion");
 
-      setMessages(prev => [...prev, {
+      setMessages([...messages, {
         role: "assistant",
         content: "I've transformed your code according to our guidelines. Please review the changes on the right."
       }]);
