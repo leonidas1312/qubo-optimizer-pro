@@ -1,77 +1,70 @@
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { MessageSquarePlus, Code, Wand2 } from "lucide-react";
 
 interface ExamplePromptsProps {
   onSelectPrompt: (prompt: string) => void;
 }
 
 export const ExamplePrompts = ({ onSelectPrompt }: ExamplePromptsProps) => {
-  const [visiblePromptIndex, setVisiblePromptIndex] = useState<number | null>(null);
-  const [prompts, setPrompts] = useState<string[]>([]);
-
-  const contextualPrompts = [
+  const examples = [
     {
-      trigger: "empty",
+      icon: <Code className="w-4 h-4" />,
+      title: "Code Analysis",
       prompts: [
-        "ADD SOLVER my_solver.py",
-        "How can I optimize my QUBO matrix?",
-        "Show me how to implement simulated annealing",
+        "Explain this code to me",
+        "What could be improved in this implementation?",
+        "How can I make this code more efficient?",
       ]
     },
     {
-      trigger: "code",
+      icon: <Wand2 className="w-4 h-4" />,
+      title: "Code Generation",
       prompts: [
-        "Can you explain this code section?",
+        "ADD SOLVER my_solver.py",
+        "Help me implement error handling",
+        "Generate unit tests for this code",
+      ]
+    },
+    {
+      icon: <MessageSquarePlus className="w-4 h-4" />,
+      title: "General Help",
+      prompts: [
+        "What's the best practice for this pattern?",
         "How can I optimize this algorithm?",
-        "What are the potential issues in this implementation?",
+        "Suggest some improvements for this code",
       ]
     }
   ];
 
-  useEffect(() => {
-    setPrompts(contextualPrompts[0].prompts);
-    
-    const interval = setInterval(() => {
-      setVisiblePromptIndex((prev) => {
-        if (prev === null) return 0;
-        if (prev >= prompts.length - 1) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [prompts.length]);
-
   return (
-    <div className="p-4 space-y-3">
-      <p className="text-sm text-muted-foreground">Try asking:</p>
-      <div className="flex flex-wrap gap-2">
-        <AnimatePresence>
-          {prompts.map((prompt, index) => (
-            visiblePromptIndex !== null && index <= visiblePromptIndex && (
-              <motion.div
+    <div className="grid gap-6 px-2">
+      {examples.map((section, sectionIndex) => (
+        <motion.div
+          key={section.title}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: sectionIndex * 0.1 }}
+          className="space-y-3"
+        >
+          <div className="flex items-center gap-2 text-muted-foreground">
+            {section.icon}
+            <h4 className="text-sm font-medium">{section.title}</h4>
+          </div>
+          <div className="grid gap-2">
+            {section.prompts.map((prompt, index) => (
+              <Button
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+                variant="outline"
+                className="justify-start text-left h-auto py-2 px-3 hover:bg-purple-500/5 hover:text-purple-500"
+                onClick={() => onSelectPrompt(prompt)}
               >
-                <Button
-                  variant="outline"
-                  className="text-sm"
-                  onClick={() => onSelectPrompt(prompt)}
-                >
-                  {prompt}
-                </Button>
-              </motion.div>
-            )
-          ))}
-        </AnimatePresence>
-      </div>
+                <span className="text-sm">{prompt}</span>
+              </Button>
+            ))}
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 };
